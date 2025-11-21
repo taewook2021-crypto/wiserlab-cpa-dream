@@ -49,15 +49,6 @@ const HeroSection = () => {
                 Summit 기반 성적구조 시스템을 구축합니다.
               </p>
             </div>
-            
-            <div className="flex gap-4 pt-8">
-              <Button size="lg" className="text-base">
-                모의고사 신청
-              </Button>
-              <Button variant="outline" size="lg" className="text-base">
-                자세히 보기
-              </Button>
-            </div>
           </div>
         </div>
       </div>

@@ -7,9 +7,9 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <h2 className="text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
-              CPA 시험 준비의
+              The New Structure.
               <br />
-              새로운 기준.
+              Navigate Toward a New Mastery.
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
               Perfect Your Performance.

@@ -5,15 +5,23 @@ const HeroSection = () => {
     <section className="min-h-screen flex items-center pt-20">
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
-            <h2 className="text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
-              The New Structure.
+          <div className="space-y-8 flex flex-col justify-between min-h-[600px]">
+            <div className="space-y-8">
+              <h2 className="text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
+                The New Structure.
+                <br />
+                Navigate Toward a New Mastery.
+              </h2>
+              <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
+                Perfect Your Performance.
+              </p>
+            </div>
+            
+            <blockquote className="text-lg italic text-foreground/80 leading-relaxed max-w-lg">
+              The signal becomes visible only when the noise collapses,
               <br />
-              Navigate Toward a New Mastery.
-            </h2>
-            <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
-              Perfect Your Performance.
-            </p>
+              and the students of WeiserLab rise at the moment the structure becomes clear.
+            </blockquote>
           </div>
           
           <div className="space-y-8">

@@ -4,7 +4,7 @@ const Footer = () => {
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div>
-            <h2 className="text-2xl font-bold mb-2">와이저랩</h2>
+            <h2 className="text-2xl font-bold mb-2">Wiser Lab</h2>
             <p className="text-sm text-muted-foreground">
               CPA 시험 준비의 새로운 기준
             </p>
@@ -37,7 +37,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>© 2024 와이저랩. All rights reserved.</p>
+          <p>© 2024 Wiser Lab. All rights reserved.</p>
         </div>
       </div>
     </footer>

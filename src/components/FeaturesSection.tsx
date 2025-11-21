@@ -22,7 +22,7 @@ const FeaturesSection = () => {
     <section id="features" className="py-32 bg-secondary/30">
       <div className="container mx-auto px-6">
         <h3 className="text-5xl font-bold mb-20 text-center">
-          와이저랩의 차별점
+          Wiser Lab의 차별점
         </h3>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (

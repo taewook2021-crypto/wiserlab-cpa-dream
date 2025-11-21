@@ -32,22 +32,25 @@ const HeroSection = () => {
               <p className="text-lg leading-relaxed">
                 공인회계사 시험의 시간가치와 성과가치의 극단적 비대칭성을 이해하고,
               </p>
-              <p className="text-lg leading-relaxed">
+              
+              <p className="text-lg leading-relaxed mt-8">
                 수많은 시간을 견뎌내더라도
               </p>
               <p className="text-lg leading-relaxed">
-                끝내 정점(Summit) 에 도달하는 학생은 극히 일부뿐인
+                끝내 정점(Summit)에 도달하는 학생은 극히 일부뿐인
               </p>
               <p className="text-lg leading-relaxed">
                 냉혹한 실전 구조를 직시합니다.
               </p>
-              <p className="text-lg leading-relaxed">
+              
+              <p className="text-lg leading-relaxed mt-8">
                 우리는 강의와 콘텐츠의 단순한 배열을 넘어
               </p>
               <p className="text-lg leading-relaxed">
                 출제의 본질을 정점의 관점에서 재해석함으로써
               </p>
-              <p className="text-lg leading-relaxed">
+              
+              <p className="text-lg leading-relaxed mt-8">
                 학생 각자의 잠재된 Hidden Score를
               </p>
               <p className="text-lg leading-relaxed">

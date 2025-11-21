@@ -20,14 +20,14 @@ const HeroSection = () => {
             <blockquote className="text-lg italic text-foreground/80 leading-relaxed max-w-lg">
               The signal becomes visible only when the noise collapses,
               <br />
-              and the students of WeiserLab rise at the moment the structure becomes clear.
+              and the students of Wiser Lab rise at the moment the structure becomes clear.
             </blockquote>
           </div>
           
           <div className="space-y-8">
             <div className="space-y-6 text-foreground">
               <p className="text-lg leading-relaxed">
-                와이저랩은
+                Wiser Lab은
               </p>
               <p className="text-lg leading-relaxed">
                 공인회계사 시험의 시간가치와 성과가치의 극단적 비대칭성을 이해하고,

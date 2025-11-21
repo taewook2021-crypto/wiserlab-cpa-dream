@@ -18,7 +18,7 @@ const Header = () => {
       <div className="container mx-auto px-6 py-4">
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-12">
-            <h1 className="text-2xl font-bold tracking-tight">와이저랩</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Wiser Lab</h1>
             <div className="hidden md:flex items-center space-x-8">
               {navLinks.map((link) => (
                 <a

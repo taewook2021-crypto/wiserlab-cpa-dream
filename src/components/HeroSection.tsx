@@ -7,7 +7,7 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8 flex flex-col justify-between min-h-[600px]">
             <div className="space-y-8">
-              <h2 className="text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
+              <h2 className="text-6xl lg:text-7xl font-semibold leading-tight tracking-tight">
                 The New Structure.
                 <br />
                 Navigate Toward a New Mastery.

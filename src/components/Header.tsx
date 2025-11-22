@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -18,7 +19,12 @@ const Header = () => {
       <div className="container mx-auto px-6 py-4">
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-12">
-            <h1 className="text-2xl font-bold tracking-tight">Wiser Lab</h1>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-2">
+                <img src={logo} alt="Wiser Lab" className="w-full h-full object-contain invert" />
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight">Wiser Lab</h1>
+            </div>
             <div className="hidden md:flex items-center space-x-8">
               {navLinks.map((link) => (
                 <a

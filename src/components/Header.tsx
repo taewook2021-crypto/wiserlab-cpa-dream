@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-black.png";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -24,7 +24,7 @@ const Header = () => {
                 <img 
                   src={logo} 
                   alt="Wiser Lab" 
-                  className="w-full h-full object-contain brightness-0"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <h1 className="text-2xl font-bold tracking-tight">Wiser Lab</h1>

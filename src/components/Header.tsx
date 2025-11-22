@@ -20,12 +20,11 @@ const Header = () => {
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-12">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center p-2" style={{ backgroundColor: '#FFFFFF' }}>
+              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center p-2">
                 <img 
                   src={logo} 
                   alt="Wiser Lab" 
-                  className="w-full h-full object-contain" 
-                  style={{ filter: 'brightness(0)' }} 
+                  className="w-full h-full object-contain brightness-0"
                 />
               </div>
               <h1 className="text-2xl font-bold tracking-tight">Wiser Lab</h1>

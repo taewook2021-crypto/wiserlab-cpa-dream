@@ -1,63 +1,77 @@
 import { Button } from "@/components/ui/button";
+import mountainHero from "@/assets/mountain-hero.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="min-h-screen flex items-center pt-20">
-      <div className="container mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8 flex flex-col justify-between min-h-[600px]">
+    <section className="min-h-screen pt-16">
+      {/* Hero Image Section */}
+      <div className="relative h-[60vh] bg-black overflow-hidden">
+        <img 
+          src={mountainHero} 
+          alt="Mountain Peak" 
+          className="w-full h-full object-cover opacity-70"
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Button 
+            variant="outline" 
+            size="lg"
+            className="bg-transparent text-white border-white hover:bg-white hover:text-black transition-all duration-300 text-base px-8 py-6"
+          >
+            자세히보기
+          </Button>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="container mx-auto px-6 py-24">
+        <div className="grid lg:grid-cols-2 gap-24 items-start">
+          {/* Left Column */}
+          <div className="space-y-12">
             <div className="space-y-8">
-              <h2 className="text-6xl lg:text-7xl font-normal leading-tight tracking-tight">
-                The New Structure.
-                <br />
-                Navigate Toward a New Mastery.
+              <h2 className="text-sm uppercase tracking-widest text-muted-foreground">
+                공인회계사 / N수생에게
               </h2>
-              <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
-                Perfect Your Performance.
-              </p>
+              <h1 className="text-5xl lg:text-6xl font-light leading-tight">
+                시험 그 자체의 경험을
+                <br />
+                선물합니다.
+              </h1>
             </div>
             
-            <blockquote className="text-lg italic text-foreground/80 leading-relaxed max-w-lg">
-              The signal becomes visible only when the noise collapses,
-              <br />
-              and the students of Wiser Lab rise at the moment the structure becomes clear.
-            </blockquote>
+            <div className="space-y-4">
+              <h3 className="text-3xl font-normal">
+                Wiser Lab 전국 모의평가
+              </h3>
+              <h3 className="text-3xl font-normal">
+                Summit Program
+              </h3>
+            </div>
           </div>
           
-          <div className="space-y-8">
-            <div className="space-y-6 text-foreground">
-              <p className="text-lg leading-relaxed">
-                Wiser Lab은
-              </p>
-              <p className="text-lg leading-relaxed">
-                공인회계사 시험의 시간가치와 성과가치의 극단적 비대칭성을 이해하고,
+          {/* Right Column */}
+          <div className="space-y-8 text-foreground">
+            <div className="space-y-6 border-l-2 border-foreground pl-6">
+              <p className="text-base leading-relaxed">
+                ○ 평가된 문항 퀄리티의 시험지로 (남들보다 더 많이) 실전 연습하고 싶다.
               </p>
               
-              <p className="text-lg leading-relaxed mt-8">
-                수많은 시간을 견뎌내더라도
-              </p>
-              <p className="text-lg leading-relaxed">
-                끝내 정점(Summit)에 도달하는 학생은 극히 일부뿐인
-              </p>
-              <p className="text-lg leading-relaxed">
-                냉혹한 실전 구조를 직시합니다.
+              <p className="text-base leading-relaxed mt-8">
+                ○ 6·9월 평가원 성적표 외에도 (남들보다 더 많이) 전국단위의 정확한 성적표를 받고 싶다.
               </p>
               
-              <p className="text-lg leading-relaxed mt-8">
-                우리는 강의와 콘텐츠의 단순한 배열을 넘어
-              </p>
-              <p className="text-lg leading-relaxed">
-                출제의 본질을 정점의 관점에서 재해석함으로써
+              <div className="mt-8 space-y-2 text-sm text-muted-foreground">
+                <p className="font-semibold text-foreground">양질의 표본</p>
+                <p>Wiser Lab 재원생 + 전국 고3/N수생</p>
+              </div>
+              
+              <p className="text-sm leading-relaxed text-muted-foreground mt-6">
+                Wiser Lab 데이터를의 성적분석과 자원가능 대학 예측
+                <br />
+                수능 등급컷과 표준점수를 가장 정확하게 예측할 Wiser Lab 데이터를 제공
               </p>
               
-              <p className="text-lg leading-relaxed mt-8">
-                학생 각자의 잠재된 Hidden Score를
-              </p>
-              <p className="text-lg leading-relaxed">
-                실전의 확실한 결과로 끌어올리는
-              </p>
-              <p className="text-lg leading-relaxed font-semibold">
-                Summit 기반 성적구조 시스템을 구축합니다.
+              <p className="text-base leading-relaxed mt-8">
+                ○ 수시 / 정시 및 합숙전략 수립을 위한 내비게이션을 가지고 싶다.
               </p>
             </div>
           </div>

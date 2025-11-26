@@ -64,7 +64,7 @@ const HeroSection = () => {
                 <div className="space-y-3">
                   <h4 className="text-lg font-medium">SUMMIT의 정교한 점수 추정</h4>
                   <p className="text-base leading-relaxed text-muted-foreground">
-                    실제 수능 및 국/영/수 최고난도 시험 데이터를 다뤄 온 Wiser Lab이 개발하여 <strong className="text-foreground">가장 신뢰도 높은 등급 및 표준점수</strong>를 제공합니다.
+                    각 과목별 응시자들의 통계를 기반으로 <strong className="text-foreground">전국 등수를 제시</strong>하여 본인의 정확한 위치를 파악할 수 있습니다.
                   </p>
                 </div>
               </div>

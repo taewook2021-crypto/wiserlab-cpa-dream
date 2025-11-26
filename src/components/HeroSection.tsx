@@ -24,51 +24,51 @@ const HeroSection = () => {
 
       {/* Content Section */}
       <div className="container mx-auto px-6 py-24">
-        <div className="grid lg:grid-cols-2 gap-24 items-start">
+        <div className="grid lg:grid-cols-2 gap-20 items-start">
           {/* Left Column */}
-          <div className="space-y-12">
-            <div className="space-y-8">
-              <p className="text-xl font-light text-muted-foreground">공인회계사시험 수험생에게</p>
-              <h1 className="text-5xl lg:text-6xl font-light leading-tight">
-                3월 2일, 결전의 날.
-                <br />
-                그날의 압박감을 이겨낼
-                <br />
+          <div className="space-y-16">
+            <div className="space-y-12">
+              <h2 className="text-2xl font-light">공인회계사시험 수험생에게</h2>
+              <p className="text-4xl lg:text-5xl font-light leading-relaxed">
+                3월 2일, 결전의 날.<br />
+                그날의 압박감을 이겨낼<br />
                 &apos;실전 그 자체&apos;를 선물합니다.
-              </h1>
+              </p>
             </div>
             
-            <div className="space-y-4">
-              <h2 className="text-3xl font-normal">공인회계사 1차 모의고사</h2>
-              <h2 className="text-3xl font-normal">SUMMIT</h2>
+            <div className="space-y-2">
+              <h1 className="text-4xl lg:text-5xl font-normal">공인회계사 1차 모의고사</h1>
+              <h1 className="text-4xl lg:text-5xl font-normal">SUMMIT</h1>
             </div>
           </div>
           
           {/* Right Column */}
-          <div className="space-y-8 text-foreground">
-            <div className="space-y-10 border-l-2 border-foreground pl-6">
-              <div className="space-y-4">
-                <p className="text-base leading-relaxed">
+          <div className="space-y-10 text-foreground">
+            <div className="space-y-12">
+              <div className="space-y-3">
+                <p className="text-lg leading-relaxed">
                   ○ 책상 위 문제집이 아닌, <strong className="text-foreground">&apos;고사장 시험지 그 자체&apos;</strong>로 (남들보다 더 완벽하게) 실전 감각을 완성하고 싶다.
                 </p>
               </div>
               
-              <div className="space-y-4">
-                <p className="text-base leading-relaxed">
+              <div className="space-y-5">
+                <p className="text-lg leading-relaxed">
                   ○ 단순한 등수가 아닌, <strong className="text-foreground">서울대 데이터 기반의</strong> (남들보다 더 정확한) 합격 가능성을 확인하고 싶다.
                 </p>
-                <div className="pl-4 space-y-3 text-sm text-muted-foreground">
-                  <p className="leading-relaxed">
-                    <span className="font-medium text-foreground">양질의 표본</span> Wiser Lab 재원생 + 서울대학교 CPA 응시자 표본
-                  </p>
-                  <p className="leading-relaxed">
-                    <span className="font-medium text-foreground">Wiser Lab 데이터룸의 정밀 분석</span> 방대한 데이터를 다뤄온 Wiser Lab의 분석 노하우로 과목별 예상 합격자 평균 점수 제공
-                  </p>
+                <div className="pl-8 space-y-4 text-base">
+                  <div className="space-y-1">
+                    <p className="font-medium">양질의 표본</p>
+                    <p className="text-muted-foreground">Wiser Lab 재원생 + 서울대학교 CPA 응시자 표본</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
+                    <p className="text-muted-foreground">방대한 데이터를 다뤄온 Wiser Lab의 분석 노하우로 과목별 예상 합격자 평균 점수 제공</p>
+                  </div>
                 </div>
               </div>
               
-              <div className="space-y-4">
-                <p className="text-base leading-relaxed">
+              <div className="space-y-3">
+                <p className="text-lg leading-relaxed">
                   ○ <strong className="text-foreground">[재무회계] AI 시험지 생성기</strong>로 틀린 문제의 기출만 골라내어 (남들보다 더 효율적으로) 빈틈을 메우고 싶다.
                 </p>
               </div>

@@ -44,29 +44,36 @@ const HeroSection = () => {
           {/* Right Column */}
           <div className="space-y-8 text-foreground">
             <div className="space-y-8 border-l-2 border-foreground pl-6">
-              <h3 className="text-2xl font-normal">진짜 실력을 위한 압도적인 표본과 분석</h3>
-              
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <h4 className="text-lg font-medium">가장 실전적인 난이도와 유형</h4>
+                  <h4 className="text-lg font-medium">진짜 시험지와 동일한 형태, 단 1%의 괴리도 허용하지 않습니다.</h4>
                   <p className="text-base leading-relaxed text-muted-foreground">
-                    수험생들이 가장 어려워하고 놓치기 쉬운 부분을 정확히 반영하여 실제 시험장에서의 적응력을 극대화합니다.
+                    책이 아닌, 실제 시험장에서 만날 고사장용 OMR과 시험지 형태를 완벽 구현했습니다. 남은 기간 최적의 환경에서 실전 감각을 끌어올리세요.
                   </p>
                 </div>
                 
                 <div className="space-y-3">
-                  <h4 className="text-lg font-medium">서울대학교 데이터 기반 정교한 위치 확인</h4>
+                  <h4 className="text-lg font-medium">난이도 조절 없는 모의고사는 가짜 실전입니다.</h4>
                   <p className="text-base leading-relaxed text-muted-foreground">
-                    서울대 응시자들의 성적 데이터를 기반으로 <strong className="text-foreground">과목별 본인의 전국적 위치와 취약점을 가장 정확하게 파악</strong>하고, 남은 기간 학습 방향을 확실하게 잡을 수 있습니다.
+                    기존 모의고사처럼 &apos;단순히 어려운&apos; 문제가 아닌, 실제 CPA 시험의 출제 경향과 체감 난이도를 정교하게 반영했습니다. 가장 실전적인 난이도로 본인의 현재 위치를 정확히 파악하게 합니다.
                   </p>
                 </div>
                 
                 <div className="space-y-3">
-                  <h4 className="text-lg font-medium">SUMMIT의 정교한 점수 추정</h4>
+                  <h4 className="text-lg font-medium">서울대 데이터 기반, 가장 정확한 나의 위치 파악.</h4>
                   <p className="text-base leading-relaxed text-muted-foreground">
-                    각 과목별 응시자들의 통계를 기반으로 <strong className="text-foreground">전국 등수를 제시</strong>하여 본인의 정확한 위치를 파악할 수 있습니다.
+                    과목별 본인의 전국 석차와 취약점을 서울대 응시자 데이터 기반으로 분석합니다. 단순 등수가 아닌, 합격권에 얼마나 가까워졌는지 객관적인 데이터를 확인하세요.
                   </p>
                 </div>
+              </div>
+              
+              <div className="mt-12 pt-8 border-t border-border">
+                <p className="text-base leading-relaxed font-medium">
+                  [선택이 아닌 필수] 합격은 훈련의 결과입니다. 진짜 시험을 경험해야 진짜 실력이 완성됩니다.
+                </p>
+                <p className="text-base leading-relaxed text-muted-foreground mt-4">
+                  SUMMIT 모의고사와 함께 마지막 한 달을 가장 치열하고 완벽한 실전처럼 만드십시오.
+                </p>
               </div>
             </div>
           </div>

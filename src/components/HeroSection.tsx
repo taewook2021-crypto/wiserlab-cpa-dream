@@ -29,7 +29,7 @@ const HeroSection = () => {
             </div>
             
             <div className="space-y-4">
-              <h3 className="text-3xl font-normal">CPA 1차 모의고사</h3>
+              <h3 className="text-3xl font-normal">공인회계사 1차 모의고사</h3>
               <h3 className="text-3xl font-normal">Summit </h3>
             </div>
           </div>

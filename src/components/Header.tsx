@@ -8,33 +8,31 @@ const Header = () => {
   const [open, setOpen] = useState(false);
 
   const navLinks = [
-    { href: "#about", label: "소개" },
-    { href: "#features", label: "특징" },
-    { href: "#pricing", label: "가격" },
-    { href: "#contact", label: "문의" },
+    { href: "#about", label: "SURVIVAL PRO" },
+    { href: "#features", label: "SURVIVAL Contents" },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-6 py-4">
-        <nav className="flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/50">
+      <div className="container mx-auto px-6">
+        <nav className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-12">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center p-2">
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5">
                 <img 
                   src={logo} 
                   alt="Wiser Lab" 
                   className="w-full h-full object-contain"
                 />
               </div>
-              <h1 className="text-2xl font-bold tracking-tight">Wiser Lab</h1>
+              <h1 className="text-xl font-light tracking-wide">Wiser Lab</h1>
             </div>
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-10">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="text-sm text-foreground hover:text-primary transition-colors"
+                  className="text-sm text-foreground hover:text-muted-foreground transition-colors"
                 >
                   {link.label}
                 </a>
@@ -43,9 +41,14 @@ const Header = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <Button variant="default" size="sm" className="hidden md:inline-flex">
-              로그인
-            </Button>
+            <div className="hidden md:flex items-center gap-6">
+              <a href="#" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+                장바구니
+              </a>
+              <a href="#" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+                마이페이지
+              </a>
+            </div>
             
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild className="md:hidden">
@@ -60,14 +63,17 @@ const Header = () => {
                       key={link.href}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className="text-lg text-foreground hover:text-primary transition-colors"
+                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
                     >
                       {link.label}
                     </a>
                   ))}
-                  <Button variant="default" size="sm" className="w-full mt-4">
-                    로그인
-                  </Button>
+                  <a href="#" className="text-lg text-foreground hover:text-muted-foreground transition-colors">
+                    장바구니
+                  </a>
+                  <a href="#" className="text-lg text-foreground hover:text-muted-foreground transition-colors">
+                    마이페이지
+                  </a>
                 </div>
               </SheetContent>
             </Sheet>

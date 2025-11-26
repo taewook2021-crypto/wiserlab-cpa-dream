@@ -28,8 +28,8 @@ const HeroSection = () => {
           {/* Left Column */}
           <div className="space-y-16">
             <div className="space-y-12">
-              <h2 className="text-2xl font-light">공인회계사시험 수험생에게</h2>
-              <p className="text-4xl lg:text-5xl font-light leading-relaxed">
+              <h2 className="text-xl font-light tracking-tight">공인회계사시험 수험생에게</h2>
+              <p className="text-4xl lg:text-5xl font-normal leading-relaxed tracking-tight">
                 3월 2일, 결전의 날.<br />
                 그날의 압박감을 이겨낼<br />
                 &apos;실전 그 자체&apos;를 선물합니다.
@@ -37,8 +37,8 @@ const HeroSection = () => {
             </div>
             
             <div className="space-y-2">
-              <h1 className="text-4xl lg:text-5xl font-normal">공인회계사 1차 모의고사</h1>
-              <h1 className="text-4xl lg:text-5xl font-normal">SUMMIT</h1>
+              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight">공인회계사 1차 모의고사</h1>
+              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight">SUMMIT</h1>
             </div>
           </div>
           

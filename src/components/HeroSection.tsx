@@ -28,51 +28,48 @@ const HeroSection = () => {
           {/* Left Column */}
           <div className="space-y-12">
             <div className="space-y-8">
+              <p className="text-xl font-light text-muted-foreground">공인회계사시험 수험생에게</p>
               <h1 className="text-5xl lg:text-6xl font-light leading-tight">
-                시뮬레이션이 아닌,
+                3월 2일, 결전의 날.
                 <br />
-                &apos;실전 그 자체&apos;를 경험하라.
+                그날의 압박감을 이겨낼
+                <br />
+                &apos;실전 그 자체&apos;를 선물합니다.
               </h1>
             </div>
             
             <div className="space-y-4">
-              <h2 className="text-3xl font-normal">공인회계사 시험 1차 모의고사</h2>
+              <h2 className="text-3xl font-normal">공인회계사 1차 모의고사</h2>
               <h2 className="text-3xl font-normal">SUMMIT</h2>
             </div>
           </div>
           
           {/* Right Column */}
           <div className="space-y-8 text-foreground">
-            <div className="space-y-8 border-l-2 border-foreground pl-6">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <h4 className="text-lg font-medium">진짜 시험지와 동일한 형태, 단 1%의 괴리도 허용하지 않습니다.</h4>
-                  <p className="text-base leading-relaxed text-muted-foreground">
-                    책이 아닌, 실제 시험장에서 만날 고사장용 OMR과 시험지 형태를 완벽 구현했습니다. 남은 기간 최적의 환경에서 실전 감각을 끌어올리세요.
+            <div className="space-y-10 border-l-2 border-foreground pl-6">
+              <div className="space-y-4">
+                <p className="text-base leading-relaxed">
+                  ○ 책상 위 문제집이 아닌, <strong className="text-foreground">&apos;고사장 시험지 그 자체&apos;</strong>로 (남들보다 더 완벽하게) 실전 감각을 완성하고 싶다.
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-base leading-relaxed">
+                  ○ 단순한 등수가 아닌, <strong className="text-foreground">서울대 데이터 기반의</strong> (남들보다 더 정확한) 합격 가능성을 확인하고 싶다.
+                </p>
+                <div className="pl-4 space-y-3 text-sm text-muted-foreground">
+                  <p className="leading-relaxed">
+                    <span className="font-medium text-foreground">양질의 표본</span> Wiser Lab 재원생 + 서울대학교 CPA 응시자 표본
                   </p>
-                </div>
-                
-                <div className="space-y-3">
-                  <h4 className="text-lg font-medium">난이도 조절 없는 모의고사는 가짜 실전입니다.</h4>
-                  <p className="text-base leading-relaxed text-muted-foreground">
-                    기존 모의고사처럼 &apos;단순히 어려운&apos; 문제가 아닌, 실제 CPA 시험의 출제 경향과 체감 난이도를 정교하게 반영했습니다. 가장 실전적인 난이도로 본인의 현재 위치를 정확히 파악하게 합니다.
-                  </p>
-                </div>
-                
-                <div className="space-y-3">
-                  <h4 className="text-lg font-medium">서울대 데이터 기반, 가장 정확한 나의 위치 파악.</h4>
-                  <p className="text-base leading-relaxed text-muted-foreground">
-                    과목별 본인의 전국 석차와 취약점을 서울대 응시자 데이터 기반으로 분석합니다. 단순 등수가 아닌, 합격권에 얼마나 가까워졌는지 객관적인 데이터를 확인하세요.
+                  <p className="leading-relaxed">
+                    <span className="font-medium text-foreground">Wiser Lab 데이터룸의 정밀 분석</span> 방대한 데이터를 다뤄온 Wiser Lab의 분석 노하우로 과목별 예상 합격자 평균 점수 제공
                   </p>
                 </div>
               </div>
               
-              <div className="mt-12 pt-8 border-t border-border">
-                <p className="text-base leading-relaxed font-medium">
-                  [선택이 아닌 필수] 합격은 훈련의 결과입니다. 진짜 시험을 경험해야 진짜 실력이 완성됩니다.
-                </p>
-                <p className="text-base leading-relaxed text-muted-foreground mt-4">
-                  SUMMIT 모의고사와 함께 마지막 한 달을 가장 치열하고 완벽한 실전처럼 만드십시오.
+              <div className="space-y-4">
+                <p className="text-base leading-relaxed">
+                  ○ <strong className="text-foreground">[재무회계] AI 시험지 생성기</strong>로 틀린 문제의 기출만 골라내어 (남들보다 더 효율적으로) 빈틈을 메우고 싶다.
                 </p>
               </div>
             </div>

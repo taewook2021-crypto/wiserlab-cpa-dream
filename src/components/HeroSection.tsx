@@ -29,7 +29,7 @@ const HeroSection = () => {
           <div className="space-y-12">
             <div className="space-y-8">
               <h2 className="text-sm uppercase tracking-widest text-muted-foreground">
-                공인회계사 / N수생에게
+                공인회계사시험 수험생에게
               </h2>
               <h1 className="text-5xl lg:text-6xl font-light leading-tight">
                 시험 그 자체의 경험을

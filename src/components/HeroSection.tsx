@@ -1,22 +1,12 @@
 import { Button } from "@/components/ui/button";
 import mountainHero from "@/assets/mountain-hero.jpg";
-
 const HeroSection = () => {
-  return (
-    <section className="min-h-screen pt-16">
+  return <section className="min-h-screen pt-16">
       {/* Hero Image Section */}
       <div className="relative h-[60vh] bg-black overflow-hidden">
-        <img 
-          src={mountainHero} 
-          alt="Mountain Peak" 
-          className="w-full h-full object-cover opacity-70"
-        />
+        <img src={mountainHero} alt="Mountain Peak" className="w-full h-full object-cover opacity-70" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="bg-transparent text-white border-white hover:bg-white hover:text-black transition-all duration-300 text-base px-8 py-6"
-          >
+          <Button variant="outline" size="lg" className="bg-transparent text-white border-white hover:bg-white hover:text-black transition-all duration-300 text-base px-8 py-6">
             자세히보기
           </Button>
         </div>
@@ -39,12 +29,8 @@ const HeroSection = () => {
             </div>
             
             <div className="space-y-4">
-              <h3 className="text-3xl font-normal">
-                Wiser Lab 전국 모의평가
-              </h3>
-              <h3 className="text-3xl font-normal">
-                Summit Program
-              </h3>
+              <h3 className="text-3xl font-normal">CPA 1차 모의고사</h3>
+              <h3 className="text-3xl font-normal">Summit </h3>
             </div>
           </div>
           
@@ -77,8 +63,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;

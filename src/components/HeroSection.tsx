@@ -52,7 +52,7 @@ const HeroSection = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
-                    <p className="text-muted-foreground">합격 가능성을 확인하고 싶다.</p>
+                    <p className="text-muted-foreground">문항 별 정답률 기반의 취약 유형 분석 + 관련 기출 제공</p>
                   </div>
                 </div>
               </div>

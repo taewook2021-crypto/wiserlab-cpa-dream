@@ -43,7 +43,7 @@ const HeroSection = () => {
               
               <div className="space-y-5">
                 <p className="text-lg leading-relaxed">
-                  ○ 단순한 등수가 아닌, <strong className="text-foreground">서울대 데이터 기반의</strong> (남들보다 더 정확한) 합격 가능성을 확인하고 싶다.
+                  ○ 단순한 등수가 아닌, <strong className="text-foreground">서울대 데이터 기반의</strong>  합격 가능성을 확인하고 싶다.
                 </p>
                 <div className="pl-8 space-y-4 text-base">
                   <div className="space-y-1">

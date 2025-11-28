@@ -8,9 +8,6 @@ const Header = () => {
   const navLinks = [{
     href: "#about",
     label: "SUMMIT Contents"
-  }, {
-    href: "#features",
-    label: "SURVIVAL Contents"
   }];
   return <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/50">
       <div className="container mx-auto px-6">

@@ -58,9 +58,7 @@ const HeroSection = () => {
               </div>
               
               <div className="space-y-3">
-                <p className="text-lg leading-relaxed">
-                  ○ <strong className="text-foreground">[재무회계] AI 시험지 생성기</strong>로 틀린 문제의 기출만 골라내어 (남들보다 더 효율적으로) 빈틈을 메우고 싶다.
-                </p>
+                
               </div>
             </div>
           </div>

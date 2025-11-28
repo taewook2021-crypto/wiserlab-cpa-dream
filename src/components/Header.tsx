@@ -8,7 +8,7 @@ const Header = () => {
   const [open, setOpen] = useState(false);
 
   const navLinks = [
-    { href: "#about", label: "SURVIVAL PRO" },
+    { href: "#about", label: "SUMMIT Contents" },
     { href: "#features", label: "SURVIVAL Contents" },
   ];
 

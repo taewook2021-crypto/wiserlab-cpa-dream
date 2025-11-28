@@ -42,6 +42,9 @@ const Header = () => {
           
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-6">
+              <Button variant="default" size="sm" className="font-normal">
+                빠른 채점하기
+              </Button>
               <a href="#" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
                 장바구니
               </a>
@@ -68,6 +71,9 @@ const Header = () => {
                       {link.label}
                     </a>
                   ))}
+                  <Button variant="default" className="w-full font-normal">
+                    빠른 채점하기
+                  </Button>
                   <a href="#" className="text-lg text-foreground hover:text-muted-foreground transition-colors">
                     장바구니
                   </a>

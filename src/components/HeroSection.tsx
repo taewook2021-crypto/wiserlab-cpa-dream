@@ -52,7 +52,7 @@ const HeroSection = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
-                    <p className="text-muted-foreground">방대한 데이터를 다뤄온 Wiser Lab의 분석 노하우로 과목별 예상 합격자 평균 점수 제공</p>
+                    <p className="text-muted-foreground">합격 가능성을 확인하고 싶다.</p>
                   </div>
                 </div>
               </div>

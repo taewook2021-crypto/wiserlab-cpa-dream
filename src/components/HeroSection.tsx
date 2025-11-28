@@ -48,7 +48,7 @@ const HeroSection = () => {
                 <div className="pl-8 space-y-4 text-base">
                   <div className="space-y-1">
                     <p className="font-medium">양질의 표본</p>
-                    <p className="text-muted-foreground">Wiser Lab 재원생 + 서울대학교 CPA 응시자 표본</p>
+                    <p className="text-muted-foreground">Wiser Lab 응시자 + 서울대학교 CPA 응시자 표본</p>
                   </div>
                   <div className="space-y-1">
                     <p className="font-medium">Wiser Lab 데이터룸의 정밀 분석</p>

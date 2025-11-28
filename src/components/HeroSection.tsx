@@ -1,22 +1,12 @@
 import { Button } from "@/components/ui/button";
 import mountainHero from "@/assets/mountain-hero.jpg";
-
 const HeroSection = () => {
-  return (
-    <section className="min-h-screen pt-16">
+  return <section className="min-h-screen pt-16">
       {/* Hero Image Section */}
       <div className="relative h-[60vh] bg-black overflow-hidden">
-        <img 
-          src={mountainHero} 
-          alt="Mountain Peak" 
-          className="w-full h-full object-cover opacity-70" 
-        />
+        <img src={mountainHero} alt="Mountain Peak" className="w-full h-full object-cover opacity-70" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <Button 
-            variant="outline" 
-            size="lg" 
-            className="bg-transparent text-white border-white hover:bg-white hover:text-black transition-all duration-300 text-base px-8 py-6"
-          >
+          <Button variant="outline" size="lg" className="bg-transparent text-white border-white hover:bg-white hover:text-black transition-all duration-300 text-base px-8 py-6">
             자세히보기
           </Button>
         </div>
@@ -47,7 +37,7 @@ const HeroSection = () => {
             <div className="space-y-12">
               <div className="space-y-3">
                 <p className="text-lg leading-relaxed">
-                  ○ 책상 위 문제집이 아닌, <strong className="text-foreground">&apos;고사장 시험지 그 자체&apos;</strong>로 (남들보다 더 완벽하게) 실전 감각을 완성하고 싶다.
+                  ○ 책상 위 문제집이 아닌, <strong className="text-foreground">&apos;고사장 시험지 그 자체&apos;</strong>로 실전 감각을 완성하고 싶다.
                 </p>
               </div>
               
@@ -76,8 +66,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;

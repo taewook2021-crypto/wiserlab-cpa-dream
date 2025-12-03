@@ -77,7 +77,7 @@ const Summit = () => {
                 {/* Discount Info */}
                 <div className="space-y-2 py-6 border-y border-border">
                   <p className="text-sm">
-                    <span className="text-primary font-medium">2과목 구매 시 10,000원 할인 + 해설 강의 무료 제공</span>
+                    <span className="text-primary font-medium">2과목 구매 시 10,000원 할인 </span>
                   </p>
                   <p className="text-xs text-muted-foreground">
                     * 한 번의 주문으로 함께 구매 시 할인 및 사은품이 제공됩니다.

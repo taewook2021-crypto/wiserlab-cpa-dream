@@ -42,9 +42,9 @@ const Summit = () => {
     const selected = subjects.filter(s => selectedSubjects.includes(s.id));
     const total = selected.reduce((sum, s) => sum + s.price, 0);
 
-    // 2과목 구매 시 10% 할인
+    // 2과목 구매 시 10,000원 할인
     const hasDiscount = selectedSubjects.length >= 2;
-    const discountAmount = hasDiscount ? Math.floor(total * 0.1) : 0;
+    const discountAmount = hasDiscount ? 10000 : 0;
     return {
       totalPrice: total,
       discountedPrice: total - discountAmount,
@@ -77,7 +77,7 @@ const Summit = () => {
                 {/* Discount Info */}
                 <div className="space-y-2 py-6 border-y border-border">
                   <p className="text-sm">
-                    <span className="text-primary font-medium">2과목 구매 시 10% 할인 + 해설 강의 무료 제공</span>
+                    <span className="text-primary font-medium">2과목 구매 시 10,000원 할인 + 해설 강의 무료 제공</span>
                   </p>
                   <p className="text-xs text-muted-foreground">
                     * 한 번의 주문으로 함께 구매 시 할인 및 사은품이 제공됩니다.
@@ -111,7 +111,7 @@ const Summit = () => {
                           {formatPrice(totalPrice)}원
                         </p>}
                       <p className="font-medium">
-                        {formatPrice(subjects.reduce((sum, s) => sum + s.price, 0) * 0.9)}원
+                        {formatPrice(subjects.reduce((sum, s) => sum + s.price, 0) - 10000)}원
                       </p>
                     </div>
                   </div>

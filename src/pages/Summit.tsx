@@ -265,7 +265,9 @@ const Summit = () => {
                     <p className="text-sm text-muted-foreground">바른생각 세법 강사</p>
                   </div>
                   <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-                    <p className="font-medium text-foreground">5명 출제팀</p>
+                    <p className="font-medium text-foreground">
+                      서울대학교 출신 공인회계사 5명 출제팀
+                    </p>
                     <div className="pl-4 border-l-2 border-border">
                       <p>전원 2025년 세법 2차 75점 이상</p>
                     </div>

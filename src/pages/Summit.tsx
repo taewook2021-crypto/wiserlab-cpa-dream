@@ -76,11 +76,11 @@ const Summit = () => {
           <div className="container mx-auto px-6 py-16">
             <div className="grid md:grid-cols-2 gap-12 items-start">
               {/* Left: Product Image */}
-              <div className="aspect-square bg-[#b8d4e3] flex items-center justify-center p-8">
+              <div className="aspect-square bg-[#6b7c5e] flex items-center justify-center p-12">
                 <img 
                   src={summitProduct} 
                   alt="Wiser Lab SUMMIT 모의고사 패키지" 
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain drop-shadow-2xl"
                 />
               </div>
 

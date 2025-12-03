@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import mountainHero from "@/assets/mountain-hero.jpg";
+import summitProduct from "@/assets/summit-product.jpg";
 
 interface Subject {
   id: string;
@@ -75,11 +76,12 @@ const Summit = () => {
           <div className="container mx-auto px-6 py-16">
             <div className="grid md:grid-cols-2 gap-12 items-start">
               {/* Left: Product Image */}
-              <div className="aspect-square bg-muted flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-6xl font-light tracking-widest text-muted-foreground">SUMMIT</p>
-                  <p className="text-sm text-muted-foreground mt-4">CPA 1차 모의고사</p>
-                </div>
+              <div className="aspect-square bg-[#b8d4e3] flex items-center justify-center p-8">
+                <img 
+                  src={summitProduct} 
+                  alt="Wiser Lab SUMMIT 모의고사 패키지" 
+                  className="w-full h-full object-contain"
+                />
               </div>
 
               {/* Right: Product Info */}

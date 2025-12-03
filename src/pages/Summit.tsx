@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import mountainHero from "@/assets/mountain-hero.jpg";
+import summitFeature from "@/assets/summit-feature.jpg";
 import summitProduct from "@/assets/summit-product.jpg";
 interface Subject {
   id: string;
@@ -166,8 +166,8 @@ const Summit = () => {
         <section className="py-0">
           <div className="grid md:grid-cols-2">
             {/* Left: Image */}
-            <div className="aspect-square md:aspect-auto md:min-h-[600px] bg-cover bg-center" style={{
-            backgroundImage: `url(${mountainHero})`
+          <div className="aspect-square md:aspect-auto md:min-h-[600px] bg-cover bg-center" style={{
+            backgroundImage: `url(${summitFeature})`
           }} />
 
             {/* Right: Features */}

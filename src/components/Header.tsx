@@ -11,7 +11,7 @@ const Header = () => {
   const { user, loading, signOut } = useAuth();
   
   const navLinks = [{
-    href: "#about",
+    to: "/summit",
     label: "SUMMIT Contents"
   }];
 
@@ -28,9 +28,9 @@ const Header = () => {
             </Link>
             <div className="hidden md:flex items-center space-x-10">
               {navLinks.map(link => (
-                <a key={link.href} href={link.href} className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+                <Link key={link.to} to={link.to} className="text-sm text-foreground hover:text-muted-foreground transition-colors">
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -68,9 +68,9 @@ const Header = () => {
               <SheetContent side="right" className="w-[300px]">
                 <div className="flex flex-col gap-6 mt-8">
                   {navLinks.map(link => (
-                    <a key={link.href} href={link.href} onClick={() => setOpen(false)} className="text-lg text-foreground hover:text-muted-foreground transition-colors">
+                    <Link key={link.to} to={link.to} onClick={() => setOpen(false)} className="text-lg text-foreground hover:text-muted-foreground transition-colors">
                       {link.label}
-                    </a>
+                    </Link>
                   ))}
                   <Button variant="default" className="w-full font-normal">
                     빠른 채점하기

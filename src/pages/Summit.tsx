@@ -5,40 +5,28 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import summitFeature from "@/assets/summit-feature.jpg";
 import summitProduct from "@/assets/summit-product.jpg";
-
 interface Subject {
   id: string;
   name: string;
   description: string;
   price: number;
 }
-
-const subjects: Subject[] = [
-  {
-    id: "financial",
-    name: "재무회계",
-    description: "SUMMIT 모의고사 2회분",
-    price: 30000
-  },
-  {
-    id: "tax",
-    name: "세법",
-    description: "SUMMIT 모의고사 2회분",
-    price: 30000
-  }
-];
-
+const subjects: Subject[] = [{
+  id: "financial",
+  name: "재무회계",
+  description: "SUMMIT 모의고사 2회분",
+  price: 30000
+}, {
+  id: "tax",
+  name: "세법",
+  description: "SUMMIT 모의고사 2회분",
+  price: 30000
+}];
 const Summit = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-
   const handleSubjectToggle = (subjectId: string) => {
-    setSelectedSubjects(prev =>
-      prev.includes(subjectId)
-        ? prev.filter(id => id !== subjectId)
-        : [...prev, subjectId]
-    );
+    setSelectedSubjects(prev => prev.includes(subjectId) ? prev.filter(id => id !== subjectId) : [...prev, subjectId]);
   };
-
   const handleSelectAll = () => {
     if (selectedSubjects.length === subjects.length) {
       setSelectedSubjects([]);
@@ -46,28 +34,27 @@ const Summit = () => {
       setSelectedSubjects(subjects.map(s => s.id));
     }
   };
-
-  const { totalPrice, discountedPrice, discount } = useMemo(() => {
+  const {
+    totalPrice,
+    discountedPrice,
+    discount
+  } = useMemo(() => {
     const selected = subjects.filter(s => selectedSubjects.includes(s.id));
     const total = selected.reduce((sum, s) => sum + s.price, 0);
 
     // 2과목 구매 시 10,000원 할인
     const hasDiscount = selectedSubjects.length >= 2;
     const discountAmount = hasDiscount ? 10000 : 0;
-
     return {
       totalPrice: total,
       discountedPrice: total - discountAmount,
       discount: discountAmount
     };
   }, [selectedSubjects]);
-
   const formatPrice = (price: number) => {
     return price.toLocaleString("ko-KR");
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
 
       <main className="pt-16">
@@ -77,11 +64,7 @@ const Summit = () => {
             <div className="grid md:grid-cols-2 gap-16 md:gap-20 items-start">
               {/* Left: Product Image */}
               <div className="aspect-square bg-[#b8d4e3] flex items-center justify-center">
-                <img
-                  src={summitProduct}
-                  alt="Wiser Lab SUMMIT 모의고사 패키지"
-                  className="w-full h-full object-cover"
-                />
+                <img src={summitProduct} alt="Wiser Lab SUMMIT 모의고사 패키지" className="w-full h-full object-cover" />
               </div>
 
               {/* Right: Product Info */}
@@ -107,17 +90,9 @@ const Summit = () => {
 
                 {/* Subject Selection */}
                 <div className="space-y-6">
-                  {subjects.map(subject => (
-                    <div
-                      key={subject.id}
-                      className="flex items-center justify-between py-5 border-b border-border"
-                    >
+                  {subjects.map(subject => <div key={subject.id} className="flex items-center justify-between py-5 border-b border-border">
                       <div className="flex items-center gap-4">
-                        <Checkbox
-                          id={subject.id}
-                          checked={selectedSubjects.includes(subject.id)}
-                          onCheckedChange={() => handleSubjectToggle(subject.id)}
-                        />
+                        <Checkbox id={subject.id} checked={selectedSubjects.includes(subject.id)} onCheckedChange={() => handleSubjectToggle(subject.id)} />
                         <label htmlFor={subject.id} className="cursor-pointer">
                           <p className="font-medium">{subject.name}</p>
                           <p className="text-sm text-muted-foreground">
@@ -126,17 +101,12 @@ const Summit = () => {
                         </label>
                       </div>
                       <p className="font-medium">{formatPrice(subject.price)}원</p>
-                    </div>
-                  ))}
+                    </div>)}
 
                   {/* Select All */}
                   <div className="flex items-center justify-between py-5 border-b border-border">
                     <div className="flex items-center gap-4">
-                      <Checkbox
-                        id="all"
-                        checked={selectedSubjects.length === subjects.length}
-                        onCheckedChange={handleSelectAll}
-                      />
+                      <Checkbox id="all" checked={selectedSubjects.length === subjects.length} onCheckedChange={handleSelectAll} />
                       <label htmlFor="all" className="cursor-pointer">
                         <p className="font-medium">전과목 PACK</p>
                         <p className="text-sm text-muted-foreground">
@@ -145,11 +115,9 @@ const Summit = () => {
                       </label>
                     </div>
                     <div className="text-right">
-                      {selectedSubjects.length === subjects.length && discount > 0 && (
-                        <p className="text-sm text-muted-foreground line-through">
+                      {selectedSubjects.length === subjects.length && discount > 0 && <p className="text-sm text-muted-foreground line-through">
                           {formatPrice(totalPrice)}원
-                        </p>
-                      )}
+                        </p>}
                       <p className="font-medium">
                         {formatPrice(subjects.reduce((sum, s) => sum + s.price, 0) - 10000)}원
                       </p>
@@ -167,20 +135,15 @@ const Summit = () => {
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">총 상품금액</p>
                     <div className="text-right">
-                      {discount > 0 && (
-                        <p className="text-sm text-muted-foreground line-through">
+                      {discount > 0 && <p className="text-sm text-muted-foreground line-through">
                           {formatPrice(totalPrice)}원
-                        </p>
-                      )}
+                        </p>}
                       <p className="text-2xl font-medium">
                         {formatPrice(discountedPrice)}원
                       </p>
                     </div>
                   </div>
-                  <Button
-                    className="w-full h-14 text-base font-normal"
-                    disabled={selectedSubjects.length === 0}
-                  >
+                  <Button className="w-full h-14 text-base font-normal" disabled={selectedSubjects.length === 0}>
                     바로구매 하기
                   </Button>
                 </div>
@@ -193,10 +156,9 @@ const Summit = () => {
         <section className="py-20 md:py-28 border-b border-border">
           <div className="grid md:grid-cols-2">
             {/* Left: Image */}
-            <div
-              className="aspect-square md:aspect-auto md:min-h-[700px] bg-cover bg-center"
-              style={{ backgroundImage: `url(${summitFeature})` }}
-            />
+            <div className="aspect-square md:aspect-auto md:min-h-[700px] bg-cover bg-center" style={{
+            backgroundImage: `url(${summitFeature})`
+          }} />
 
             {/* Right: Features */}
             <div className="bg-background p-16 md:p-24 flex flex-col justify-center">
@@ -217,9 +179,7 @@ const Summit = () => {
 
                 <div>
                   <h3 className="text-xl font-medium mb-6">트렌디하며 기본에 충실한 모의고사를</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    당해 출제 경향을 반영하면서, 다양한 관점의 문항을 출제합니다.
-                  </p>
+                  <p className="text-muted-foreground leading-relaxed">출제 가능성이 전혀 없는 주제를 다루지 않으며, 최근 1차 시험의 난이도를 반영한 가장 실전적인 모의고사입니다.</p>
                 </div>
               </div>
             </div>
@@ -280,8 +240,6 @@ const Summit = () => {
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Summit;

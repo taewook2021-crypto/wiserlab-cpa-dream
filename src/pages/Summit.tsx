@@ -121,7 +121,7 @@ const Summit = () => {
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p>
                 </p>
-                  <p>• 시험 일정: 2026년 3월 2일 시행 공인회계사 1차 시험의 모의고사 </p>
+                  <p>* 본 상품은 2026년 CPA 1차 시험 대비용 콘텐츠로, 시험 종료 후에는 구매가 불가합니다.</p>
                   <p className="text-xs">* 본 상품은 2025년 CPA 1차 시험 대비용 콘텐츠로, 시험 종료 후에는 구매가 불가합니다.</p>
                 </div>
 

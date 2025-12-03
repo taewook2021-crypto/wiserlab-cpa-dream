@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import summitFeature from "@/assets/summit-feature.jpg";
-import summitProduct from "@/assets/summit-product.jpg";
+import summitProduct from "@/assets/summit-product.png";
 interface Subject {
   id: string;
   name: string;

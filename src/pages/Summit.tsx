@@ -15,12 +15,12 @@ const subjects: Subject[] = [{
   id: "financial",
   name: "재무회계",
   description: "SUMMIT 모의고사 2회분",
-  price: 89000
+  price: 25000
 }, {
   id: "tax",
   name: "세법",
   description: "SUMMIT 모의고사 2회분",
-  price: 89000
+  price: 25000
 }];
 const Summit = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);

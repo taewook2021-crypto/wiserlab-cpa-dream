@@ -64,7 +64,7 @@ const Summit = () => {
             <div className="grid md:grid-cols-2 gap-16 md:gap-20 items-start">
               {/* Left: Product Image */}
               <div className="flex items-center justify-center">
-                <img src={summitProduct} alt="Wiser Lab SUMMIT 모의고사 패키지" className="w-full max-w-md object-contain" />
+                <img src={summitProduct} alt="Wiser Lab SUMMIT 모의고사 패키지" className="w-full max-w-2xl object-contain" />
               </div>
 
               {/* Right: Product Info */}

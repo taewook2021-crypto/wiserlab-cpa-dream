@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AnswerGroup {
   startNum: number;
@@ -18,26 +20,39 @@ interface AnswerGroup {
   value: string;
 }
 
+interface ScoringResult {
+  questionNumber: number;
+  userAnswer: number;
+  correctAnswer: number;
+  isCorrect: boolean;
+}
+
 const subjects = [
-  { id: "financial", name: "재무회계" },
-  { id: "tax", name: "세법" },
+  { id: "financial", name: "재무회계", dbValue: "financial_accounting" },
+  { id: "tax", name: "세법", dbValue: "tax_law" },
 ];
 
 const exams = [
-  { id: "summit-1", name: "SUMMIT 1회" },
-  { id: "summit-2", name: "SUMMIT 2회" },
+  { id: "summit-1", name: "SUMMIT 1회", round: 1 },
+  { id: "summit-2", name: "SUMMIT 2회", round: 2 },
 ];
+
+const TOTAL_QUESTIONS = 35;
 
 const QuickScoring = () => {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedExam, setSelectedExam] = useState<string>("");
+  const [isScoring, setIsScoring] = useState(false);
+  const [results, setResults] = useState<ScoringResult[] | null>(null);
   const [answers, setAnswers] = useState<AnswerGroup[]>(() => {
-    // 40문제 기준으로 8개 그룹 생성 (5문제씩)
+    // 35문제: 7개 그룹 (5문제씩)
     const groups: AnswerGroup[] = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 7; i++) {
+      const startNum = i * 5 + 1;
+      const endNum = Math.min(i * 5 + 5, TOTAL_QUESTIONS);
       groups.push({
-        startNum: i * 5 + 1,
-        endNum: i * 5 + 5,
+        startNum,
+        endNum,
         value: "",
       });
     }
@@ -45,26 +60,86 @@ const QuickScoring = () => {
   });
 
   const handleAnswerChange = (index: number, value: string) => {
-    // 숫자만 허용하고 5자리까지만
-    const numericValue = value.replace(/[^1-5]/g, "").slice(0, 5);
+    const group = answers[index];
+    const maxLength = group.endNum - group.startNum + 1;
+    const numericValue = value.replace(/[^1-5]/g, "").slice(0, maxLength);
     setAnswers((prev) =>
-      prev.map((group, i) =>
-        i === index ? { ...group, value: numericValue } : group
+      prev.map((g, i) =>
+        i === index ? { ...g, value: numericValue } : g
       )
     );
+    // 답안 변경시 결과 초기화
+    if (results) setResults(null);
   };
 
-  const handleSubmit = () => {
-    // 채점 로직 (추후 구현)
-    console.log("Selected Subject:", selectedSubject);
-    console.log("Selected Exam:", selectedExam);
-    console.log("Answers:", answers);
+  const handleSubmit = async () => {
+    const subject = subjects.find((s) => s.id === selectedSubject);
+    const exam = exams.find((e) => e.id === selectedExam);
+
+    if (!subject || !exam) {
+      toast.error("과목과 회차를 선택해주세요");
+      return;
+    }
+
+    setIsScoring(true);
+
+    try {
+      // Fetch answer keys from database
+      const { data: answerKeys, error } = await supabase
+        .from("exam_answer_keys")
+        .select("question_number, correct_answer")
+        .eq("exam_name", "SUMMIT")
+        .eq("exam_round", exam.round)
+        .eq("subject", subject.dbValue as "financial_accounting" | "tax_law")
+        .order("question_number");
+
+      if (error) throw error;
+
+      if (!answerKeys || answerKeys.length === 0) {
+        toast.error("해당 시험의 정답표가 없습니다");
+        return;
+      }
+
+      // Flatten user answers
+      const userAnswers: number[] = [];
+      answers.forEach((group) => {
+        for (const char of group.value) {
+          userAnswers.push(parseInt(char));
+        }
+      });
+
+      // Compare and generate results
+      const scoringResults: ScoringResult[] = answerKeys.map((key) => {
+        const userAnswer = userAnswers[key.question_number - 1] || 0;
+        return {
+          questionNumber: key.question_number,
+          userAnswer,
+          correctAnswer: key.correct_answer,
+          isCorrect: userAnswer === key.correct_answer,
+        };
+      });
+
+      setResults(scoringResults);
+
+      const correctCount = scoringResults.filter((r) => r.isCorrect).length;
+      toast.success(`채점 완료! ${correctCount}/${scoringResults.length}문제 정답`);
+    } catch (error) {
+      console.error("Scoring error:", error);
+      toast.error("채점 중 오류가 발생했습니다");
+    } finally {
+      setIsScoring(false);
+    }
   };
 
   const isFormValid =
     selectedSubject &&
     selectedExam &&
-    answers.every((group) => group.value.length === 5);
+    answers.every((group) => {
+      const expectedLength = group.endNum - group.startNum + 1;
+      return group.value.length === expectedLength;
+    });
+
+  const correctCount = results?.filter((r) => r.isCorrect).length || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,7 +162,10 @@ const QuickScoring = () => {
                   <Label>과목 선택</Label>
                   <Select
                     value={selectedSubject}
-                    onValueChange={setSelectedSubject}
+                    onValueChange={(v) => {
+                      setSelectedSubject(v);
+                      setResults(null);
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="과목을 선택하세요" />
@@ -104,7 +182,13 @@ const QuickScoring = () => {
 
                 <div className="space-y-2">
                   <Label>회차 선택</Label>
-                  <Select value={selectedExam} onValueChange={setSelectedExam}>
+                  <Select
+                    value={selectedExam}
+                    onValueChange={(v) => {
+                      setSelectedExam(v);
+                      setResults(null);
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="회차를 선택하세요" />
                     </SelectTrigger>
@@ -119,29 +203,67 @@ const QuickScoring = () => {
                 </div>
               </div>
 
-              {/* 답안 입력 */}
+              {/* 답안 입력 및 결과 */}
               <div className="space-y-6 mb-12">
                 <div className="grid grid-cols-2 gap-x-8 gap-y-6">
-                  {answers.map((group, index) => (
-                    <div key={index} className="space-y-2">
-                      <Label className="text-sm text-muted-foreground">
-                        {group.startNum}번 ~ {group.endNum}번
-                      </Label>
-                      <Input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="54312"
-                        value={group.value}
-                        onChange={(e) =>
-                          handleAnswerChange(index, e.target.value)
-                        }
-                        className="text-center text-lg tracking-[0.5em] font-mono"
-                        maxLength={5}
-                      />
-                    </div>
-                  ))}
+                  {answers.map((group, index) => {
+                    const groupResults = results?.filter(
+                      (r) =>
+                        r.questionNumber >= group.startNum &&
+                        r.questionNumber <= group.endNum
+                    );
+
+                    return (
+                      <div key={index} className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">
+                          {group.startNum}번 ~ {group.endNum}번
+                        </Label>
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="54312"
+                          value={group.value}
+                          onChange={(e) =>
+                            handleAnswerChange(index, e.target.value)
+                          }
+                          className="text-center text-lg tracking-[0.5em] font-mono"
+                          maxLength={group.endNum - group.startNum + 1}
+                        />
+                        {/* O/X 결과 표시 */}
+                        {groupResults && groupResults.length > 0 && (
+                          <div className="flex justify-center gap-1 pt-1">
+                            {groupResults.map((r) => (
+                              <span
+                                key={r.questionNumber}
+                                className={`text-lg font-bold w-6 text-center ${
+                                  r.isCorrect
+                                    ? "text-green-600"
+                                    : "text-red-500"
+                                }`}
+                              >
+                                {r.isCorrect ? "O" : "X"}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+
+              {/* 채점 결과 요약 */}
+              {results && (
+                <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 mb-8 text-center">
+                  <p className="text-2xl font-light mb-2">
+                    <span className="text-primary font-medium">{correctCount}</span>
+                    <span className="text-muted-foreground"> / {results.length}</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    정답률 {Math.round((correctCount / results.length) * 100)}%
+                  </p>
+                </div>
+              )}
 
               {/* 안내 문구 */}
               <div className="bg-muted/50 rounded-lg p-6 mb-8">
@@ -157,9 +279,9 @@ const QuickScoring = () => {
               <Button
                 onClick={handleSubmit}
                 className="w-full h-14 text-base font-normal"
-                disabled={!isFormValid}
+                disabled={!isFormValid || isScoring}
               >
-                채점하기
+                {isScoring ? "채점 중..." : "채점하기"}
               </Button>
             </div>
           </div>

@@ -175,39 +175,27 @@ const Statistics = () => {
                   {mockBillboard.map((entry) => (
                     <div
                       key={entry.rank}
-                      className={`flex items-center gap-4 p-4 transition-colors ${
-                        entry.rank <= 3
-                          ? "bg-foreground text-background"
-                          : "bg-card hover:bg-muted/50"
-                      }`}
+                      className="flex items-center gap-4 p-4 bg-card hover:bg-muted/50 transition-colors"
                     >
                       {/* 순위 */}
                       <div className="w-10 text-center">
-                        <span className={`font-mono text-sm ${
-                          entry.rank <= 3 ? "font-medium" : "text-muted-foreground"
-                        }`}>
+                        <span className="font-mono text-sm text-muted-foreground">
                           {entry.rank}
                         </span>
                       </div>
 
                       {/* 닉네임 */}
                       <div className="flex-1 min-w-0">
-                        <p className={`font-medium truncate ${
-                          entry.rank <= 3 ? "" : "text-foreground/80"
-                        }`}>
+                        <p className="font-medium truncate text-foreground/80">
                           {entry.nickname}
                         </p>
                       </div>
 
                       {/* 점수 */}
                       <div className="text-right">
-                        <p className={`font-mono ${
-                          entry.rank <= 3 ? "font-medium" : "text-muted-foreground"
-                        }`}>
+                        <p className="font-mono text-muted-foreground">
                           {entry.score}
-                          <span className={`text-xs ${
-                            entry.rank <= 3 ? "opacity-70" : "text-muted-foreground"
-                          }`}>/35</span>
+                          <span className="text-xs text-muted-foreground">/35</span>
                         </p>
                       </div>
                     </div>

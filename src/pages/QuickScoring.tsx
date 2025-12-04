@@ -243,7 +243,7 @@ const QuickScoring = () => {
                                     : "text-red-500"
                                 }`}
                               >
-                                {r.isCorrect ? "●" : "✕"}
+                                {r.isCorrect ? "○" : "✕"}
                               </span>
                             ))}
                           </div>

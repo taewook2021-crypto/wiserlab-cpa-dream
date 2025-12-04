@@ -28,6 +28,10 @@ const mockWeakAreas = [
   { id: 2, name: "유형자산", wrongCount: 2, relatedCount: 8 },
   { id: 3, name: "금융상품", wrongCount: 2, relatedCount: 15 },
   { id: 4, name: "수익인식", wrongCount: 1, relatedCount: 6 },
+  { id: 5, name: "리스회계", wrongCount: 2, relatedCount: 9 },
+  { id: 6, name: "충당부채", wrongCount: 1, relatedCount: 7 },
+  { id: 7, name: "법인세회계", wrongCount: 3, relatedCount: 11 },
+  { id: 8, name: "연결재무제표", wrongCount: 2, relatedCount: 14 },
 ];
 
 // 목업 추천 기출문제 데이터

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -21,8 +20,7 @@ import {
   ChevronLeft, 
   ChevronRight,
   Save,
-  FolderOpen,
-  Sparkles
+  FolderOpen
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -48,9 +46,6 @@ const mockWeakAreas = [
   { id: 8, name: "연결재무제표", wrongCount: 2, relatedCount: 14 },
 ];
 
-type Difficulty = "상" | "중" | "하";
-type Frequency = "high" | "medium" | "low";
-
 interface PastQuestion {
   id: number;
   year: number;
@@ -58,22 +53,20 @@ interface PastQuestion {
   number: number;
   topic: string;
   areaId: number;
-  difficulty: Difficulty;
-  frequency: Frequency;
 }
 
-// 목업 추천 기출문제 데이터 (영역, 난이도, 빈도 추가)
+// 목업 추천 기출문제 데이터
 const initialPastQuestions: PastQuestion[] = [
-  { id: 1, year: 2024, round: 1, number: 12, topic: "재고자산 - 저가법 적용", areaId: 1, difficulty: "중", frequency: "high" },
-  { id: 2, year: 2024, round: 2, number: 8, topic: "재고자산 - 매출원가 계산", areaId: 1, difficulty: "하", frequency: "medium" },
-  { id: 3, year: 2023, round: 1, number: 15, topic: "유형자산 - 감가상각", areaId: 2, difficulty: "중", frequency: "high" },
-  { id: 4, year: 2023, round: 2, number: 22, topic: "금융상품 - 공정가치 측정", areaId: 3, difficulty: "상", frequency: "medium" },
-  { id: 5, year: 2022, round: 1, number: 18, topic: "금융상품 - 손상차손", areaId: 3, difficulty: "상", frequency: "low" },
-  { id: 6, year: 2022, round: 2, number: 11, topic: "수익인식 - 계약변경", areaId: 4, difficulty: "중", frequency: "high" },
-  { id: 7, year: 2024, round: 1, number: 25, topic: "리스회계 - 사용권자산", areaId: 5, difficulty: "상", frequency: "medium" },
-  { id: 8, year: 2023, round: 2, number: 19, topic: "충당부채 - 측정기준", areaId: 6, difficulty: "하", frequency: "low" },
-  { id: 9, year: 2024, round: 2, number: 30, topic: "법인세회계 - 이연법인세", areaId: 7, difficulty: "상", frequency: "high" },
-  { id: 10, year: 2022, round: 1, number: 33, topic: "연결재무제표 - 내부거래 제거", areaId: 8, difficulty: "상", frequency: "high" },
+  { id: 1, year: 2024, round: 1, number: 12, topic: "재고자산 - 저가법 적용", areaId: 1 },
+  { id: 2, year: 2024, round: 2, number: 8, topic: "재고자산 - 매출원가 계산", areaId: 1 },
+  { id: 3, year: 2023, round: 1, number: 15, topic: "유형자산 - 감가상각", areaId: 2 },
+  { id: 4, year: 2023, round: 2, number: 22, topic: "금융상품 - 공정가치 측정", areaId: 3 },
+  { id: 5, year: 2022, round: 1, number: 18, topic: "금융상품 - 손상차손", areaId: 3 },
+  { id: 6, year: 2022, round: 2, number: 11, topic: "수익인식 - 계약변경", areaId: 4 },
+  { id: 7, year: 2024, round: 1, number: 25, topic: "리스회계 - 사용권자산", areaId: 5 },
+  { id: 8, year: 2023, round: 2, number: 19, topic: "충당부채 - 측정기준", areaId: 6 },
+  { id: 9, year: 2024, round: 2, number: 30, topic: "법인세회계 - 이연법인세", areaId: 7 },
+  { id: 10, year: 2022, round: 1, number: 33, topic: "연결재무제표 - 내부거래 제거", areaId: 8 },
 ];
 
 const STORAGE_KEY = "edge-exam-config";
@@ -87,7 +80,6 @@ const Edge = () => {
   const [selectedQuestions, setSelectedQuestions] = useState<number[]>([1, 2, 3]);
   const [showPreview, setShowPreview] = useState(false);
   const [activeAreaFilter, setActiveAreaFilter] = useState<number | null>(null);
-  const [difficultyFilters, setDifficultyFilters] = useState<Difficulty[]>([]);
   const [includeNotes, setIncludeNotes] = useState(false);
   const [includeSolutions, setIncludeSolutions] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -141,10 +133,7 @@ const Edge = () => {
 
   // 필터링된 문제 목록
   const filteredQuestions = initialPastQuestions.filter((q) => {
-    const areaMatch = activeAreaFilter === null || q.areaId === activeAreaFilter;
-    const difficultyMatch =
-      difficultyFilters.length === 0 || difficultyFilters.includes(q.difficulty);
-    return areaMatch && difficultyMatch;
+    return activeAreaFilter === null || q.areaId === activeAreaFilter;
   });
 
   const toggleQuestion = (id: number) => {
@@ -163,18 +152,12 @@ const Edge = () => {
     }
   };
 
-  const toggleDifficulty = (diff: Difficulty) => {
-    setDifficultyFilters((prev) =>
-      prev.includes(diff) ? prev.filter((d) => d !== diff) : [...prev, diff]
-    );
-  };
 
   // 저장/불러오기
   const saveConfig = () => {
     const config = {
       selectedQuestions,
       activeAreaFilter,
-      difficultyFilters,
       includeNotes,
       includeSolutions,
       savedAt: new Date().toISOString(),
@@ -193,7 +176,6 @@ const Edge = () => {
         const config = JSON.parse(saved);
         setSelectedQuestions(config.selectedQuestions || []);
         setActiveAreaFilter(config.activeAreaFilter ?? null);
-        setDifficultyFilters(config.difficultyFilters || []);
         setIncludeNotes(config.includeNotes || false);
         setIncludeSolutions(config.includeSolutions || false);
         toast({
@@ -218,29 +200,6 @@ const Edge = () => {
   const selectedPastQuestions = initialPastQuestions.filter((q) =>
     selectedQuestions.includes(q.id)
   );
-
-  const getFrequencyBadge = (frequency: Frequency) => {
-    if (frequency === "high") {
-      return (
-        <Badge variant="secondary" className="text-xs gap-1">
-          <Sparkles className="w-3 h-3" />
-          자주 출제
-        </Badge>
-      );
-    }
-    return null;
-  };
-
-  const getDifficultyStyle = (difficulty: Difficulty) => {
-    switch (difficulty) {
-      case "상":
-        return "bg-destructive/10 text-destructive";
-      case "중":
-        return "bg-primary/10 text-primary";
-      case "하":
-        return "bg-muted text-muted-foreground";
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -442,32 +401,6 @@ const Edge = () => {
                             : "전체 선택"}
                         </Button>
                       </div>
-                      {/* 난이도 필터 */}
-                      <div className="flex items-center gap-2 flex-wrap" role="group" aria-label="난이도 필터">
-                        <span className="text-sm text-muted-foreground mr-1">난이도:</span>
-                        {(["상", "중", "하"] as Difficulty[]).map((diff) => (
-                          <button
-                            key={diff}
-                            onClick={() => toggleDifficulty(diff)}
-                            className={`px-3 py-1 rounded-full text-sm transition-all ${
-                              difficultyFilters.includes(diff)
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted text-muted-foreground hover:bg-muted/80"
-                            }`}
-                            aria-pressed={difficultyFilters.includes(diff)}
-                          >
-                            {diff}
-                          </button>
-                        ))}
-                        {difficultyFilters.length > 0 && (
-                          <button
-                            onClick={() => setDifficultyFilters([])}
-                            className="text-xs text-muted-foreground underline ml-2"
-                          >
-                            초기화
-                          </button>
-                        )}
-                      </div>
                     </div>
                     <div className="space-y-3" role="listbox" aria-label="기출문제 목록">
                       {filteredQuestions.length === 0 ? (
@@ -501,19 +434,11 @@ const Edge = () => {
                               aria-label={`${q.topic} 선택`}
                             />
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <p className="text-sm font-medium">{q.topic}</p>
-                                {getFrequencyBadge(q.frequency)}
-                              </div>
+                              <p className="text-sm font-medium">{q.topic}</p>
                               <p className="text-xs text-muted-foreground">
                                 {q.year}년 {q.round}회 {q.number}번
                               </p>
                             </div>
-                            <span
-                              className={`px-2 py-0.5 rounded text-xs ${getDifficultyStyle(q.difficulty)}`}
-                            >
-                              {q.difficulty}
-                            </span>
                           </div>
                         ))
                       )}
@@ -625,13 +550,6 @@ const Edge = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <p className="font-medium">{q.topic}</p>
-                        <span className={`px-2 py-0.5 rounded text-xs ${
-                          q.difficulty === "상" ? "bg-red-100 text-red-700" :
-                          q.difficulty === "중" ? "bg-blue-100 text-blue-700" :
-                          "bg-gray-100 text-gray-600"
-                        }`}>
-                          {q.difficulty}
-                        </span>
                       </div>
                       <p className="text-xs text-gray-500 mb-4">
                         출처: {q.year}년 {q.round}회 {q.number}번

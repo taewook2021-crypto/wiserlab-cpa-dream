@@ -81,7 +81,6 @@ const Edge = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [activeAreaFilter, setActiveAreaFilter] = useState<number | null>(null);
   const [includeNotes, setIncludeNotes] = useState(false);
-  const [includeSolutions, setIncludeSolutions] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -159,7 +158,6 @@ const Edge = () => {
       selectedQuestions,
       activeAreaFilter,
       includeNotes,
-      includeSolutions,
       savedAt: new Date().toISOString(),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
@@ -177,7 +175,6 @@ const Edge = () => {
         setSelectedQuestions(config.selectedQuestions || []);
         setActiveAreaFilter(config.activeAreaFilter ?? null);
         setIncludeNotes(config.includeNotes || false);
-        setIncludeSolutions(config.includeSolutions || false);
         toast({
           title: "구성 불러오기 완료",
           description: "저장된 설정이 복원되었습니다.",
@@ -462,19 +459,6 @@ const Edge = () => {
                           onCheckedChange={setIncludeNotes}
                         />
                       </div>
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="include-solutions" className="cursor-pointer">
-                          해설 포함
-                          <span className="block text-xs text-muted-foreground">
-                            문제 풀이 후 확인할 해설을 추가합니다
-                          </span>
-                        </Label>
-                        <Switch
-                          id="include-solutions"
-                          checked={includeSolutions}
-                          onCheckedChange={setIncludeSolutions}
-                        />
-                      </div>
                     </div>
                   </div>
 
@@ -518,7 +502,6 @@ const Edge = () => {
               <p className="text-sm text-gray-600">
                 Wiser Lab Edge | {exams[exam]} 기반 | {selectedQuestions.length}문제
                 {includeNotes && " | 메모 포함"}
-                {includeSolutions && " | 해설 포함"}
               </p>
             </div>
 
@@ -575,15 +558,6 @@ const Edge = () => {
                               <div key={line} className="border-b border-gray-200 h-6" />
                             ))}
                           </div>
-                        </div>
-                      )}
-                      {/* 해설 */}
-                      {includeSolutions && (
-                        <div className="mt-4 pt-4 border-t border-gray-200 bg-yellow-50 p-3 rounded">
-                          <p className="text-xs font-medium text-gray-700 mb-1">[해설]</p>
-                          <p className="text-sm text-gray-600">
-                            이 문제의 정답은 ③번입니다. 해설 내용이 여기에 표시됩니다.
-                          </p>
                         </div>
                       )}
                     </div>

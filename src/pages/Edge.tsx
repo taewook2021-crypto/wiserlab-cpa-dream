@@ -139,21 +139,23 @@ const Edge = () => {
                   {/* 취약 영역 분석 */}
                   <div className="bg-card border border-border rounded-lg p-8 mb-8">
                     <h2 className="text-lg font-light mb-6">취약 영역 분석</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {mockWeakAreas.map((area) => (
-                        <div
-                          key={area.id}
-                          className="p-4 bg-muted/50 rounded-lg text-center"
-                        >
-                          <p className="font-medium mb-1">{area.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            오답 {area.wrongCount}개
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            관련 기출 {area.relatedCount}문제
-                          </p>
-                        </div>
-                      ))}
+                    <div className="overflow-x-auto -mx-2 px-2 pb-2">
+                      <div className="flex gap-4 min-w-max">
+                        {mockWeakAreas.map((area) => (
+                          <div
+                            key={area.id}
+                            className="p-4 bg-muted/50 rounded-lg text-center min-w-[140px]"
+                          >
+                            <p className="font-medium mb-1">{area.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              오답 {area.wrongCount}개
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              관련 기출 {area.relatedCount}문제
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 

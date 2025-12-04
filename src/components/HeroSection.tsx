@@ -1,9 +1,17 @@
 import mountainHero from "@/assets/mountain-hero.jpg";
+import OptimizedImage from "@/components/OptimizedImage";
+
 const HeroSection = () => {
   return <section className="min-h-screen pt-16">
       {/* Hero Image Section */}
       <div className="relative h-[60vh] bg-black overflow-hidden">
-        <img src={mountainHero} alt="Mountain Peak" className="w-full h-full object-cover opacity-70" />
+        <OptimizedImage 
+          src={mountainHero} 
+          alt="Mountain Peak" 
+          className="w-full h-full object-cover opacity-70"
+          containerClassName="w-full h-full"
+          priority={true}
+        />
       </div>
 
       {/* Content Section */}

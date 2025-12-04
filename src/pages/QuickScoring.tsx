@@ -64,7 +64,7 @@ const QuickScoring = () => {
   const handleAnswerChange = (index: number, value: string) => {
     const group = answers[index];
     const maxLength = group.endNum - group.startNum + 1;
-    const numericValue = value.replace(/[^1-5]/g, "").slice(0, maxLength);
+    const numericValue = value.replace(/[^0-5]/g, "").slice(0, maxLength);
     setAnswers((prev) =>
       prev.map((g, i) =>
         i === index ? { ...g, value: numericValue } : g
@@ -288,7 +288,7 @@ const QuickScoring = () => {
                   * 각 칸에 해당 문제의 답을 순서대로 입력하세요.
                   <br />* 1~5번 문제의 답이 5, 4, 3, 1, 2번이면 "54312"를
                   입력합니다.
-                  <br />* 답은 1~5 사이의 숫자만 입력 가능합니다.
+                  <br />* 답은 0~5 사이의 숫자만 입력 가능합니다. (0 = 미응답)
                 </p>
               </div>
 

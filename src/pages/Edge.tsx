@@ -1,16 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileText, ArrowLeft, Download, X } from "lucide-react";
+import { 
+  FileText, 
+  ArrowLeft, 
+  Download, 
+  X, 
+  ChevronLeft, 
+  ChevronRight,
+  Save,
+  FolderOpen,
+  Sparkles
+} from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const subjects: Record<string, string> = {
   financial: "재무회계",
@@ -34,21 +48,50 @@ const mockWeakAreas = [
   { id: 8, name: "연결재무제표", wrongCount: 2, relatedCount: 14 },
 ];
 
-// 목업 추천 기출문제 데이터
-const initialPastQuestions = [
-  { id: 1, year: 2024, round: 1, number: 12, topic: "재고자산 - 저가법 적용" },
-  { id: 2, year: 2024, round: 2, number: 8, topic: "재고자산 - 매출원가 계산" },
-  { id: 3, year: 2023, round: 1, number: 15, topic: "유형자산 - 감가상각" },
-  { id: 4, year: 2023, round: 2, number: 22, topic: "금융상품 - 공정가치 측정" },
-  { id: 5, year: 2022, round: 1, number: 18, topic: "금융상품 - 손상차손" },
-  { id: 6, year: 2022, round: 2, number: 11, topic: "수익인식 - 계약변경" },
+type Difficulty = "상" | "중" | "하";
+type Frequency = "high" | "medium" | "low";
+
+interface PastQuestion {
+  id: number;
+  year: number;
+  round: number;
+  number: number;
+  topic: string;
+  areaId: number;
+  difficulty: Difficulty;
+  frequency: Frequency;
+}
+
+// 목업 추천 기출문제 데이터 (영역, 난이도, 빈도 추가)
+const initialPastQuestions: PastQuestion[] = [
+  { id: 1, year: 2024, round: 1, number: 12, topic: "재고자산 - 저가법 적용", areaId: 1, difficulty: "중", frequency: "high" },
+  { id: 2, year: 2024, round: 2, number: 8, topic: "재고자산 - 매출원가 계산", areaId: 1, difficulty: "하", frequency: "medium" },
+  { id: 3, year: 2023, round: 1, number: 15, topic: "유형자산 - 감가상각", areaId: 2, difficulty: "중", frequency: "high" },
+  { id: 4, year: 2023, round: 2, number: 22, topic: "금융상품 - 공정가치 측정", areaId: 3, difficulty: "상", frequency: "medium" },
+  { id: 5, year: 2022, round: 1, number: 18, topic: "금융상품 - 손상차손", areaId: 3, difficulty: "상", frequency: "low" },
+  { id: 6, year: 2022, round: 2, number: 11, topic: "수익인식 - 계약변경", areaId: 4, difficulty: "중", frequency: "high" },
+  { id: 7, year: 2024, round: 1, number: 25, topic: "리스회계 - 사용권자산", areaId: 5, difficulty: "상", frequency: "medium" },
+  { id: 8, year: 2023, round: 2, number: 19, topic: "충당부채 - 측정기준", areaId: 6, difficulty: "하", frequency: "low" },
+  { id: 9, year: 2024, round: 2, number: 30, topic: "법인세회계 - 이연법인세", areaId: 7, difficulty: "상", frequency: "high" },
+  { id: 10, year: 2022, round: 1, number: 33, topic: "연결재무제표 - 내부거래 제거", areaId: 8, difficulty: "상", frequency: "high" },
 ];
+
+const STORAGE_KEY = "edge-exam-config";
 
 const Edge = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // 상태
   const [selectedQuestions, setSelectedQuestions] = useState<number[]>([1, 2, 3]);
   const [showPreview, setShowPreview] = useState(false);
+  const [activeAreaFilter, setActiveAreaFilter] = useState<number | null>(null);
+  const [difficultyFilters, setDifficultyFilters] = useState<Difficulty[]>([]);
+  const [includeNotes, setIncludeNotes] = useState(false);
+  const [includeSolutions, setIncludeSolutions] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const subject = searchParams.get("subject") || "";
   const exam = searchParams.get("exam") || "";
@@ -60,6 +103,50 @@ const Edge = () => {
 
   const hasData = subject && exam && wrongQuestions.length > 0;
 
+  // 스크롤 상태 체크
+  const checkScrollState = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 1
+      );
+    }
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      checkScrollState();
+      container.addEventListener("scroll", checkScrollState);
+      window.addEventListener("resize", checkScrollState);
+      return () => {
+        container.removeEventListener("scroll", checkScrollState);
+        window.removeEventListener("resize", checkScrollState);
+      };
+    }
+  }, [hasData]);
+
+  // 스크롤 핸들러
+  const scrollWeakAreas = (direction: "left" | "right") => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollAmount = 200;
+      container.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // 필터링된 문제 목록
+  const filteredQuestions = initialPastQuestions.filter((q) => {
+    const areaMatch = activeAreaFilter === null || q.areaId === activeAreaFilter;
+    const difficultyMatch =
+      difficultyFilters.length === 0 || difficultyFilters.includes(q.difficulty);
+    return areaMatch && difficultyMatch;
+  });
+
   const toggleQuestion = (id: number) => {
     setSelectedQuestions((prev) =>
       prev.includes(id) ? prev.filter((q) => q !== id) : [...prev, id]
@@ -67,16 +154,93 @@ const Edge = () => {
   };
 
   const toggleAll = () => {
-    if (selectedQuestions.length === initialPastQuestions.length) {
-      setSelectedQuestions([]);
+    const filteredIds = filteredQuestions.map((q) => q.id);
+    const allSelected = filteredIds.every((id) => selectedQuestions.includes(id));
+    if (allSelected) {
+      setSelectedQuestions((prev) => prev.filter((id) => !filteredIds.includes(id)));
     } else {
-      setSelectedQuestions(initialPastQuestions.map((q) => q.id));
+      setSelectedQuestions((prev) => [...new Set([...prev, ...filteredIds])]);
+    }
+  };
+
+  const toggleDifficulty = (diff: Difficulty) => {
+    setDifficultyFilters((prev) =>
+      prev.includes(diff) ? prev.filter((d) => d !== diff) : [...prev, diff]
+    );
+  };
+
+  // 저장/불러오기
+  const saveConfig = () => {
+    const config = {
+      selectedQuestions,
+      activeAreaFilter,
+      difficultyFilters,
+      includeNotes,
+      includeSolutions,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    toast({
+      title: "구성 저장 완료",
+      description: "선택한 문제와 설정이 저장되었습니다.",
+    });
+  };
+
+  const loadConfig = () => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const config = JSON.parse(saved);
+        setSelectedQuestions(config.selectedQuestions || []);
+        setActiveAreaFilter(config.activeAreaFilter ?? null);
+        setDifficultyFilters(config.difficultyFilters || []);
+        setIncludeNotes(config.includeNotes || false);
+        setIncludeSolutions(config.includeSolutions || false);
+        toast({
+          title: "구성 불러오기 완료",
+          description: "저장된 설정이 복원되었습니다.",
+        });
+      } catch {
+        toast({
+          title: "불러오기 실패",
+          description: "저장된 구성을 불러올 수 없습니다.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "저장된 구성 없음",
+        description: "저장된 구성이 없습니다.",
+      });
     }
   };
 
   const selectedPastQuestions = initialPastQuestions.filter((q) =>
     selectedQuestions.includes(q.id)
   );
+
+  const getFrequencyBadge = (frequency: Frequency) => {
+    if (frequency === "high") {
+      return (
+        <Badge variant="secondary" className="text-xs gap-1">
+          <Sparkles className="w-3 h-3" />
+          자주 출제
+        </Badge>
+      );
+    }
+    return null;
+  };
+
+  const getDifficultyStyle = (difficulty: Difficulty) => {
+    switch (difficulty) {
+      case "상":
+        return "bg-destructive/10 text-destructive";
+      case "중":
+        return "bg-primary/10 text-primary";
+      case "하":
+        return "bg-muted text-muted-foreground";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -112,14 +276,36 @@ const Edge = () => {
                 </div>
               ) : (
                 <>
-                  {/* 과목/회차 정보 */}
-                  <div className="flex items-center justify-center gap-4 mb-12 text-sm text-muted-foreground">
-                    <span className="px-3 py-1 bg-muted rounded-full">
-                      {subjects[subject]}
-                    </span>
-                    <span className="px-3 py-1 bg-muted rounded-full">
-                      {exams[exam]}
-                    </span>
+                  {/* 과목/회차 정보 + 저장/불러오기 */}
+                  <div className="flex items-center justify-between mb-12">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span className="px-3 py-1 bg-muted rounded-full">
+                        {subjects[subject]}
+                      </span>
+                      <span className="px-3 py-1 bg-muted rounded-full">
+                        {exams[exam]}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={loadConfig}
+                        aria-label="저장된 구성 불러오기"
+                      >
+                        <FolderOpen className="w-4 h-4 mr-1" />
+                        불러오기
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={saveConfig}
+                        aria-label="현재 구성 저장하기"
+                      >
+                        <Save className="w-4 h-4 mr-1" />
+                        저장
+                      </Button>
+                    </div>
                   </div>
 
                   {/* 틀린 문제 목록 */}
@@ -140,63 +326,230 @@ const Edge = () => {
                     </div>
                   </div>
 
-                  {/* 취약 영역 분석 */}
+                  {/* 취약 영역 분석 (스크롤 인디케이터 포함) */}
                   <div className="bg-card border border-border rounded-lg p-8 mb-8">
-                    <h2 className="text-lg font-light mb-6">취약 영역 분석</h2>
-                    <div className="overflow-x-auto -mx-2 px-2 pb-2">
-                      <div className="flex gap-4 min-w-max">
-                        {mockWeakAreas.map((area) => (
-                          <div
-                            key={area.id}
-                            className="p-4 bg-muted/50 rounded-lg text-center min-w-[140px]"
-                          >
-                            <p className="font-medium mb-1">{area.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              오답 {area.wrongCount}개
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              관련 기출 {area.relatedCount}문제
-                            </p>
-                          </div>
-                        ))}
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-lg font-light">취약 영역 분석</h2>
+                      {activeAreaFilter && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setActiveAreaFilter(null)}
+                          className="text-muted-foreground"
+                        >
+                          필터 초기화
+                        </Button>
+                      )}
+                    </div>
+                    <div className="relative">
+                      {/* 스크롤 인디케이터 - 왼쪽 */}
+                      {canScrollLeft && (
+                        <button
+                          onClick={() => scrollWeakAreas("left")}
+                          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-background/90 border border-border rounded-full flex items-center justify-center shadow-sm hover:bg-muted transition-colors"
+                          aria-label="왼쪽으로 스크롤"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                      )}
+                      {/* 스크롤 인디케이터 - 오른쪽 */}
+                      {canScrollRight && (
+                        <button
+                          onClick={() => scrollWeakAreas("right")}
+                          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-background/90 border border-border rounded-full flex items-center justify-center shadow-sm hover:bg-muted transition-colors"
+                          aria-label="오른쪽으로 스크롤"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      )}
+                      {/* 그라데이션 페이드 */}
+                      {canScrollLeft && (
+                        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent pointer-events-none z-[5]" />
+                      )}
+                      {canScrollRight && (
+                        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none z-[5]" />
+                      )}
+                      <div
+                        ref={scrollContainerRef}
+                        className="overflow-x-auto scrollbar-hide -mx-2 px-2 pb-2"
+                        role="listbox"
+                        aria-label="취약 영역 목록"
+                      >
+                        <div className="flex gap-4 min-w-max">
+                          {mockWeakAreas.map((area) => (
+                            <button
+                              key={area.id}
+                              onClick={() =>
+                                setActiveAreaFilter(
+                                  activeAreaFilter === area.id ? null : area.id
+                                )
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  setActiveAreaFilter(
+                                    activeAreaFilter === area.id ? null : area.id
+                                  );
+                                }
+                              }}
+                              className={`p-4 rounded-lg text-center min-w-[140px] transition-all duration-200 ${
+                                activeAreaFilter === area.id
+                                  ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-card scale-[1.02]"
+                                  : "bg-muted/50 hover:bg-muted hover:scale-[1.01]"
+                              }`}
+                              role="option"
+                              aria-selected={activeAreaFilter === area.id}
+                              tabIndex={0}
+                            >
+                              <p className="font-medium mb-1">{area.name}</p>
+                              <p className={`text-sm ${activeAreaFilter === area.id ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                오답 {area.wrongCount}개
+                              </p>
+                              <p className={`text-xs ${activeAreaFilter === area.id ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                                관련 기출 {area.relatedCount}문제
+                              </p>
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* 추천 기출문제 */}
                   <div className="bg-card border border-border rounded-lg p-8 mb-8">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-lg font-light">추천 관련 기출문제</h2>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-muted-foreground"
-                        onClick={toggleAll}
-                      >
-                        {selectedQuestions.length === initialPastQuestions.length
-                          ? "전체 해제"
-                          : "전체 선택"}
-                      </Button>
-                    </div>
-                    <div className="space-y-3">
-                      {initialPastQuestions.map((q) => (
-                        <div
-                          key={q.id}
-                          className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                          onClick={() => toggleQuestion(q.id)}
+                    <div className="flex flex-col gap-4 mb-6">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-lg font-light">
+                          추천 관련 기출문제
+                          <span className="ml-2 text-sm text-muted-foreground">
+                            ({filteredQuestions.length}문제 중{" "}
+                            {filteredQuestions.filter((q) => selectedQuestions.includes(q.id)).length}개 선택)
+                          </span>
+                        </h2>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-muted-foreground"
+                          onClick={toggleAll}
+                          aria-label={
+                            filteredQuestions.every((q) => selectedQuestions.includes(q.id))
+                              ? "전체 해제"
+                              : "전체 선택"
+                          }
                         >
-                          <Checkbox
-                            checked={selectedQuestions.includes(q.id)}
-                            onCheckedChange={() => toggleQuestion(q.id)}
-                          />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{q.topic}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {q.year}년 {q.round}회 {q.number}번
-                            </p>
+                          {filteredQuestions.every((q) => selectedQuestions.includes(q.id))
+                            ? "전체 해제"
+                            : "전체 선택"}
+                        </Button>
+                      </div>
+                      {/* 난이도 필터 */}
+                      <div className="flex items-center gap-2 flex-wrap" role="group" aria-label="난이도 필터">
+                        <span className="text-sm text-muted-foreground mr-1">난이도:</span>
+                        {(["상", "중", "하"] as Difficulty[]).map((diff) => (
+                          <button
+                            key={diff}
+                            onClick={() => toggleDifficulty(diff)}
+                            className={`px-3 py-1 rounded-full text-sm transition-all ${
+                              difficultyFilters.includes(diff)
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                            }`}
+                            aria-pressed={difficultyFilters.includes(diff)}
+                          >
+                            {diff}
+                          </button>
+                        ))}
+                        {difficultyFilters.length > 0 && (
+                          <button
+                            onClick={() => setDifficultyFilters([])}
+                            className="text-xs text-muted-foreground underline ml-2"
+                          >
+                            초기화
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-3" role="listbox" aria-label="기출문제 목록">
+                      {filteredQuestions.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-8">
+                          필터 조건에 맞는 문제가 없습니다.
+                        </p>
+                      ) : (
+                        filteredQuestions.map((q) => (
+                          <div
+                            key={q.id}
+                            className={`flex items-center gap-4 p-4 rounded-lg cursor-pointer transition-all duration-200 ${
+                              selectedQuestions.includes(q.id)
+                                ? "bg-primary/5 ring-1 ring-primary/20"
+                                : "bg-muted/30 hover:bg-muted/50"
+                            }`}
+                            onClick={() => toggleQuestion(q.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                toggleQuestion(q.id);
+                              }
+                            }}
+                            role="option"
+                            aria-selected={selectedQuestions.includes(q.id)}
+                            tabIndex={0}
+                          >
+                            <Checkbox
+                              checked={selectedQuestions.includes(q.id)}
+                              onCheckedChange={() => toggleQuestion(q.id)}
+                              className="transition-transform duration-200 data-[state=checked]:scale-110"
+                              aria-label={`${q.topic} 선택`}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-sm font-medium">{q.topic}</p>
+                                {getFrequencyBadge(q.frequency)}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {q.year}년 {q.round}회 {q.number}번
+                              </p>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded text-xs ${getDifficultyStyle(q.difficulty)}`}
+                            >
+                              {q.difficulty}
+                            </span>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 시험지 옵션 */}
+                  <div className="bg-card border border-border rounded-lg p-8 mb-8">
+                    <h2 className="text-lg font-light mb-6">시험지 옵션</h2>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="include-notes" className="cursor-pointer">
+                          메모 공간 포함
+                          <span className="block text-xs text-muted-foreground">
+                            각 문제 아래에 메모할 공간을 추가합니다
+                          </span>
+                        </Label>
+                        <Switch
+                          id="include-notes"
+                          checked={includeNotes}
+                          onCheckedChange={setIncludeNotes}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="include-solutions" className="cursor-pointer">
+                          해설 포함
+                          <span className="block text-xs text-muted-foreground">
+                            문제 풀이 후 확인할 해설을 추가합니다
+                          </span>
+                        </Label>
+                        <Switch
+                          id="include-solutions"
+                          checked={includeSolutions}
+                          onCheckedChange={setIncludeSolutions}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -207,6 +560,7 @@ const Edge = () => {
                       className="w-full max-w-md h-14 text-base font-normal"
                       disabled={selectedQuestions.length === 0}
                       onClick={() => setShowPreview(true)}
+                      aria-label={`맞춤형 시험지 생성 - ${selectedQuestions.length}문제`}
                     >
                       맞춤형 시험지 생성 ({selectedQuestions.length}문제)
                     </Button>
@@ -230,7 +584,7 @@ const Edge = () => {
           </DialogHeader>
 
           {/* 시험지 미리보기 컨텐츠 */}
-          <div className="bg-white text-black p-8 rounded-lg border">
+          <div className="bg-white text-black p-8 rounded-lg border print:p-0 print:border-0">
             {/* 시험지 헤더 */}
             <div className="text-center border-b-2 border-black pb-6 mb-8">
               <h1 className="text-2xl font-bold mb-2">
@@ -238,6 +592,8 @@ const Edge = () => {
               </h1>
               <p className="text-sm text-gray-600">
                 Wiser Lab Edge | {exams[exam]} 기반 | {selectedQuestions.length}문제
+                {includeNotes && " | 메모 포함"}
+                {includeSolutions && " | 해설 포함"}
               </p>
             </div>
 
@@ -256,13 +612,27 @@ const Edge = () => {
             {/* 문제 목록 */}
             <div className="space-y-8">
               {selectedPastQuestions.map((q, idx) => (
-                <div key={q.id} className="pb-6 border-b border-gray-200 last:border-0">
+                <div 
+                  key={q.id} 
+                  className={`pb-6 border-b border-gray-200 last:border-0 ${
+                    (idx + 1) % 5 === 0 ? "print:break-after-page" : ""
+                  }`}
+                >
                   <div className="flex items-start gap-4">
                     <span className="flex-shrink-0 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-bold">
                       {idx + 1}
                     </span>
                     <div className="flex-1">
-                      <p className="font-medium mb-2">{q.topic}</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <p className="font-medium">{q.topic}</p>
+                        <span className={`px-2 py-0.5 rounded text-xs ${
+                          q.difficulty === "상" ? "bg-red-100 text-red-700" :
+                          q.difficulty === "중" ? "bg-blue-100 text-blue-700" :
+                          "bg-gray-100 text-gray-600"
+                        }`}>
+                          {q.difficulty}
+                        </span>
+                      </div>
                       <p className="text-xs text-gray-500 mb-4">
                         출처: {q.year}년 {q.round}회 {q.number}번
                       </p>
@@ -278,6 +648,26 @@ const Edge = () => {
                         <p>④ 보기 4</p>
                         <p>⑤ 보기 5</p>
                       </div>
+                      {/* 메모 공간 */}
+                      {includeNotes && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <p className="text-xs text-gray-400 mb-2">메모</p>
+                          <div className="space-y-2">
+                            {[1, 2, 3].map((line) => (
+                              <div key={line} className="border-b border-gray-200 h-6" />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {/* 해설 */}
+                      {includeSolutions && (
+                        <div className="mt-4 pt-4 border-t border-gray-200 bg-yellow-50 p-3 rounded">
+                          <p className="text-xs font-medium text-gray-700 mb-1">[해설]</p>
+                          <p className="text-sm text-gray-600">
+                            이 문제의 정답은 ③번입니다. 해설 내용이 여기에 표시됩니다.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -285,7 +675,7 @@ const Edge = () => {
             </div>
 
             {/* 답안 표기란 */}
-            <div className="mt-8 pt-6 border-t-2 border-black">
+            <div className="mt-8 pt-6 border-t-2 border-black print:break-before-page">
               <h3 className="font-bold mb-4">답안 표기란</h3>
               <div className="grid grid-cols-5 gap-4">
                 {selectedPastQuestions.map((_, idx) => (

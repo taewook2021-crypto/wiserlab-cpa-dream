@@ -9,7 +9,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Trophy, Medal, Award } from "lucide-react";
 
 // Mock data - 150명 기준 통계
 const TOTAL_PARTICIPANTS = 150;
@@ -20,23 +19,23 @@ const COMPETITIVE_ZONE_PERCENTILE = 70; // 상위 70%
 const SAFE_ZONE_CUTOFF = 28; // 80점
 const COMPETITIVE_ZONE_CUTOFF = 22; // 약 63점
 
-// Mock billboard data - 상위 40% 진입자들
+// Mock billboard data - 전국 응시자 (서울대/연대 제외)
 const mockBillboard = [
-  { rank: 1, nickname: "재무왕", score: 35, university: "서울대" },
-  { rank: 2, nickname: "회계마스터", score: 34, university: "연세대" },
-  { rank: 3, nickname: "CPA예비생", score: 34, university: "서울대" },
-  { rank: 4, nickname: "합격기원", score: 33, university: "서울대" },
-  { rank: 5, nickname: "열공중", score: 33, university: "연세대" },
-  { rank: 6, nickname: "막차탑승", score: 32, university: "서울대" },
-  { rank: 7, nickname: "파이팅", score: 32, university: "연세대" },
-  { rank: 8, nickname: "새벽공부", score: 31, university: "서울대" },
-  { rank: 9, nickname: "합격예정", score: 31, university: "연세대" },
-  { rank: 10, nickname: "끝까지", score: 30, university: "서울대" },
-  { rank: 11, nickname: "도전자", score: 30, university: "연세대" },
-  { rank: 12, nickname: "열정맨", score: 29, university: "서울대" },
-  { rank: 13, nickname: "노력파", score: 29, university: "연세대" },
-  { rank: 14, nickname: "성실이", score: 28, university: "서울대" },
-  { rank: 15, nickname: "꾸준히", score: 28, university: "연세대" },
+  { rank: 1, nickname: "재무왕", score: 35 },
+  { rank: 2, nickname: "회계마스터", score: 34 },
+  { rank: 3, nickname: "CPA예비생", score: 34 },
+  { rank: 4, nickname: "합격기원", score: 33 },
+  { rank: 5, nickname: "열공중", score: 33 },
+  { rank: 6, nickname: "막차탑승", score: 32 },
+  { rank: 7, nickname: "파이팅", score: 32 },
+  { rank: 8, nickname: "새벽공부", score: 31 },
+  { rank: 9, nickname: "합격예정", score: 31 },
+  { rank: 10, nickname: "끝까지", score: 30 },
+  { rank: 11, nickname: "도전자", score: 30 },
+  { rank: 12, nickname: "열정맨", score: 29 },
+  { rank: 13, nickname: "노력파", score: 29 },
+  { rank: 14, nickname: "성실이", score: 28 },
+  { rank: 15, nickname: "꾸준히", score: 28 },
 ];
 
 // Mock user score (나중에 실제 채점 결과로 대체)
@@ -47,35 +46,22 @@ const getZoneInfo = (score: number) => {
   if (score >= SAFE_ZONE_CUTOFF) {
     return {
       zone: "안정권",
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
-      borderColor: "border-green-500/30",
       description: "상위 40% 이내",
+      intensity: "high",
     };
   } else if (score >= COMPETITIVE_ZONE_CUTOFF) {
     return {
       zone: "경합권",
-      color: "text-yellow-500",
-      bgColor: "bg-yellow-500/10",
-      borderColor: "border-yellow-500/30",
       description: "상위 40% ~ 70%",
+      intensity: "medium",
     };
   } else {
     return {
       zone: "레드라인",
-      color: "text-red-500",
-      bgColor: "bg-red-500/10",
-      borderColor: "border-red-500/30",
       description: "상위 70% 이하",
+      intensity: "low",
     };
   }
-};
-
-const getRankIcon = (rank: number) => {
-  if (rank === 1) return <Trophy className="w-5 h-5 text-yellow-500" />;
-  if (rank === 2) return <Medal className="w-5 h-5 text-gray-400" />;
-  if (rank === 3) return <Award className="w-5 h-5 text-amber-600" />;
-  return null;
 };
 
 const Statistics = () => {
@@ -130,15 +116,21 @@ const Statistics = () => {
               </div>
 
               {/* 내 점수 & 존 표시 */}
-              <div className={`rounded-2xl p-8 mb-8 ${userZone.bgColor} border ${userZone.borderColor}`}>
+              <div className="border border-border rounded-none p-8 mb-8 bg-card">
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground mb-2">내 점수</p>
                   <p className="text-5xl font-light mb-1">
-                    <span className={userZone.color}>{mockUserScore}</span>
+                    <span className="text-foreground">{mockUserScore}</span>
                     <span className="text-muted-foreground text-2xl"> / 35</span>
                   </p>
-                  <div className="mt-4 mb-6">
-                    <span className={`inline-block px-4 py-1.5 rounded-full text-sm font-medium ${userZone.bgColor} ${userZone.color} border ${userZone.borderColor}`}>
+                  <div className="mt-6 mb-6">
+                    <span className={`inline-block px-6 py-2 text-sm font-medium border ${
+                      userZone.intensity === "high" 
+                        ? "bg-foreground text-background border-foreground" 
+                        : userZone.intensity === "medium"
+                        ? "bg-muted text-foreground border-border"
+                        : "bg-background text-muted-foreground border-muted-foreground"
+                    }`}>
                       {userZone.zone}
                     </span>
                   </div>
@@ -149,21 +141,21 @@ const Statistics = () => {
               </div>
 
               {/* 존 가이드 */}
-              <div className="grid grid-cols-3 gap-3 mb-12">
-                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-center">
-                  <p className="text-green-500 font-medium text-sm mb-1">안정권</p>
-                  <p className="text-xs text-muted-foreground">상위 40%</p>
-                  <p className="text-xs text-muted-foreground mt-1">{SAFE_ZONE_CUTOFF}점 이상</p>
+              <div className="grid grid-cols-3 gap-px bg-border mb-12">
+                <div className="bg-foreground text-background p-6 text-center">
+                  <p className="font-medium text-sm mb-1">안정권</p>
+                  <p className="text-xs opacity-70">상위 40%</p>
+                  <p className="text-xs opacity-70 mt-1">{SAFE_ZONE_CUTOFF}점 이상</p>
                 </div>
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-center">
-                  <p className="text-yellow-500 font-medium text-sm mb-1">경합권</p>
+                <div className="bg-muted text-foreground p-6 text-center">
+                  <p className="font-medium text-sm mb-1">경합권</p>
                   <p className="text-xs text-muted-foreground">상위 40~70%</p>
                   <p className="text-xs text-muted-foreground mt-1">{COMPETITIVE_ZONE_CUTOFF}~{SAFE_ZONE_CUTOFF - 1}점</p>
                 </div>
-                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-center">
-                  <p className="text-red-500 font-medium text-sm mb-1">레드라인</p>
-                  <p className="text-xs text-muted-foreground">상위 70% 이하</p>
-                  <p className="text-xs text-muted-foreground mt-1">{COMPETITIVE_ZONE_CUTOFF - 1}점 이하</p>
+                <div className="bg-background text-muted-foreground p-6 text-center border border-border">
+                  <p className="font-medium text-sm mb-1">레드라인</p>
+                  <p className="text-xs">상위 70% 이하</p>
+                  <p className="text-xs mt-1">{COMPETITIVE_ZONE_CUTOFF - 1}점 이하</p>
                 </div>
               </div>
 
@@ -174,43 +166,48 @@ const Statistics = () => {
                     <h2 className="text-xl font-light">전국 빌보드</h2>
                     <p className="text-sm text-muted-foreground">안정권 진입자 랭킹</p>
                   </div>
-                  <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                  <span className="text-xs text-muted-foreground border border-border px-3 py-1">
                     TOP {mockBillboard.length}
                   </span>
                 </div>
 
-                <div className="space-y-2">
+                <div className="border border-border divide-y divide-border">
                   {mockBillboard.map((entry) => (
                     <div
                       key={entry.rank}
-                      className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${
+                      className={`flex items-center gap-4 p-4 transition-colors ${
                         entry.rank <= 3
-                          ? "bg-primary/5 border-primary/20"
-                          : "bg-muted/30 border-border/50 hover:bg-muted/50"
+                          ? "bg-foreground text-background"
+                          : "bg-card hover:bg-muted/50"
                       }`}
                     >
                       {/* 순위 */}
-                      <div className="w-10 flex items-center justify-center">
-                        {getRankIcon(entry.rank) || (
-                          <span className="text-muted-foreground font-mono text-sm">
-                            {entry.rank}
-                          </span>
-                        )}
+                      <div className="w-10 text-center">
+                        <span className={`font-mono text-sm ${
+                          entry.rank <= 3 ? "font-medium" : "text-muted-foreground"
+                        }`}>
+                          {entry.rank}
+                        </span>
                       </div>
 
-                      {/* 닉네임 & 대학 */}
+                      {/* 닉네임 */}
                       <div className="flex-1 min-w-0">
-                        <p className={`font-medium truncate ${entry.rank <= 3 ? "text-foreground" : "text-foreground/80"}`}>
+                        <p className={`font-medium truncate ${
+                          entry.rank <= 3 ? "" : "text-foreground/80"
+                        }`}>
                           {entry.nickname}
                         </p>
-                        <p className="text-xs text-muted-foreground">{entry.university}</p>
                       </div>
 
                       {/* 점수 */}
                       <div className="text-right">
-                        <p className={`font-mono ${entry.rank <= 3 ? "text-primary font-medium" : "text-muted-foreground"}`}>
+                        <p className={`font-mono ${
+                          entry.rank <= 3 ? "font-medium" : "text-muted-foreground"
+                        }`}>
                           {entry.score}
-                          <span className="text-xs text-muted-foreground">/35</span>
+                          <span className={`text-xs ${
+                            entry.rank <= 3 ? "opacity-70" : "text-muted-foreground"
+                          }`}>/35</span>
                         </p>
                       </div>
                     </div>
@@ -219,7 +216,7 @@ const Statistics = () => {
               </div>
 
               {/* 안내 */}
-              <div className="bg-muted/50 rounded-lg p-6 text-center">
+              <div className="border border-border p-6 text-center bg-muted/30">
                 <p className="text-sm text-muted-foreground">
                   통계는 서울대학교, 연세대학교 고시반 응시자 데이터를 기반으로 합니다.
                 </p>

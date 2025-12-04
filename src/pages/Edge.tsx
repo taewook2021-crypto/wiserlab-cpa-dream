@@ -4,8 +4,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -80,7 +78,7 @@ const Edge = () => {
   const [selectedQuestions, setSelectedQuestions] = useState<number[]>([1, 2, 3]);
   const [showPreview, setShowPreview] = useState(false);
   const [activeAreaFilter, setActiveAreaFilter] = useState<number | null>(null);
-  const [includeNotes, setIncludeNotes] = useState(false);
+  
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -157,7 +155,6 @@ const Edge = () => {
     const config = {
       selectedQuestions,
       activeAreaFilter,
-      includeNotes,
       savedAt: new Date().toISOString(),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
@@ -174,7 +171,6 @@ const Edge = () => {
         const config = JSON.parse(saved);
         setSelectedQuestions(config.selectedQuestions || []);
         setActiveAreaFilter(config.activeAreaFilter ?? null);
-        setIncludeNotes(config.includeNotes || false);
         toast({
           title: "구성 불러오기 완료",
           description: "저장된 설정이 복원되었습니다.",
@@ -442,25 +438,6 @@ const Edge = () => {
                     </div>
                   </div>
 
-                  {/* 시험지 옵션 */}
-                  <div className="bg-card border border-border rounded-lg p-8 mb-8">
-                    <h2 className="text-lg font-light mb-6">시험지 옵션</h2>
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="include-notes" className="cursor-pointer">
-                          메모 공간 포함
-                          <span className="block text-xs text-muted-foreground">
-                            각 문제 아래에 메모할 공간을 추가합니다
-                          </span>
-                        </Label>
-                        <Switch
-                          id="include-notes"
-                          checked={includeNotes}
-                          onCheckedChange={setIncludeNotes}
-                        />
-                      </div>
-                    </div>
-                  </div>
 
                   {/* 시험지 생성 버튼 */}
                   <div className="text-center">
@@ -501,7 +478,6 @@ const Edge = () => {
               </h1>
               <p className="text-sm text-gray-600">
                 Wiser Lab Edge | {exams[exam]} 기반 | {selectedQuestions.length}문제
-                {includeNotes && " | 메모 포함"}
               </p>
             </div>
 
@@ -549,17 +525,6 @@ const Edge = () => {
                         <p>④ 보기 4</p>
                         <p>⑤ 보기 5</p>
                       </div>
-                      {/* 메모 공간 */}
-                      {includeNotes && (
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                          <p className="text-xs text-gray-400 mb-2">메모</p>
-                          <div className="space-y-2">
-                            {[1, 2, 3].map((line) => (
-                              <div key={line} className="border-b border-gray-200 h-6" />
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>

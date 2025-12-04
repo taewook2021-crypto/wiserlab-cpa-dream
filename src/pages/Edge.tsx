@@ -16,11 +16,8 @@ import {
   Download, 
   X, 
   ChevronLeft, 
-  ChevronRight,
-  Save,
-  FolderOpen
+  ChevronRight
 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 
 const subjects: Record<string, string> = {
   financial: "재무회계",
@@ -66,8 +63,6 @@ const initialPastQuestions: PastQuestion[] = [
   { id: 9, year: 2024, round: 2, number: 30, topic: "법인세회계 - 이연법인세", areaId: 7 },
   { id: 10, year: 2022, round: 1, number: 33, topic: "연결재무제표 - 내부거래 제거", areaId: 8 },
 ];
-
-const STORAGE_KEY = "edge-exam-config";
 
 const Edge = () => {
   const [searchParams] = useSearchParams();
@@ -149,47 +144,6 @@ const Edge = () => {
     }
   };
 
-
-  // 저장/불러오기
-  const saveConfig = () => {
-    const config = {
-      selectedQuestions,
-      activeAreaFilter,
-      savedAt: new Date().toISOString(),
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-    toast({
-      title: "구성 저장 완료",
-      description: "선택한 문제와 설정이 저장되었습니다.",
-    });
-  };
-
-  const loadConfig = () => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const config = JSON.parse(saved);
-        setSelectedQuestions(config.selectedQuestions || []);
-        setActiveAreaFilter(config.activeAreaFilter ?? null);
-        toast({
-          title: "구성 불러오기 완료",
-          description: "저장된 설정이 복원되었습니다.",
-        });
-      } catch {
-        toast({
-          title: "불러오기 실패",
-          description: "저장된 구성을 불러올 수 없습니다.",
-          variant: "destructive",
-        });
-      }
-    } else {
-      toast({
-        title: "저장된 구성 없음",
-        description: "저장된 구성이 없습니다.",
-      });
-    }
-  };
-
   const selectedPastQuestions = initialPastQuestions.filter((q) =>
     selectedQuestions.includes(q.id)
   );
@@ -228,36 +182,14 @@ const Edge = () => {
                 </div>
               ) : (
                 <>
-                  {/* 과목/회차 정보 + 저장/불러오기 */}
-                  <div className="flex items-center justify-between mb-12">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="px-3 py-1 bg-muted rounded-full">
-                        {subjects[subject]}
-                      </span>
-                      <span className="px-3 py-1 bg-muted rounded-full">
-                        {exams[exam]}
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={loadConfig}
-                        aria-label="저장된 구성 불러오기"
-                      >
-                        <FolderOpen className="w-4 h-4 mr-1" />
-                        불러오기
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={saveConfig}
-                        aria-label="현재 구성 저장하기"
-                      >
-                        <Save className="w-4 h-4 mr-1" />
-                        저장
-                      </Button>
-                    </div>
+                  {/* 과목/회차 정보 */}
+                  <div className="flex items-center justify-center gap-4 mb-12 text-sm text-muted-foreground">
+                    <span className="px-3 py-1 bg-muted rounded-full">
+                      {subjects[subject]}
+                    </span>
+                    <span className="px-3 py-1 bg-muted rounded-full">
+                      {exams[exam]}
+                    </span>
                   </div>
 
                   {/* 틀린 문제 목록 */}

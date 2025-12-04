@@ -14,7 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      exam_answer_keys: {
+        Row: {
+          correct_answer: number
+          created_at: string
+          exam_name: string
+          exam_round: number
+          id: string
+          question_number: number
+          subject: Database["public"]["Enums"]["exam_subject"]
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string
+          exam_name: string
+          exam_round: number
+          id?: string
+          question_number: number
+          subject: Database["public"]["Enums"]["exam_subject"]
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string
+          exam_name?: string
+          exam_round?: number
+          id?: string
+          question_number?: number
+          subject?: Database["public"]["Enums"]["exam_subject"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +52,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      exam_subject: "financial_accounting" | "tax_law"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +179,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      exam_subject: ["financial_accounting", "tax_law"],
+    },
   },
 } as const

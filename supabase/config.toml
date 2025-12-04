@@ -1,1 +1,4 @@
 project_id = "ipholpmeblfnkbbereih"
+
+[functions.seed-answer-keys]
+verify_jwt = false

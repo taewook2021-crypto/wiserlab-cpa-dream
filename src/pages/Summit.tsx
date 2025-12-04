@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import OptimizedImage from "@/components/OptimizedImage";
 import summitFeature from "@/assets/summit-feature.jpg";
 import summitProduct from "@/assets/summit-product.png";
 interface Subject {
@@ -64,7 +65,12 @@ const Summit = () => {
             <div className="grid md:grid-cols-2 gap-16 md:gap-20 items-start">
               {/* Left: Product Image */}
               <div className="flex items-center justify-center">
-                <img src={summitProduct} alt="Wiser Lab SUMMIT 모의고사 패키지" className="w-full max-w-2xl object-contain" />
+                <OptimizedImage 
+                  src={summitProduct} 
+                  alt="Wiser Lab SUMMIT 모의고사 패키지" 
+                  className="w-full max-w-2xl object-contain"
+                  containerClassName="w-full max-w-2xl"
+                />
               </div>
 
               {/* Right: Product Info */}
@@ -156,9 +162,12 @@ const Summit = () => {
         <section className="py-20 md:py-28 border-b border-border">
           <div className="grid md:grid-cols-2">
             {/* Left: Image */}
-            <div className="aspect-square md:aspect-auto md:min-h-[700px] bg-cover bg-center" style={{
-            backgroundImage: `url(${summitFeature})`
-          }} />
+            <OptimizedImage 
+              src={summitFeature}
+              alt="SUMMIT 모의고사 특징"
+              className="w-full h-full object-cover"
+              containerClassName="aspect-square md:aspect-auto md:min-h-[700px]"
+            />
 
             {/* Right: Features */}
             <div className="bg-background p-16 md:p-24 flex flex-col justify-center">

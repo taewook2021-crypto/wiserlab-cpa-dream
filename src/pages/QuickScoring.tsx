@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ const exams = [
 const TOTAL_QUESTIONS = 35;
 
 const QuickScoring = () => {
+  const navigate = useNavigate();
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [isScoring, setIsScoring] = useState(false);
@@ -237,11 +239,11 @@ const QuickScoring = () => {
                                 key={r.questionNumber}
                                 className={`text-lg font-bold w-6 text-center ${
                                   r.isCorrect
-                                    ? "text-green-600"
+                                    ? "text-blue-500"
                                     : "text-red-500"
                                 }`}
                               >
-                                {r.isCorrect ? "O" : "X"}
+                                {r.isCorrect ? "●" : "✕"}
                               </span>
                             ))}
                           </div>
@@ -259,9 +261,24 @@ const QuickScoring = () => {
                     <span className="text-primary font-medium">{correctCount}</span>
                     <span className="text-muted-foreground"> / {results.length}</span>
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mb-6">
                     정답률 {Math.round((correctCount / results.length) * 100)}%
                   </p>
+                  <div className="flex gap-4">
+                    <Button
+                      variant="outline"
+                      className="flex-1 h-12"
+                      onClick={() => navigate("/statistics")}
+                    >
+                      통계 확인하기
+                    </Button>
+                    <Button
+                      className="flex-1 h-12"
+                      onClick={() => navigate("/edge")}
+                    >
+                      Edge
+                    </Button>
+                  </div>
                 </div>
               )}
 

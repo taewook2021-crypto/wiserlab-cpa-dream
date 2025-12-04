@@ -274,7 +274,13 @@ const QuickScoring = () => {
                     </Button>
                     <Button
                       className="flex-1 h-12"
-                      onClick={() => navigate("/edge")}
+                      onClick={() => {
+                        const wrongQuestions = results
+                          .filter(r => !r.isCorrect)
+                          .map(r => r.questionNumber)
+                          .join(',');
+                        navigate(`/edge?subject=${selectedSubject}&exam=${selectedExam}&wrong=${wrongQuestions}`);
+                      }}
                     >
                       Edge
                     </Button>

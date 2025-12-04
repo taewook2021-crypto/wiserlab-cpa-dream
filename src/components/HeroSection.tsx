@@ -1,15 +1,9 @@
-import { Button } from "@/components/ui/button";
 import mountainHero from "@/assets/mountain-hero.jpg";
 const HeroSection = () => {
   return <section className="min-h-screen pt-16">
       {/* Hero Image Section */}
       <div className="relative h-[60vh] bg-black overflow-hidden">
         <img src={mountainHero} alt="Mountain Peak" className="w-full h-full object-cover opacity-70" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Button variant="outline" size="lg" className="bg-transparent text-white border-white hover:bg-white hover:text-black transition-all duration-300 text-base px-8 py-6">
-            자세히보기
-          </Button>
-        </div>
       </div>
 
       {/* Content Section */}

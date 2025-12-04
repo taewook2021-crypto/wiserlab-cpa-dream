@@ -104,3 +104,13 @@ All colors MUST be HSL.
     font-feature-settings: 'liga' 1, 'calt' 1;
   }
 }
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

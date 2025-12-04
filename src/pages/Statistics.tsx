@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -12,8 +13,6 @@ import { Label } from "@/components/ui/label";
 
 // Mock data - 150명 기준 통계
 const TOTAL_PARTICIPANTS = 150;
-const SAFE_ZONE_PERCENTILE = 40; // 상위 40%
-const COMPETITIVE_ZONE_PERCENTILE = 70; // 상위 70%
 
 // 상위 40% 컷라인 점수 (35문제 기준)
 const SAFE_ZONE_CUTOFF = 28; // 80점
@@ -38,10 +37,6 @@ const mockBillboard = [
   { rank: 15, nickname: "꾸준히", score: 28 },
 ];
 
-// Mock user score (나중에 실제 채점 결과로 대체)
-const mockUserScore = 26;
-const mockUserRank = 72;
-
 const getZoneInfo = (score: number) => {
   if (score >= SAFE_ZONE_CUTOFF) {
     return {
@@ -64,12 +59,35 @@ const getZoneInfo = (score: number) => {
   }
 };
 
-const Statistics = () => {
-  const [selectedSubject, setSelectedSubject] = useState<string>("financial");
-  const [selectedExam, setSelectedExam] = useState<string>("summit-1");
+// 점수 기반 예상 등수 계산 (35문제 기준)
+const estimateRank = (score: number): number => {
+  // 점수별 예상 상위 퍼센트 (대략적인 정규분포 가정)
+  const scoreToPercentile: Record<number, number> = {
+    35: 1, 34: 3, 33: 6, 32: 10, 31: 15, 30: 21,
+    29: 28, 28: 36, 27: 44, 26: 52, 25: 60, 24: 67,
+    23: 73, 22: 78, 21: 82, 20: 86, 19: 89, 18: 92,
+  };
+  const percentile = scoreToPercentile[score] ?? Math.min(95, 100 - score * 2);
+  return Math.max(1, Math.round((percentile / 100) * TOTAL_PARTICIPANTS));
+};
 
-  const userZone = getZoneInfo(mockUserScore);
-  const percentile = Math.round((mockUserRank / TOTAL_PARTICIPANTS) * 100);
+const Statistics = () => {
+  const [searchParams] = useSearchParams();
+  
+  // URL에서 채점 결과 읽기
+  const scoreFromUrl = searchParams.get("score");
+  const subjectFromUrl = searchParams.get("subject");
+  const examFromUrl = searchParams.get("exam");
+  
+  const [selectedSubject, setSelectedSubject] = useState<string>(subjectFromUrl || "financial");
+  const [selectedExam, setSelectedExam] = useState<string>(examFromUrl || "summit-1");
+  
+  // 실제 점수 또는 기본값
+  const userScore = scoreFromUrl ? parseInt(scoreFromUrl, 10) : null;
+  const userRank = userScore !== null ? estimateRank(userScore) : null;
+
+  const userZone = userScore !== null ? getZoneInfo(userScore) : null;
+  const percentile = userRank !== null ? Math.round((userRank / TOTAL_PARTICIPANTS) * 100) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -116,29 +134,39 @@ const Statistics = () => {
               </div>
 
               {/* 내 점수 & 존 표시 */}
-              <div className="border border-border rounded-none p-8 mb-8 bg-card">
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-2">내 점수</p>
-                  <p className="text-5xl font-light mb-1">
-                    <span className="text-foreground">{mockUserScore}</span>
-                    <span className="text-muted-foreground text-2xl"> / 35</span>
-                  </p>
-                  <div className="mt-6 mb-6">
-                    <span className={`inline-block px-6 py-2 text-sm font-medium border ${
-                      userZone.intensity === "high" 
-                        ? "bg-foreground text-background border-foreground" 
-                        : userZone.intensity === "medium"
-                        ? "bg-muted text-foreground border-border"
-                        : "bg-background text-muted-foreground border-muted-foreground"
-                    }`}>
-                      {userZone.zone}
-                    </span>
+              {userScore !== null && userZone && userRank !== null ? (
+                <div className="border border-border rounded-none p-8 mb-8 bg-card">
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-2">내 점수</p>
+                    <p className="text-5xl font-light mb-1">
+                      <span className="text-foreground">{userScore}</span>
+                      <span className="text-muted-foreground text-2xl"> / 35</span>
+                    </p>
+                    <div className="mt-6 mb-6">
+                      <span className={`inline-block px-6 py-2 text-sm font-medium border ${
+                        userZone.intensity === "high" 
+                          ? "bg-foreground text-background border-foreground" 
+                          : userZone.intensity === "medium"
+                          ? "bg-muted text-foreground border-border"
+                          : "bg-background text-muted-foreground border-muted-foreground"
+                      }`}>
+                        {userZone.zone}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {TOTAL_PARTICIPANTS}명 중 <span className="font-medium text-foreground">{userRank}등</span> · 상위 {percentile}%
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {TOTAL_PARTICIPANTS}명 중 <span className="font-medium text-foreground">{mockUserRank}등</span> · 상위 {percentile}%
-                  </p>
                 </div>
-              </div>
+              ) : (
+                <div className="border border-border rounded-none p-8 mb-8 bg-card">
+                  <div className="text-center">
+                    <p className="text-muted-foreground">
+                      채점 후 통계를 확인할 수 있습니다.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* 존 가이드 */}
               <div className="grid grid-cols-3 gap-px bg-border mb-12">

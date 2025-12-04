@@ -268,7 +268,7 @@ const QuickScoring = () => {
                     <Button
                       variant="outline"
                       className="flex-1 h-12"
-                      onClick={() => navigate("/statistics")}
+                      onClick={() => navigate(`/statistics?subject=${selectedSubject}&exam=${selectedExam}&score=${correctCount}&total=${results.length}`)}
                     >
                       통계 확인하기
                     </Button>

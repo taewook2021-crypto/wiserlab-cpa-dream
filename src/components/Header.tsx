@@ -45,6 +45,11 @@ const Header = () => {
               <a href="#" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
                 장바구니
               </a>
+              {user && (
+                <Link to="/mypage" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+                  마이페이지
+                </Link>
+              )}
               {!loading && (
                 user ? (
                   <button 
@@ -82,6 +87,15 @@ const Header = () => {
                   <a href="#" className="text-lg text-foreground hover:text-muted-foreground transition-colors">
                     장바구니
                   </a>
+                  {user && (
+                    <Link 
+                      to="/mypage" 
+                      onClick={() => setOpen(false)}
+                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
+                    >
+                      마이페이지
+                    </Link>
+                  )}
                   {!loading && (
                     user ? (
                       <button 

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -37,16 +37,6 @@ const mockBillboard = [
   { rank: 15, nickname: "꾸준히", score: 28 },
 ];
 
-// Mock 문항별 정답률 데이터
-const generateMockQuestionStats = () => {
-  return Array.from({ length: 35 }, (_, i) => ({
-    questionNumber: i + 1,
-    correctRate: Math.round(30 + Math.random() * 60), // 30% ~ 90%
-  }));
-};
-
-const mockQuestionStats = generateMockQuestionStats();
-
 const getZoneInfo = (score: number) => {
   if (score >= SAFE_ZONE_CUTOFF) {
     return {
@@ -81,7 +71,6 @@ const estimateRank = (score: number): number => {
   return Math.max(1, Math.round((percentile / 100) * TOTAL_PARTICIPANTS));
 };
 
-
 const Statistics = () => {
   const [searchParams] = useSearchParams();
   
@@ -99,11 +88,6 @@ const Statistics = () => {
 
   const userZone = userScore !== null ? getZoneInfo(userScore) : null;
   const percentile = userRank !== null ? Math.round((userRank / TOTAL_PARTICIPANTS) * 100) : null;
-
-  // 정답률 낮은 순으로 정렬 (어려운 문제)
-  const sortedByDifficulty = [...mockQuestionStats].sort((a, b) => a.correctRate - b.correctRate);
-  const hardestQuestions = sortedByDifficulty.slice(0, 5);
-  const easiestQuestions = sortedByDifficulty.slice(-5).reverse();
 
   return (
     <div className="min-h-screen bg-background">
@@ -185,7 +169,7 @@ const Statistics = () => {
               )}
 
               {/* 존 가이드 */}
-              <div className="grid grid-cols-3 gap-px bg-border mb-12">
+              <div className="grid grid-cols-3 gap-px bg-border mb-10">
                 <div className="bg-foreground text-background p-6 text-center">
                   <p className="font-medium text-sm mb-1">안정권</p>
                   <p className="text-xs opacity-70">상위 40%</p>
@@ -203,55 +187,19 @@ const Statistics = () => {
                 </div>
               </div>
 
-              {/* 문항별 정답률 분석 */}
-              <div className="mb-12">
-                <div className="mb-6">
-                  <h2 className="text-xl font-light mb-1">문항별 정답률</h2>
-                  <p className="text-sm text-muted-foreground">전체 응시자 기준 문항별 정답률</p>
-                </div>
-
-                {/* 어려운 문제 TOP 5 */}
-                <div className="mb-8">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-4">어려운 문제 TOP 5</h3>
-                  <div className="space-y-3">
-                    {hardestQuestions.map((q) => (
-                      <div key={q.questionNumber} className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">{q.questionNumber}번</span>
-                        <span className="text-sm font-mono">{q.correctRate}%</span>
-                      </div>
-                    ))}
+              {/* 문항별 정답률 링크 */}
+              <Link 
+                to={`/question-analysis?subject=${selectedSubject}&exam=${selectedExam}`}
+                className="block border border-border p-6 mb-10 hover:bg-muted/30 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-light mb-1">문항별 정답률</h2>
+                    <p className="text-sm text-muted-foreground">전체 응시자 기준 문항별 정답률 확인</p>
                   </div>
+                  <span className="text-muted-foreground">→</span>
                 </div>
-
-                {/* 쉬운 문제 TOP 5 */}
-                <div className="mb-8">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-4">쉬운 문제 TOP 5</h3>
-                  <div className="space-y-3">
-                    {easiestQuestions.map((q) => (
-                      <div key={q.questionNumber} className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">{q.questionNumber}번</span>
-                        <span className="text-sm font-mono">{q.correctRate}%</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 전체 문항 정답률 */}
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-4">전체 문항</h3>
-                  <div className="grid grid-cols-5 sm:grid-cols-7 gap-3">
-                    {mockQuestionStats.map((q) => (
-                      <div 
-                        key={q.questionNumber}
-                        className="text-center py-2"
-                      >
-                        <p className="text-xs text-muted-foreground mb-1">{q.questionNumber}번</p>
-                        <p className="text-sm font-mono">{q.correctRate}%</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              </Link>
 
               {/* 빌보드 차트 - 안정권 진입자 */}
               <div className="mb-8">

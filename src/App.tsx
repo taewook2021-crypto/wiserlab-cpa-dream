@@ -10,6 +10,7 @@ import Summit from "./pages/Summit";
 import QuickScoring from "./pages/QuickScoring";
 import Edge from "./pages/Edge";
 import Statistics from "./pages/Statistics";
+import QuestionAnalysis from "./pages/QuestionAnalysis";
 import MyPage from "./pages/MyPage";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/quick-scoring" element={<QuickScoring />} />
             <Route path="/edge" element={<Edge />} />
             <Route path="/statistics" element={<Statistics />} />
+            <Route path="/question-analysis" element={<QuestionAnalysis />} />
             <Route path="/mypage" element={<MyPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

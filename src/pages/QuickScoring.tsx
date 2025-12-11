@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -29,6 +29,12 @@ interface ScoringResult {
   isCorrect: boolean;
 }
 
+interface ExistingResult {
+  correct_count: number;
+  total_questions: number;
+  score_percentage: number;
+}
+
 const subjects = [
   { id: "financial", name: "재무회계", dbValue: "financial_accounting" },
   { id: "tax", name: "세법", dbValue: "tax_law" },
@@ -49,6 +55,8 @@ const QuickScoring = () => {
   const [isScoring, setIsScoring] = useState(false);
   const [results, setResults] = useState<ScoringResult[] | null>(null);
   const [resultSaved, setResultSaved] = useState(false);
+  const [existingResult, setExistingResult] = useState<ExistingResult | null>(null);
+  const [checkingExisting, setCheckingExisting] = useState(false);
   const [answers, setAnswers] = useState<AnswerGroup[]>(() => {
     // 35문제: 7개 그룹 (5문제씩)
     const groups: AnswerGroup[] = [];
@@ -63,6 +71,38 @@ const QuickScoring = () => {
     }
     return groups;
   });
+
+  // Check for existing results when subject/exam changes
+  useEffect(() => {
+    const checkExisting = async () => {
+      if (!user || !selectedSubject || !selectedExam) {
+        setExistingResult(null);
+        return;
+      }
+
+      const subject = subjects.find((s) => s.id === selectedSubject);
+      const exam = exams.find((e) => e.id === selectedExam);
+      if (!subject || !exam) return;
+
+      setCheckingExisting(true);
+      const { data, error } = await supabase
+        .from("scoring_results")
+        .select("correct_count, total_questions, score_percentage")
+        .eq("user_id", user.id)
+        .eq("subject", subject.dbValue)
+        .eq("exam_round", exam.round)
+        .maybeSingle();
+
+      if (!error && data) {
+        setExistingResult(data);
+      } else {
+        setExistingResult(null);
+      }
+      setCheckingExisting(false);
+    };
+
+    checkExisting();
+  }, [user, selectedSubject, selectedExam]);
 
   const handleAnswerChange = (index: number, value: string) => {
     const group = answers[index];
@@ -233,54 +273,85 @@ const QuickScoring = () => {
                 </div>
               </div>
 
-              {/* 답안 입력 및 결과 */}
-              <div className="space-y-6 mb-12">
-                <div className="grid grid-cols-2 gap-x-8 gap-y-6">
-                  {answers.map((group, index) => {
-                    const groupResults = results?.filter(
-                      (r) =>
-                        r.questionNumber >= group.startNum &&
-                        r.questionNumber <= group.endNum
-                    );
-
-                    return (
-                      <div key={index} className="space-y-2">
-                        <Label className="text-sm text-muted-foreground">
-                          {group.startNum}번 ~ {group.endNum}번
-                        </Label>
-                        <Input
-                          type="text"
-                          inputMode="numeric"
-                          placeholder="54312"
-                          value={group.value}
-                          onChange={(e) =>
-                            handleAnswerChange(index, e.target.value)
-                          }
-                          className="text-center text-lg tracking-[0.5em] font-mono"
-                          maxLength={group.endNum - group.startNum + 1}
-                        />
-                        {/* O/X 결과 표시 */}
-                        {groupResults && groupResults.length > 0 && (
-                          <div className="flex justify-center gap-1 pt-1">
-                            {groupResults.map((r) => (
-                              <span
-                                key={r.questionNumber}
-                                className={`text-lg font-bold w-6 text-center ${
-                                  r.isCorrect
-                                    ? "text-blue-500"
-                                    : "text-red-500"
-                                }`}
-                              >
-                                {r.isCorrect ? "○" : "✕"}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+              {/* 이미 채점한 시험 알림 */}
+              {existingResult && (
+                <div className="bg-muted border border-border rounded-lg p-6 mb-8 text-center">
+                  <p className="text-muted-foreground mb-2">이미 채점을 완료한 시험입니다</p>
+                  <p className="text-2xl font-light mb-2">
+                    <span className="text-primary font-medium">{existingResult.correct_count}</span>
+                    <span className="text-muted-foreground"> / {existingResult.total_questions}</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    정답률 {existingResult.score_percentage}%
+                  </p>
+                  <div className="flex gap-4">
+                    <Button
+                      variant="outline"
+                      className="flex-1 h-12"
+                      onClick={() => navigate(`/statistics?subject=${selectedSubject}&exam=${selectedExam}&score=${existingResult.correct_count}&total=${existingResult.total_questions}`)}
+                    >
+                      통계 확인하기
+                    </Button>
+                    <Button
+                      className="flex-1 h-12"
+                      onClick={() => navigate(`/edge?subject=${selectedSubject}&exam=${selectedExam}`)}
+                    >
+                      Edge
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* 답안 입력 및 결과 */}
+              {!existingResult && (
+                <div className="space-y-6 mb-12">
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                    {answers.map((group, index) => {
+                      const groupResults = results?.filter(
+                        (r) =>
+                          r.questionNumber >= group.startNum &&
+                          r.questionNumber <= group.endNum
+                      );
+
+                      return (
+                        <div key={index} className="space-y-2">
+                          <Label className="text-sm text-muted-foreground">
+                            {group.startNum}번 ~ {group.endNum}번
+                          </Label>
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="54312"
+                            value={group.value}
+                            onChange={(e) =>
+                              handleAnswerChange(index, e.target.value)
+                            }
+                            className="text-center text-lg tracking-[0.5em] font-mono"
+                            maxLength={group.endNum - group.startNum + 1}
+                          />
+                          {/* O/X 결과 표시 */}
+                          {groupResults && groupResults.length > 0 && (
+                            <div className="flex justify-center gap-1 pt-1">
+                              {groupResults.map((r) => (
+                                <span
+                                  key={r.questionNumber}
+                                  className={`text-lg font-bold w-6 text-center ${
+                                    r.isCorrect
+                                      ? "text-blue-500"
+                                      : "text-red-500"
+                                  }`}
+                                >
+                                  {r.isCorrect ? "○" : "✕"}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* 채점 결과 요약 */}
               {results && (
@@ -317,23 +388,27 @@ const QuickScoring = () => {
               )}
 
               {/* 안내 문구 */}
-              <div className="bg-muted/50 rounded-lg p-6 mb-8">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  * 각 칸에 해당 문제의 답을 순서대로 입력하세요.
-                  <br />* 1~5번 문제의 답이 5, 4, 3, 1, 2번이면 "54312"를
-                  입력합니다.
-                  <br />* 답은 0~5 사이의 숫자만 입력 가능합니다. (0 = 미응답)
-                </p>
-              </div>
+              {!existingResult && (
+                <div className="bg-muted/50 rounded-lg p-6 mb-8">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    * 각 칸에 해당 문제의 답을 순서대로 입력하세요.
+                    <br />* 1~5번 문제의 답이 5, 4, 3, 1, 2번이면 "54312"를
+                    입력합니다.
+                    <br />* 답은 0~5 사이의 숫자만 입력 가능합니다. (0 = 미응답)
+                  </p>
+                </div>
+              )}
 
               {/* 채점 버튼 */}
-              <Button
-                onClick={handleSubmit}
-                className="w-full h-14 text-base font-normal"
-                disabled={!isFormValid || isScoring}
-              >
-                {isScoring ? "채점 중..." : "채점하기"}
-              </Button>
+              {!existingResult && (
+                <Button
+                  onClick={handleSubmit}
+                  className="w-full h-14 text-base font-normal"
+                  disabled={!isFormValid || isScoring || checkingExisting}
+                >
+                  {isScoring ? "채점 중..." : checkingExisting ? "확인 중..." : "채점하기"}
+                </Button>
+              )}
             </div>
           </div>
         </section>

@@ -169,11 +169,11 @@ const QuickScoring = () => {
       const correctCount = scoringResults.filter((r) => r.isCorrect).length;
       const scorePercentage = Math.round((correctCount / scoringResults.length) * 100);
 
-      // Save results to database if user is logged in
-      if (user) {
+      // Save results to database only if first time (no existing result)
+      if (user && !existingResult) {
         const { error: saveError } = await supabase
           .from("scoring_results")
-          .upsert({
+          .insert({
             user_id: user.id,
             subject: subject.dbValue,
             exam_name: "SUMMIT",
@@ -181,8 +181,6 @@ const QuickScoring = () => {
             correct_count: correctCount,
             total_questions: scoringResults.length,
             score_percentage: scorePercentage,
-          }, {
-            onConflict: "user_id,subject,exam_round"
           });
 
         if (saveError) {
@@ -273,16 +271,29 @@ const QuickScoring = () => {
                 </div>
               </div>
 
-              {/* 이미 채점한 시험 알림 */}
-              {existingResult && (
+              {/* 비로그인 안내 */}
+              {!user && (
                 <div className="bg-muted border border-border rounded-lg p-6 mb-8 text-center">
-                  <p className="text-muted-foreground mb-2">이미 채점을 완료한 시험입니다</p>
+                  <p className="text-muted-foreground mb-4">로그인 후 채점 서비스를 이용할 수 있습니다</p>
+                  <Button onClick={() => navigate("/auth")} className="h-12 px-8">
+                    로그인하기
+                  </Button>
+                </div>
+              )}
+
+              {/* 이미 채점한 시험 알림 */}
+              {user && existingResult && !results && (
+                <div className="bg-muted border border-border rounded-lg p-6 mb-8 text-center">
+                  <p className="text-muted-foreground mb-2">이전 채점 기록 (통계 반영됨)</p>
                   <p className="text-2xl font-light mb-2">
                     <span className="text-primary font-medium">{existingResult.correct_count}</span>
                     <span className="text-muted-foreground"> / {existingResult.total_questions}</span>
                   </p>
-                  <p className="text-sm text-muted-foreground mb-6">
+                  <p className="text-sm text-muted-foreground mb-4">
                     정답률 {existingResult.score_percentage}%
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-6">
+                    * 재채점은 가능하지만 통계에는 최초 채점 결과만 반영됩니다
                   </p>
                   <div className="flex gap-4">
                     <Button
@@ -303,7 +314,7 @@ const QuickScoring = () => {
               )}
 
               {/* 답안 입력 및 결과 */}
-              {!existingResult && (
+              {user && (
                 <div className="space-y-6 mb-12">
                   <div className="grid grid-cols-2 gap-x-8 gap-y-6">
                     {answers.map((group, index) => {
@@ -388,7 +399,7 @@ const QuickScoring = () => {
               )}
 
               {/* 안내 문구 */}
-              {!existingResult && (
+              {user && (
                 <div className="bg-muted/50 rounded-lg p-6 mb-8">
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     * 각 칸에 해당 문제의 답을 순서대로 입력하세요.
@@ -400,7 +411,7 @@ const QuickScoring = () => {
               )}
 
               {/* 채점 버튼 */}
-              {!existingResult && (
+              {user && (
                 <Button
                   onClick={handleSubmit}
                   className="w-full h-14 text-base font-normal"

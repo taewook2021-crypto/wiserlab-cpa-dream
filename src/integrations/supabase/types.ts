@@ -44,6 +44,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scoring_results: {
+        Row: {
+          correct_count: number
+          created_at: string
+          exam_name: string
+          exam_round: number
+          id: string
+          score_percentage: number
+          subject: string
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          correct_count: number
+          created_at?: string
+          exam_name: string
+          exam_round: number
+          id?: string
+          score_percentage: number
+          subject: string
+          total_questions: number
+          user_id: string
+        }
+        Update: {
+          correct_count?: number
+          created_at?: string
+          exam_name?: string
+          exam_round?: number
+          id?: string
+          score_percentage?: number
+          subject?: string
+          total_questions?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

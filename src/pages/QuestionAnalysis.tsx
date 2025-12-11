@@ -34,7 +34,6 @@ const QuestionAnalysis = () => {
   // 정답률 낮은 순으로 정렬 (어려운 문제)
   const sortedByDifficulty = [...mockQuestionStats].sort((a, b) => a.correctRate - b.correctRate);
   const hardestQuestions = sortedByDifficulty.slice(0, 5);
-  const easiestQuestions = sortedByDifficulty.slice(-5).reverse();
 
   return (
     <div className="min-h-screen bg-background">
@@ -92,24 +91,14 @@ const QuestionAnalysis = () => {
               {/* 어려운 문제 TOP 5 */}
               <div className="mb-12">
                 <h3 className="text-sm font-medium text-muted-foreground mb-6">어려운 문제 TOP 5</h3>
-                <div className="space-y-4">
+                <div className="grid grid-cols-5 gap-4">
                   {hardestQuestions.map((q) => (
-                    <div key={q.questionNumber} className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">{q.questionNumber}번</span>
-                      <span className="text-sm font-mono">{q.correctRate}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 쉬운 문제 TOP 5 */}
-              <div className="mb-12">
-                <h3 className="text-sm font-medium text-muted-foreground mb-6">쉬운 문제 TOP 5</h3>
-                <div className="space-y-4">
-                  {easiestQuestions.map((q) => (
-                    <div key={q.questionNumber} className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">{q.questionNumber}번</span>
-                      <span className="text-sm font-mono">{q.correctRate}%</span>
+                    <div 
+                      key={q.questionNumber}
+                      className="text-center py-3"
+                    >
+                      <p className="text-xs text-muted-foreground mb-1">{q.questionNumber}번</p>
+                      <p className="text-sm font-mono">{q.correctRate}%</p>
                     </div>
                   ))}
                 </div>

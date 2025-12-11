@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AnswerGroup {
   startNum: number;
@@ -42,10 +43,12 @@ const TOTAL_QUESTIONS = 35;
 
 const QuickScoring = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [isScoring, setIsScoring] = useState(false);
   const [results, setResults] = useState<ScoringResult[] | null>(null);
+  const [resultSaved, setResultSaved] = useState(false);
   const [answers, setAnswers] = useState<AnswerGroup[]>(() => {
     // 35문제: 7개 그룹 (5문제씩)
     const groups: AnswerGroup[] = [];
@@ -124,6 +127,31 @@ const QuickScoring = () => {
       setResults(scoringResults);
 
       const correctCount = scoringResults.filter((r) => r.isCorrect).length;
+      const scorePercentage = Math.round((correctCount / scoringResults.length) * 100);
+
+      // Save results to database if user is logged in
+      if (user) {
+        const { error: saveError } = await supabase
+          .from("scoring_results")
+          .upsert({
+            user_id: user.id,
+            subject: subject.dbValue,
+            exam_name: "SUMMIT",
+            exam_round: exam.round,
+            correct_count: correctCount,
+            total_questions: scoringResults.length,
+            score_percentage: scorePercentage,
+          }, {
+            onConflict: "user_id,subject,exam_round"
+          });
+
+        if (saveError) {
+          console.error("Save error:", saveError);
+        } else {
+          setResultSaved(true);
+        }
+      }
+
       toast.success(`채점 완료! ${correctCount}/${scoringResults.length}문제 정답`);
     } catch (error) {
       console.error("Scoring error:", error);

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, FileText, Trophy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { User, FileText, Trophy, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ScoringResult {
@@ -18,6 +19,13 @@ interface ScoringResult {
   created_at: string;
 }
 
+interface CartItem {
+  id: string;
+  product_type: string;
+  product_name: string;
+  price: number;
+}
+
 const subjectNames: Record<string, string> = {
   financial_accounting: "재무회계",
   tax_law: "세법",
@@ -28,6 +36,8 @@ const MyPage = () => {
   const navigate = useNavigate();
   const [scoringResults, setScoringResults] = useState<ScoringResult[]>([]);
   const [loadingResults, setLoadingResults] = useState(true);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loadingCart, setLoadingCart] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -51,8 +61,24 @@ const MyPage = () => {
       setLoadingResults(false);
     };
 
+    const fetchCartItems = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("cart_items")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (!error && data) {
+        setCartItems(data);
+      }
+      setLoadingCart(false);
+    };
+
     if (user) {
       fetchResults();
+      fetchCartItems();
     }
   }, [user]);
 
@@ -149,6 +175,49 @@ const MyPage = () => {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* 장바구니 카드 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg font-normal">
+                <ShoppingCart className="w-5 h-5" />
+                장바구니
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingCart ? (
+                <p className="text-muted-foreground text-sm animate-pulse">불러오는 중...</p>
+              ) : cartItems.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  장바구니가 비어있습니다.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {cartItems.slice(0, 3).map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                    >
+                      <p className="font-medium text-sm">{item.product_name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.price.toLocaleString()}원
+                      </p>
+                    </div>
+                  ))}
+                  {cartItems.length > 3 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      외 {cartItems.length - 3}개 상품
+                    </p>
+                  )}
+                </div>
+              )}
+              <Link to="/cart" className="block mt-4">
+                <Button variant="outline" size="sm" className="w-full">
+                  더보기
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

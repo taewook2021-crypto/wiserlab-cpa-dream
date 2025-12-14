@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
@@ -9,6 +9,14 @@ import logo from "@/assets/logo-black.png";
 const Header = () => {
   const [open, setOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleQuickScoringClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      navigate("/auth?redirect=/quick-scoring");
+    }
+  };
   
   const navLinks = [{
     to: "/summit",
@@ -37,7 +45,7 @@ const Header = () => {
           
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-6">
-              <Link to="/quick-scoring">
+              <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
                 <Button variant="default" size="sm" className="font-normal">
                   빠른 채점하기
                 </Button>
@@ -79,7 +87,7 @@ const Header = () => {
                       {link.label}
                     </Link>
                   ))}
-                  <Link to="/quick-scoring" onClick={() => setOpen(false)}>
+                  <Link to="/quick-scoring" onClick={(e) => { handleQuickScoringClick(e); setOpen(false); }}>
                     <Button variant="default" className="w-full font-normal">
                       빠른 채점하기
                     </Button>

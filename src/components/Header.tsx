@@ -50,9 +50,9 @@ const Header = () => {
                   빠른 채점하기
                 </Button>
               </Link>
-              <a href="#" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+              <Link to="/cart" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
                 장바구니
-              </a>
+              </Link>
               {user && (
                 <Link to="/mypage" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
                   마이페이지
@@ -92,9 +92,9 @@ const Header = () => {
                       빠른 채점하기
                     </Button>
                   </Link>
-                  <a href="#" className="text-lg text-foreground hover:text-muted-foreground transition-colors">
+                  <Link to="/cart" onClick={() => setOpen(false)} className="text-lg text-foreground hover:text-muted-foreground transition-colors">
                     장바구니
-                  </a>
+                  </Link>
                   {user && (
                     <Link 
                       to="/mypage" 

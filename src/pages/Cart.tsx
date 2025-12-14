@@ -4,7 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -20,6 +21,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loadingCart, setLoadingCart] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -60,10 +62,29 @@ const Cart = () => {
     }
 
     setCartItems(cartItems.filter((item) => item.id !== itemId));
+    setSelectedItems(selectedItems.filter((id) => id !== itemId));
     toast.success("상품이 삭제되었습니다.");
   };
 
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const handleSelectItem = (itemId: string) => {
+    setSelectedItems((prev) =>
+      prev.includes(itemId)
+        ? prev.filter((id) => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedItems.length === cartItems.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(cartItems.map((item) => item.id));
+    }
+  };
+
+  const selectedTotal = cartItems
+    .filter((item) => selectedItems.includes(item.id))
+    .reduce((sum, item) => sum + item.price, 0);
 
   if (loading) {
     return (
@@ -78,59 +99,98 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
-      <main className="container mx-auto px-6 pt-24 pb-16">
-        <h1 className="text-2xl font-light mb-8">장바구니</h1>
-
-        {loadingCart ? (
-          <p className="text-muted-foreground animate-pulse">불러오는 중...</p>
-        ) : cartItems.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground mb-4">장바구니가 비어있습니다.</p>
-            <Button variant="outline" onClick={() => navigate("/summit")}>
-              상품 보러가기
-            </Button>
+      <main className="flex-1 container mx-auto px-6 pt-24 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 min-h-[60vh]">
+          {/* Left Column - Title and Back */}
+          <div className="flex flex-col justify-between">
+            <h1 className="text-3xl font-light">장바구니</h1>
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm">Back</span>
+            </button>
           </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-6 border border-border rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium">{item.product_name}</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {item.price.toLocaleString()}원
-                    </p>
+
+          {/* Right Column - Cart Items */}
+          <div className="flex flex-col">
+            {loadingCart ? (
+              <p className="text-muted-foreground animate-pulse">불러오는 중...</p>
+            ) : cartItems.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-muted-foreground">장바구니가 비어 있습니다.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Select All */}
+                <div className="flex items-center gap-3 pb-4 border-b border-border">
+                  <Checkbox
+                    id="select-all"
+                    checked={selectedItems.length === cartItems.length}
+                    onCheckedChange={handleSelectAll}
+                  />
+                  <label
+                    htmlFor="select-all"
+                    className="text-sm text-muted-foreground cursor-pointer"
+                  >
+                    전체 선택 ({selectedItems.length}/{cartItems.length})
+                  </label>
+                </div>
+
+                {/* Cart Items List */}
+                <div className="space-y-4">
+                  {cartItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-4 p-4 border border-border rounded-lg"
+                    >
+                      <Checkbox
+                        checked={selectedItems.includes(item.id)}
+                        onCheckedChange={() => handleSelectItem(item.id)}
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium">{item.product_name}</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {item.price.toLocaleString()}원
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveItem(item.id)}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Total and Purchase */}
+                <div className="border-t border-border pt-6 mt-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="text-muted-foreground">
+                      선택 상품 ({selectedItems.length}개)
+                    </span>
+                    <span className="text-xl font-medium">
+                      {selectedTotal.toLocaleString()}원
+                    </span>
                   </div>
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveItem(item.id)}
+                    className="w-full h-14 text-base font-normal"
+                    disabled={selectedItems.length === 0}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    구매하기
                   </Button>
                 </div>
-              ))}
-            </div>
-
-            <div className="border-t border-border pt-6">
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-lg">총 결제금액</span>
-                <span className="text-xl font-medium">
-                  {totalPrice.toLocaleString()}원
-                </span>
               </div>
-              <Button className="w-full" size="lg" disabled>
-                결제하기 (준비중)
-              </Button>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
 
       <Footer />

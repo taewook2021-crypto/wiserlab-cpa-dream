@@ -66,6 +66,24 @@ const Cart = () => {
     toast.success("상품이 삭제되었습니다.");
   };
 
+  const handleRemoveSelectedItems = async () => {
+    if (selectedItems.length === 0) return;
+
+    const { error } = await supabase
+      .from("cart_items")
+      .delete()
+      .in("id", selectedItems);
+
+    if (error) {
+      toast.error("삭제에 실패했습니다.");
+      return;
+    }
+
+    setCartItems(cartItems.filter((item) => !selectedItems.includes(item.id)));
+    setSelectedItems([]);
+    toast.success(`${selectedItems.length}개 상품이 삭제되었습니다.`);
+  };
+
   const handleSelectItem = (itemId: string) => {
     setSelectedItems((prev) =>
       prev.includes(itemId)
@@ -180,12 +198,22 @@ const Cart = () => {
                       {selectedTotal.toLocaleString()}원
                     </span>
                   </div>
-                  <Button
-                    className="w-full h-14 text-base font-normal"
-                    disabled={selectedItems.length === 0}
-                  >
-                    구매하기
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1 h-14 text-base font-normal"
+                      disabled={selectedItems.length === 0}
+                      onClick={handleRemoveSelectedItems}
+                    >
+                      장바구니에서 제거
+                    </Button>
+                    <Button
+                      className="flex-1 h-14 text-base font-normal"
+                      disabled={selectedItems.length === 0}
+                    >
+                      구매하기
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

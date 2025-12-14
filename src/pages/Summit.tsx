@@ -1,9 +1,14 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import OptimizedImage from "@/components/OptimizedImage";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { ShoppingCart } from "lucide-react";
 import summitFeature from "@/assets/summit-feature.jpg";
 import summitProduct from "@/assets/summit-product.png";
 interface Subject {
@@ -24,7 +29,10 @@ const subjects: Subject[] = [{
   price: 30000
 }];
 const Summit = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const handleSubjectToggle = (subjectId: string) => {
     setSelectedSubjects(prev => prev.includes(subjectId) ? prev.filter(id => id !== subjectId) : [...prev, subjectId]);
   };
@@ -54,6 +62,43 @@ const Summit = () => {
   }, [selectedSubjects]);
   const formatPrice = (price: number) => {
     return price.toLocaleString("ko-KR");
+  };
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      navigate("/auth?redirect=/summit");
+      return;
+    }
+
+    if (selectedSubjects.length === 0) return;
+
+    setIsAddingToCart(true);
+
+    try {
+      const itemsToAdd = selectedSubjects.map((subjectId) => {
+        const subject = subjects.find((s) => s.id === subjectId);
+        return {
+          user_id: user.id,
+          product_type: `summit_${subjectId}`,
+          product_name: `SUMMIT ${subject?.name} 모의고사`,
+          price: subject?.price || 0,
+        };
+      });
+
+      const { error } = await supabase.from("cart_items").insert(itemsToAdd);
+
+      if (error) {
+        toast.error("장바구니에 담기를 실패했습니다.");
+        return;
+      }
+
+      toast.success("장바구니에 담았습니다.");
+      setSelectedSubjects([]);
+    } catch {
+      toast.error("오류가 발생했습니다.");
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
   return <div className="min-h-screen bg-background">
       <Header />
@@ -149,9 +194,23 @@ const Summit = () => {
                       </p>
                     </div>
                   </div>
-                  <Button className="w-full h-14 text-base font-normal" disabled={selectedSubjects.length === 0}>
-                    바로구매 하기
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 h-14 text-base font-normal" 
+                      disabled={selectedSubjects.length === 0 || isAddingToCart}
+                      onClick={handleAddToCart}
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      {isAddingToCart ? "담는 중..." : "장바구니에 담기"}
+                    </Button>
+                    <Button 
+                      className="flex-1 h-14 text-base font-normal" 
+                      disabled={selectedSubjects.length === 0}
+                    >
+                      바로구매 하기
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

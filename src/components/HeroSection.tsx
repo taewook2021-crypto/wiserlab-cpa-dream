@@ -1,7 +1,19 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import mountainHero from "@/assets/mountain-hero.jpg";
 import summitLogo from "@/assets/summit-logo.svg";
 
 const HeroSection = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleQuickScoringClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      navigate("/auth?redirect=/quick-scoring");
+    }
+  };
+
   return (
     <section className="min-h-screen">
       {/* Full-bleed Hero with Overlay Card */}
@@ -35,7 +47,21 @@ const HeroSection = () => {
                 공인회계사 1차 모의고사
               </h1>
             </div>
-            <img src={summitLogo} alt="SUMMIT" className="self-end h-6" />
+            
+            <div className="flex justify-between items-end">
+              <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
+                <Link to="/summit" className="hover:text-foreground transition-colors">
+                  SUMMIT Contents
+                </Link>
+                <Link to="/quick-scoring" onClick={handleQuickScoringClick} className="hover:text-foreground transition-colors">
+                  빠른 채점하기
+                </Link>
+                <Link to="/auth" className="hover:text-foreground transition-colors">
+                  로그인
+                </Link>
+              </div>
+              <img src={summitLogo} alt="SUMMIT" className="h-6" />
+            </div>
           </div>
         </div>
 

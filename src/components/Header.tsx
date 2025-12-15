@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
@@ -11,6 +11,9 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const isHomePage = location.pathname === "/";
 
   const handleQuickScoringClick = (e: React.MouseEvent) => {
     if (!user) {
@@ -24,17 +27,37 @@ const Header = () => {
     label: "SUMMIT Contents"
   }];
 
+  const textColor = isHomePage 
+    ? "text-white hover:text-white/80" 
+    : "text-foreground hover:text-muted-foreground";
+  
+  const textColorNav = isHomePage 
+    ? "text-white/90 hover:text-white" 
+    : "text-foreground hover:text-muted-foreground";
+
+  const logoFilter = isHomePage 
+    ? { filter: 'brightness(0) invert(1)' } 
+    : {};
+
+  const buttonStyle = isHomePage
+    ? "font-normal bg-white text-foreground hover:bg-white/90"
+    : "font-normal";
+
+  const menuButtonStyle = isHomePage
+    ? "text-white hover:bg-white/10"
+    : "text-foreground hover:bg-muted";
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-6">
         <nav className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-12">
             <Link to="/" className="flex items-center gap-3">
-              <img src={wiserLabLogo} alt="Wiser Lab" className="h-5 text-white" style={{ filter: 'brightness(0) invert(1)' }} />
+              <img src={wiserLabLogo} alt="Wiser Lab" className="h-5" style={logoFilter} />
             </Link>
             <div className="hidden md:flex items-center space-x-10">
               {navLinks.map(link => (
-                <Link key={link.to} to={link.to} className="text-sm text-white/90 hover:text-white transition-colors">
+                <Link key={link.to} to={link.to} className={`text-sm ${textColorNav} transition-colors`}>
                   {link.label}
                 </Link>
               ))}
@@ -44,15 +67,15 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-6">
               <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
-                <Button variant="default" size="sm" className="font-normal bg-white text-foreground hover:bg-white/90">
+                <Button variant="default" size="sm" className={buttonStyle}>
                   빠른 채점하기
                 </Button>
               </Link>
-              <Link to="/cart" className="text-sm text-white hover:text-white/80 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+              <Link to="/cart" className={`text-sm ${textColor} transition-colors`}>
                 장바구니
               </Link>
               {user && (
-                <Link to="/mypage" className="text-sm text-white hover:text-white/80 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                <Link to="/mypage" className={`text-sm ${textColor} transition-colors`}>
                   마이페이지
                 </Link>
               )}
@@ -60,12 +83,12 @@ const Header = () => {
                 user ? (
                   <button 
                     onClick={signOut}
-                    className="text-sm text-white hover:text-white/80 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+                    className={`text-sm ${textColor} transition-colors`}
                   >
                     로그아웃
                   </button>
                 ) : (
-                  <Link to="/auth" className="text-sm text-white hover:text-white/80 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                  <Link to="/auth" className={`text-sm ${textColor} transition-colors`}>
                     로그인
                   </Link>
                 )
@@ -74,7 +97,7 @@ const Header = () => {
             
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                <Button variant="ghost" size="icon" className={menuButtonStyle}>
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>

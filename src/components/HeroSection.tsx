@@ -16,19 +16,26 @@ const ConcentricCircles = ({ isVisible }: { isVisible: boolean }) => {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="absolute -left-[400px] top-1/2 -translate-y-1/2">
+      <div 
+        className="absolute"
+        style={{
+          left: '10%',
+          top: '50%',
+          transform: 'translateY(-50%)',
+        }}
+      >
         {circles.map((circle, index) => (
           <div
             key={index}
-            className="absolute rounded-full border border-border/40"
+            className="absolute rounded-full border border-muted-foreground/30"
             style={{
               width: circle.size,
               height: circle.size,
               left: -circle.size / 2,
               top: -circle.size / 2,
               opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'scale(1)' : 'scale(0.8)',
-              transition: `opacity 0.6s ease-out ${circle.delay}s, transform 0.6s ease-out ${circle.delay}s`,
+              transform: isVisible ? 'scale(1)' : 'scale(0.5)',
+              transition: `opacity 0.8s ease-out ${circle.delay}s, transform 0.8s ease-out ${circle.delay}s`,
             }}
           />
         ))}

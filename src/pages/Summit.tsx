@@ -131,12 +131,14 @@ const Summit = () => {
             <div className="grid md:grid-cols-2 gap-16 md:gap-20 items-start">
               {/* Left: Product Image */}
               <div className="flex items-center justify-center">
-                <OptimizedImage 
-                  src={summitCover} 
-                  alt="Wiser Lab SUMMIT 모의고사 패키지" 
-                  className="w-full max-w-2xl object-contain"
-                  containerClassName="w-full max-w-2xl"
-                />
+                <div className="shadow-xl rounded-sm overflow-hidden">
+                  <OptimizedImage 
+                    src={summitCover} 
+                    alt="Wiser Lab SUMMIT 모의고사 패키지" 
+                    className="w-full h-auto object-contain"
+                    containerClassName="w-[320px] md:w-[400px]"
+                  />
+                </div>
               </div>
 
               {/* Right: Product Info */}

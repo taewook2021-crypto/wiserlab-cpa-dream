@@ -51,10 +51,21 @@ const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+          
+          // 7초마다 애니메이션 반복
+          intervalId = setInterval(() => {
+            setIsVisible(false);
+            setTimeout(() => setIsVisible(true), 100);
+          }, 7000);
+        } else {
+          setIsVisible(false);
+          if (intervalId) clearInterval(intervalId);
         }
       },
       { threshold: 0.3 }
@@ -64,7 +75,10 @@ const HeroSection = () => {
       observer.observe(sectionRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (intervalId) clearInterval(intervalId);
+    };
   }, []);
 
   const handleQuickScoringClick = (e: React.MouseEvent) => {

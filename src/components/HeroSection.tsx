@@ -15,7 +15,7 @@ const HeroSection = () => {
             poster={mountainHero}
             className="w-full h-full object-cover grayscale-[30%]"
           >
-            <source src="/videos/mountain-hero.mp4" type="video/mp4" />
+            <source src="/videos/mountain-bw.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
         </div>

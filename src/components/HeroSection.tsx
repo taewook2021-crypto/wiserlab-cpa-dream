@@ -1,4 +1,5 @@
 import mountainHero from "@/assets/mountain-hero.jpg";
+import summitLogo from "@/assets/summit-logo.svg";
 
 const HeroSection = () => {
   return (
@@ -22,7 +23,7 @@ const HeroSection = () => {
 
         {/* Overlay White Card */}
         <div className="relative z-10 h-full flex items-center">
-          <div className="ml-8 lg:ml-24 bg-white/95 backdrop-blur-sm p-12 lg:p-16 w-[480px] min-h-[520px] flex items-center">
+          <div className="ml-8 lg:ml-24 bg-white/95 backdrop-blur-sm p-12 lg:p-16 w-[480px] min-h-[520px] flex flex-col justify-between relative">
             <div className="space-y-2">
               <h1 className="text-4xl lg:text-5xl font-light text-foreground">
                 실전을 넘어
@@ -34,6 +35,7 @@ const HeroSection = () => {
                 SUMMIT
               </h1>
             </div>
+            <img src={summitLogo} alt="SUMMIT" className="self-end h-8" />
           </div>
         </div>
 

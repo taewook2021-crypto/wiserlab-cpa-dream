@@ -21,7 +21,7 @@ const HeroSection = () => {
           <div className="space-y-16">
             <div className="space-y-12">
               <h2 className="text-xl font-light tracking-tight">공인회계사시험 수험생에게</h2>
-              <p className="text-4xl lg:text-5xl font-normal leading-relaxed tracking-tight">
+              <p className="text-4xl lg:text-5xl font-normal leading-loose tracking-tight">
                 3월 2일, 결전의 날.<br />
                 그날의 압박감을 이겨낼<br />
                 &apos;실전 그 자체&apos;를 선물합니다.

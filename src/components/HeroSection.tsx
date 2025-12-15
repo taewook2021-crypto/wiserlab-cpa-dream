@@ -23,33 +23,16 @@ const HeroSection = () => {
         {/* Overlay White Card */}
         <div className="relative z-10 h-full flex items-center">
           <div className="ml-8 lg:ml-24 bg-white/95 backdrop-blur-sm p-12 lg:p-16 max-w-xl">
-            <div className="space-y-8">
-              <p className="text-sm tracking-widest text-muted-foreground uppercase">
-                For CPA Exam Candidates
-              </p>
-              
-              <div className="space-y-2">
-                <h1 className="text-4xl lg:text-5xl font-light text-foreground">
-                  실전을 넘어
-                </h1>
-                <h1 className="text-4xl lg:text-5xl font-light text-muted-foreground/70">
-                  정상으로
-                </h1>
-                <h1 className="text-4xl lg:text-5xl font-light text-muted-foreground/40">
-                  SUMMIT
-                </h1>
-              </div>
-
-              <p className="text-base text-muted-foreground leading-relaxed max-w-md">
-                3월 2일, 결전의 날.<br />
-                그날의 압박감을 이겨낼 &apos;실전 그 자체&apos;를 선물합니다.
-              </p>
-
-              <div className="flex flex-col space-y-3 text-sm text-foreground pt-4">
-                <span className="cursor-pointer hover:text-primary transition-colors">공인회계사 1차 모의고사</span>
-                <span className="cursor-pointer hover:text-primary transition-colors">서울대 데이터 기반 분석</span>
-                <span className="cursor-pointer hover:text-primary transition-colors">정밀 취약 유형 분석</span>
-              </div>
+            <div className="space-y-2">
+              <h1 className="text-4xl lg:text-5xl font-light text-foreground">
+                실전을 넘어
+              </h1>
+              <h1 className="text-4xl lg:text-5xl font-light text-muted-foreground/70">
+                정상으로
+              </h1>
+              <h1 className="text-4xl lg:text-5xl font-light text-muted-foreground/40">
+                SUMMIT
+              </h1>
             </div>
           </div>
         </div>

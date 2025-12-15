@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo-black.png";
+import wiserLabLogo from "@/assets/wiser-lab-logo.svg";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -29,10 +30,7 @@ const Header = () => {
         <nav className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-12">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5">
-                <img src={logo} alt="Wiser Lab" className="w-full h-full object-contain" />
-              </div>
-              <h1 className="text-xl font-extrabold tracking-wide text-white font-work-sans">Wiser Lab</h1>
+              <img src={wiserLabLogo} alt="Wiser Lab" className="h-5 text-white" style={{ filter: 'brightness(0) invert(1)' }} />
             </Link>
             <div className="hidden md:flex items-center space-x-10">
               {navLinks.map(link => (

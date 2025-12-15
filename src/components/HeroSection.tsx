@@ -35,7 +35,7 @@ const HeroSection = () => {
                 SUMMIT
               </h1>
             </div>
-            <img src={summitLogo} alt="SUMMIT" className="self-end h-8" />
+            <img src={summitLogo} alt="SUMMIT" className="self-end h-5" />
           </div>
         </div>
 

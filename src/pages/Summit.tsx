@@ -75,15 +75,32 @@ const Summit = () => {
     setIsAddingToCart(true);
 
     try {
-      const itemsToAdd = selectedSubjects.map((subjectId) => {
-        const subject = subjects.find((s) => s.id === subjectId);
-        return {
-          user_id: user.id,
-          product_type: `summit_${subjectId}`,
-          product_name: `SUMMIT ${subject?.name} 모의고사`,
-          price: subject?.price || 0,
-        };
-      });
+      // 이미 장바구니에 있는 상품 확인
+      const { data: existingItems } = await supabase
+        .from("cart_items")
+        .select("product_type")
+        .eq("user_id", user.id);
+
+      const existingProductTypes = existingItems?.map((item) => item.product_type) || [];
+
+      const itemsToAdd = selectedSubjects
+        .filter((subjectId) => !existingProductTypes.includes(`summit_${subjectId}`))
+        .map((subjectId) => {
+          const subject = subjects.find((s) => s.id === subjectId);
+          return {
+            user_id: user.id,
+            product_type: `summit_${subjectId}`,
+            product_name: `SUMMIT ${subject?.name} 모의고사`,
+            price: subject?.price || 0,
+          };
+        });
+
+      const duplicateCount = selectedSubjects.length - itemsToAdd.length;
+
+      if (itemsToAdd.length === 0) {
+        toast.error("이미 장바구니에 담긴 상품입니다.");
+        return;
+      }
 
       const { error } = await supabase.from("cart_items").insert(itemsToAdd);
 
@@ -92,7 +109,11 @@ const Summit = () => {
         return;
       }
 
-      toast.success("장바구니에 담았습니다.");
+      if (duplicateCount > 0) {
+        toast.success(`${itemsToAdd.length}개 상품을 담았습니다. (${duplicateCount}개는 이미 장바구니에 있음)`);
+      } else {
+        toast.success("장바구니에 담았습니다.");
+      }
       setSelectedSubjects([]);
     } catch {
       toast.error("오류가 발생했습니다.");

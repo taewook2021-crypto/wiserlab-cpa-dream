@@ -43,7 +43,7 @@ const HeroSection = () => {
               <h1 className="text-4xl lg:text-5xl font-light text-muted-foreground/70">
                 정상으로
               </h1>
-              <h1 className="text-[1.65rem] lg:text-[2.5rem] font-normal text-foreground whitespace-nowrap">
+              <h1 className="text-[1.65rem] lg:text-[2.5rem] font-light text-foreground whitespace-nowrap">
                 공인회계사 1차 모의고사
               </h1>
             </div>

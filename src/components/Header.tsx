@@ -29,14 +29,14 @@ const Header = () => {
         <nav className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-12">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center p-1.5 border border-border">
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5">
                 <img src={logo} alt="Wiser Lab" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-xl font-light tracking-wide">Wiser Lab</h1>
+              <h1 className="text-xl font-light tracking-wide text-white">Wiser Lab</h1>
             </Link>
             <div className="hidden md:flex items-center space-x-10">
               {navLinks.map(link => (
-                <Link key={link.to} to={link.to} className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+                <Link key={link.to} to={link.to} className="text-sm text-white/90 hover:text-white transition-colors">
                   {link.label}
                 </Link>
               ))}
@@ -46,15 +46,15 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-6">
               <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
-                <Button variant="default" size="sm" className="font-normal">
+                <Button variant="default" size="sm" className="font-normal bg-white text-foreground hover:bg-white/90">
                   빠른 채점하기
                 </Button>
               </Link>
-              <Link to="/cart" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+              <Link to="/cart" className="text-sm text-white/90 hover:text-white transition-colors">
                 장바구니
               </Link>
               {user && (
-                <Link to="/mypage" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/mypage" className="text-sm text-white/90 hover:text-white transition-colors">
                   마이페이지
                 </Link>
               )}
@@ -62,12 +62,12 @@ const Header = () => {
                 user ? (
                   <button 
                     onClick={signOut}
-                    className="text-sm text-foreground hover:text-muted-foreground transition-colors"
+                    className="text-sm text-white/90 hover:text-white transition-colors"
                   >
                     로그아웃
                   </button>
                 ) : (
-                  <Link to="/auth" className="text-sm text-foreground hover:text-muted-foreground transition-colors">
+                  <Link to="/auth" className="text-sm text-white/90 hover:text-white transition-colors">
                     로그인
                   </Link>
                 )
@@ -76,7 +76,7 @@ const Header = () => {
             
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>

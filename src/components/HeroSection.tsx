@@ -36,7 +36,7 @@ const HeroSection = () => {
         {/* Overlay White Card */}
         <div className="relative z-10 h-full flex items-center">
           <div className="ml-8 lg:ml-24 bg-white/95 backdrop-blur-sm p-8 lg:p-10 w-[480px] min-h-[520px] flex flex-col justify-between relative">
-            <div className="space-y-2 mt-12">
+            <div className="space-y-0 mt-12">
               <h1 className="text-[1.65rem] lg:text-[2.5rem] font-light text-muted-foreground/40">
                 실전을 넘어
               </h1>

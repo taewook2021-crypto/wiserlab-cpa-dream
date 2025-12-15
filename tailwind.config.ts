@@ -84,10 +84,25 @@ export default {
             height: "0",
           },
         },
+        "text-fade-1": {
+          "0%": { color: "hsl(0 0% 85%)" },
+          "100%": { color: "hsl(0 0% 70%)" },
+        },
+        "text-fade-2": {
+          "0%": { color: "hsl(0 0% 85%)" },
+          "100%": { color: "hsl(0 0% 50%)" },
+        },
+        "text-fade-3": {
+          "0%": { color: "hsl(0 0% 85%)" },
+          "100%": { color: "hsl(0 0% 0%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "text-1": "text-fade-1 1.2s ease-out 0.3s forwards",
+        "text-2": "text-fade-2 1.2s ease-out 0.6s forwards",
+        "text-3": "text-fade-3 1.2s ease-out 0.9s forwards",
       },
     },
   },

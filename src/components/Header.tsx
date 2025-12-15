@@ -32,7 +32,7 @@ const Header = () => {
               <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5">
                 <img src={logo} alt="Wiser Lab" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-xl font-light tracking-wide text-white">Wiser Lab</h1>
+              <h1 className="text-xl font-extrabold tracking-wide text-white font-work-sans">Wiser Lab</h1>
             </Link>
             <div className="hidden md:flex items-center space-x-10">
               {navLinks.map(link => (

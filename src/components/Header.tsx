@@ -48,11 +48,11 @@ const Header = () => {
                   빠른 채점하기
                 </Button>
               </Link>
-              <Link to="/cart" className="text-sm text-white/90 hover:text-white transition-colors">
+              <Link to="/cart" className="text-sm text-white hover:text-white/80 transition-colors drop-shadow-sm">
                 장바구니
               </Link>
               {user && (
-                <Link to="/mypage" className="text-sm text-white/90 hover:text-white transition-colors">
+                <Link to="/mypage" className="text-sm text-white hover:text-white/80 transition-colors drop-shadow-sm">
                   마이페이지
                 </Link>
               )}
@@ -60,12 +60,12 @@ const Header = () => {
                 user ? (
                   <button 
                     onClick={signOut}
-                    className="text-sm text-white/90 hover:text-white transition-colors"
+                    className="text-sm text-white hover:text-white/80 transition-colors drop-shadow-sm"
                   >
                     로그아웃
                   </button>
                 ) : (
-                  <Link to="/auth" className="text-sm text-white/90 hover:text-white transition-colors">
+                  <Link to="/auth" className="text-sm text-white hover:text-white/80 transition-colors drop-shadow-sm">
                     로그인
                   </Link>
                 )

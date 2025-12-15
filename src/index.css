@@ -117,21 +117,24 @@ All colors MUST be HSL.
 
 /* Hero text color cycling animation */
 @keyframes text-cycle-1 {
-  0%, 33% { color: hsl(0 0% 70%); }
-  33.1%, 66% { color: hsl(0 0% 0%); }
-  66.1%, 100% { color: hsl(0 0% 50%); }
+  0%, 28% { color: hsl(0 0% 70%); }
+  33%, 61% { color: hsl(0 0% 0%); }
+  66%, 94% { color: hsl(0 0% 50%); }
+  100% { color: hsl(0 0% 70%); }
 }
 
 @keyframes text-cycle-2 {
-  0%, 33% { color: hsl(0 0% 50%); }
-  33.1%, 66% { color: hsl(0 0% 70%); }
-  66.1%, 100% { color: hsl(0 0% 0%); }
+  0%, 28% { color: hsl(0 0% 50%); }
+  33%, 61% { color: hsl(0 0% 70%); }
+  66%, 94% { color: hsl(0 0% 0%); }
+  100% { color: hsl(0 0% 50%); }
 }
 
 @keyframes text-cycle-3 {
-  0%, 33% { color: hsl(0 0% 0%); }
-  33.1%, 66% { color: hsl(0 0% 50%); }
-  66.1%, 100% { color: hsl(0 0% 70%); }
+  0%, 28% { color: hsl(0 0% 0%); }
+  33%, 61% { color: hsl(0 0% 50%); }
+  66%, 94% { color: hsl(0 0% 70%); }
+  100% { color: hsl(0 0% 0%); }
 }
 
 .animate-text-1 {

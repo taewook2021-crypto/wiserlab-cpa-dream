@@ -1,20 +1,22 @@
 import mountainHero from "@/assets/mountain-hero.jpg";
-import OptimizedImage from "@/components/OptimizedImage";
 
 const HeroSection = () => {
   return (
     <section className="min-h-screen">
       {/* Full-bleed Hero with Overlay Card */}
       <div className="relative h-screen">
-        {/* Background Image */}
+        {/* Background Video */}
         <div className="absolute inset-0">
-          <OptimizedImage 
-            src={mountainHero} 
-            alt="Mountain Peak" 
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={mountainHero}
             className="w-full h-full object-cover"
-            containerClassName="w-full h-full"
-            priority={true}
-          />
+          >
+            <source src="/videos/mountain-hero.mp4" type="video/mp4" />
+          </video>
           <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
         </div>
 

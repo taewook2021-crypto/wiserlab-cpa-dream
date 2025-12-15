@@ -1,10 +1,12 @@
+import wiserLabLogo from "@/assets/wiser-lab-logo.svg";
+
 const Footer = () => {
   return <footer className="bg-black text-white">
       <div className="container mx-auto px-6 py-16">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Company Info */}
           <div>
-            <h3 className="font-normal text-lg mb-6 tracking-wide">WISER LAB</h3>
+            <img src={wiserLabLogo} alt="Wiser Lab" className="h-4 mb-6" style={{ filter: 'brightness(0) invert(1)' }} />
             <ul className="space-y-3 text-sm text-gray-400">
               <li>Summit Program</li>
               <li>Performance Analysis</li>

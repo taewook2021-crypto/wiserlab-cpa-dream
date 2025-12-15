@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import mountainHero from "@/assets/mountain-hero.jpg";
 import summitLogo from "@/assets/summit-logo.svg";
 
-const ConcentricCircles = ({ isVisible }: { isVisible: boolean }) => {
+const ConcentricCircles = ({ animationKey }: { animationKey: number }) => {
   const circles = [
     { size: 200, delay: 0 },
     { size: 400, delay: 0.15 },
@@ -26,16 +26,14 @@ const ConcentricCircles = ({ isVisible }: { isVisible: boolean }) => {
       >
         {circles.map((circle, index) => (
           <div
-            key={index}
-            className="absolute rounded-full border border-muted-foreground/30"
+            key={`${animationKey}-${index}`}
+            className="absolute rounded-full border border-muted-foreground/30 animate-circle-appear"
             style={{
               width: circle.size,
               height: circle.size,
               left: -circle.size / 2,
               top: -circle.size / 2,
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'scale(1)' : 'scale(0.5)',
-              transition: `opacity 0.8s ease-out ${circle.delay}s, transform 0.8s ease-out ${circle.delay}s`,
+              animationDelay: `${circle.delay}s`,
             }}
           />
         ))}
@@ -48,7 +46,7 @@ const HeroSection = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [animationKey, setAnimationKey] = useState(0);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -56,15 +54,13 @@ const HeroSection = () => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true);
+          setAnimationKey(prev => prev + 1);
           
           // 7초마다 애니메이션 반복
           intervalId = setInterval(() => {
-            setIsVisible(false);
-            setTimeout(() => setIsVisible(true), 100);
+            setAnimationKey(prev => prev + 1);
           }, 7000);
         } else {
-          setIsVisible(false);
           if (intervalId) clearInterval(intervalId);
         }
       },
@@ -149,7 +145,7 @@ const HeroSection = () => {
 
       {/* Content Section */}
       <div ref={sectionRef} className="relative bg-background py-32 overflow-hidden">
-        <ConcentricCircles isVisible={isVisible} />
+        <ConcentricCircles animationKey={animationKey} />
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-20 items-start">
             {/* Left Column */}

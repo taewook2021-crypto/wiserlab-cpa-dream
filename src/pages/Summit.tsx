@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ShoppingCart } from "lucide-react";
 import summitFeature from "@/assets/summit-feature.jpg";
-import summitProduct from "@/assets/summit-product.png";
+import summitCover from "@/assets/summit-cover.png";
 interface Subject {
   id: string;
   name: string;
@@ -132,7 +132,7 @@ const Summit = () => {
               {/* Left: Product Image */}
               <div className="flex items-center justify-center">
                 <OptimizedImage 
-                  src={summitProduct} 
+                  src={summitCover} 
                   alt="Wiser Lab SUMMIT 모의고사 패키지" 
                   className="w-full max-w-2xl object-contain"
                   containerClassName="w-full max-w-2xl"

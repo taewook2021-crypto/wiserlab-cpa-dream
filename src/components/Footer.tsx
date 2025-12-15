@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import wiserLabLogo from "@/assets/wiser-lab-logo.svg";
 
 const Footer = () => {
@@ -8,8 +9,11 @@ const Footer = () => {
           <div>
             <img src={wiserLabLogo} alt="Wiser Lab" className="h-4 mb-6" style={{ filter: 'brightness(0) invert(1)' }} />
             <ul className="space-y-3 text-sm text-gray-400">
-              <li>Summit Program</li>
-              <li>Performance Analysis</li>
+              <li>
+                <Link to="/summit" className="hover:text-white transition-colors">
+                  SUMMIT Contents
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -27,7 +31,6 @@ const Footer = () => {
             <h4 className="font-normal mb-6 tracking-wide">Contact</h4>
             <ul className="space-y-3 text-sm text-gray-400">
               <li>1:1 문의</li>
-              <li>자주 묻는 질문</li>
               <li>공지사항</li>
             </ul>
           </div>

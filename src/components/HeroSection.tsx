@@ -13,7 +13,7 @@ const HeroSection = () => {
             muted
             playsInline
             poster={mountainHero}
-            className="w-full h-full object-cover grayscale-[50%]"
+            className="w-full h-full object-cover grayscale-[70%]"
           >
             <source src="/videos/mountain-bw.mp4" type="video/mp4" />
           </video>

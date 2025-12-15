@@ -32,7 +32,7 @@ const HeroSection = () => {
                 정상으로
               </h1>
               <h1 className="text-4xl lg:text-5xl font-light text-muted-foreground/40">
-                SUMMIT
+                공인회계사 1차 모의고사
               </h1>
             </div>
             <img src={summitLogo} alt="SUMMIT" className="self-end h-6" />

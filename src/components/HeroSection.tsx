@@ -47,7 +47,6 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [animationKey, setAnimationKey] = useState(0);
-  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -91,19 +90,13 @@ const HeroSection = () => {
       <div className="relative h-screen">
         {/* Background Video */}
         <div className="absolute inset-0">
-          <img 
-            src={mountainHero} 
-            alt="" 
-            className="w-full h-full object-cover grayscale-[70%]"
-          />
           <video
             autoPlay
             loop
             muted
             playsInline
-            preload="auto"
-            onCanPlayThrough={() => setVideoReady(true)}
-            className={`absolute inset-0 w-full h-full object-cover grayscale-[70%] transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            poster={mountainHero}
+            className="w-full h-full object-cover grayscale-[70%]"
           >
             <source src="/videos/mountain-bw.mp4" type="video/mp4" />
           </video>

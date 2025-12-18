@@ -49,11 +49,17 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-gray-800">
           <p className="text-xs text-gray-500 mb-2">
-            (주)와이저랩주식회사
+            와이저랩 주식회사 | 대표 김태욱
+          </p>
+          <p className="text-xs text-gray-500 mb-2">
+            사업자등록번호 288-87-03554 | 법인등록번호 110111-0942654
+          </p>
+          <p className="text-xs text-gray-500 mb-2">
+            서울특별시 관악구 행운2길 1, 4층 404호(봉천동)
           </p>
           
           <p className="text-xs text-gray-600 mt-4">
-            COPYRIGHT (주)와이저랩주식회사. All Rights Reserved.
+            COPYRIGHT 와이저랩 주식회사. All Rights Reserved.
           </p>
         </div>
       </div>

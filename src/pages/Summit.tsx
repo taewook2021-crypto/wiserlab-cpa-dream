@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ShoppingCart } from "lucide-react";
-import summitFeature from "@/assets/summit-feature.jpg";
+import summitFeature from "@/assets/summit-cover-new.jpg";
 import summitCover from "@/assets/summit-cover.png";
 interface Subject {
   id: string;

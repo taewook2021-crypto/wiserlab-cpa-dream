@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useRef, useState } from "react";
-import mountainHero from "@/assets/mountain-hero.jpg";
 import summitLogo from "@/assets/summit-logo.svg";
 
 const ConcentricCircles = ({ animationKey }: { animationKey: number }) => {
@@ -89,13 +88,12 @@ const HeroSection = () => {
       {/* Full-bleed Hero with Overlay Card */}
       <div className="relative h-screen">
         {/* Background Video */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-muted">
           <video
             autoPlay
             loop
             muted
             playsInline
-            poster={mountainHero}
             className="w-full h-full object-cover grayscale-[70%]"
           >
             <source src="/videos/mountain-bw.mp4" type="video/mp4" />

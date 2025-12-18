@@ -121,7 +121,7 @@ const Privacy = () => {
           <section className="pt-8 border-t border-gray-200">
             <p className="text-gray-500">
               <strong>부칙</strong><br />
-              이 개인정보처리방침은 2024년 12월 18일부터 시행됩니다.
+              이 개인정보처리방침은 2025년 12월 20일부터 시행됩니다.
             </p>
           </section>
         </div>

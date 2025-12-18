@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useRef, useState } from "react";
-import mountainHero from "@/assets/mountain-hero.jpg";
 import summitLogo from "@/assets/summit-logo.svg";
 
 const ConcentricCircles = ({ animationKey }: { animationKey: number }) => {
@@ -47,6 +46,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [animationKey, setAnimationKey] = useState(0);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -89,14 +89,15 @@ const HeroSection = () => {
       {/* Full-bleed Hero with Overlay Card */}
       <div className="relative h-screen">
         {/* Background Video */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-black">
           <video
             autoPlay
             loop
             muted
             playsInline
-            poster={mountainHero}
-            className="w-full h-full object-cover grayscale-[70%]"
+            preload="auto"
+            onCanPlayThrough={() => setVideoReady(true)}
+            className={`w-full h-full object-cover grayscale-[70%] transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
           >
             <source src="/videos/mountain-bw.mp4" type="video/mp4" />
           </video>

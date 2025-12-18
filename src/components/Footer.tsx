@@ -21,8 +21,16 @@ const Footer = () => {
           <div>
             <h4 className="font-normal mb-6 tracking-wide">Service Policies</h4>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li>이용약관</li>
-              <li>개인정보처리방침</li>
+              <li>
+                <Link to="/terms" className="hover:text-white transition-colors">
+                  이용약관
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="hover:text-white transition-colors">
+                  개인정보처리방침
+                </Link>
+              </li>
             </ul>
           </div>
 

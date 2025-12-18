@@ -7,6 +7,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Summit from "./pages/Summit";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import QuickScoring from "./pages/QuickScoring";
 import Edge from "./pages/Edge";
 import Statistics from "./pages/Statistics";
@@ -28,6 +30,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/summit" element={<Summit />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="/quick-scoring" element={<QuickScoring />} />
             <Route path="/edge" element={<Edge />} />
             <Route path="/statistics" element={<Statistics />} />

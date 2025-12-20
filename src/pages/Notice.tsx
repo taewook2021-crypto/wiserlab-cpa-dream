@@ -40,7 +40,7 @@ const Notice = () => {
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
       
-      <main className="flex-1 container mx-auto px-6 py-20">
+      <main className="flex-1 container mx-auto px-6 py-28">
         <div className="max-w-3xl mx-auto">
           {/* Title */}
           <h1 className="text-2xl font-bold mb-8">공지사항</h1>

@@ -71,6 +71,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notices: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_important: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_important?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_important?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scoring_results: {
         Row: {
           correct_count: number
@@ -107,14 +134,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
       exam_subject: "financial_accounting" | "tax_law"
     }
     CompositeTypes: {
@@ -243,6 +295,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
       exam_subject: ["financial_accounting", "tax_law"],
     },
   },

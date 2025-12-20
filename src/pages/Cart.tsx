@@ -104,6 +104,29 @@ const Cart = () => {
     .filter((item) => selectedItems.includes(item.id))
     .reduce((sum, item) => sum + item.price, 0);
 
+  const handlePurchase = () => {
+    if (selectedItems.length === 0) return;
+
+    // 선택된 상품들의 product_type을 기반으로 items 파라미터 생성
+    const selectedProducts = cartItems.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+
+    // product_type에서 items 파라미터로 변환 (financial_accounting -> financial, tax_law -> tax)
+    const itemParams = selectedProducts
+      .map((item) => {
+        if (item.product_type === "financial_accounting") return "financial";
+        if (item.product_type === "tax_law") return "tax";
+        return null;
+      })
+      .filter(Boolean)
+      .join(",");
+
+    if (itemParams) {
+      navigate(`/payment?items=${itemParams}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -210,6 +233,7 @@ const Cart = () => {
                     <Button
                       className="flex-1 h-14 text-base font-normal"
                       disabled={selectedItems.length === 0}
+                      onClick={handlePurchase}
                     >
                       구매하기
                     </Button>

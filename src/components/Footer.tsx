@@ -38,7 +38,6 @@ const Footer = () => {
           <div>
             <h4 className="font-normal mb-6 tracking-wide">Contact</h4>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li>1:1 문의</li>
               <li>공지사항</li>
             </ul>
           </div>

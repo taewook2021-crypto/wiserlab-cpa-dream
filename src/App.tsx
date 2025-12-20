@@ -15,6 +15,7 @@ import Statistics from "./pages/Statistics";
 import QuestionAnalysis from "./pages/QuestionAnalysis";
 import MyPage from "./pages/MyPage";
 import Cart from "./pages/Cart";
+import Notice from "./pages/Notice";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/question-analysis" element={<QuestionAnalysis />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/notice" element={<Notice />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

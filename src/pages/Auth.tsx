@@ -8,13 +8,23 @@ const Auth = () => {
   const { user, loading, signInWithKakao } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/";
+  
+  // sessionStorage에서 저장된 리다이렉트 경로 확인, 없으면 URL 파라미터, 그것도 없으면 "/"
+  const getRedirectPath = () => {
+    const savedRedirect = sessionStorage.getItem('auth_redirect');
+    if (savedRedirect) {
+      sessionStorage.removeItem('auth_redirect');
+      return savedRedirect;
+    }
+    return searchParams.get("redirect") || "/";
+  };
 
   useEffect(() => {
     if (!loading && user) {
+      const redirectTo = getRedirectPath();
       navigate(redirectTo);
     }
-  }, [user, loading, navigate, redirectTo]);
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (

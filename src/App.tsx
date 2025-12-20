@@ -16,6 +16,7 @@ import Statistics from "./pages/Statistics";
 import QuestionAnalysis from "./pages/QuestionAnalysis";
 import MyPage from "./pages/MyPage";
 import Cart from "./pages/Cart";
+import Payment from "./pages/Payment";
 import Notice from "./pages/Notice";
 import NoticeDetail from "./pages/NoticeDetail";
 import NoticeAdmin from "./pages/NoticeAdmin";
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/question-analysis" element={<QuestionAnalysis />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/payment" element={<Payment />} />
             <Route path="/notice" element={<Notice />} />
             <Route path="/notice/:id" element={<NoticeDetail />} />
             <Route path="/noticeadmin" element={<NoticeAdmin />} />

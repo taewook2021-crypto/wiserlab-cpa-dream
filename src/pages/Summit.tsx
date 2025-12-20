@@ -230,6 +230,13 @@ const Summit = () => {
                     <Button 
                       className="flex-1 h-14 text-base font-normal" 
                       disabled={selectedSubjects.length === 0}
+                      onClick={() => {
+                        if (!user) {
+                          navigate("/auth?redirect=/summit");
+                          return;
+                        }
+                        navigate(`/payment?items=${selectedSubjects.join(",")}`);
+                      }}
                     >
                       바로구매 하기
                     </Button>

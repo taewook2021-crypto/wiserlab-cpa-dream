@@ -29,27 +29,7 @@ interface DaumPostcodeData {
   buildingName: string;
 }
 
-interface OrderItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-}
-
-const subjects: OrderItem[] = [
-  {
-    id: "financial",
-    name: "재무회계",
-    description: "SUMMIT 모의고사 2회분",
-    price: 30000,
-  },
-  {
-    id: "tax",
-    name: "세법",
-    description: "SUMMIT 모의고사 2회분",
-    price: 30000,
-  },
-];
+const BUNDLE_PRICE = 50000;
 
 const Payment = () => {
   const { user, loading } = useAuth();
@@ -68,29 +48,14 @@ const Payment = () => {
   const [address, setAddress] = useState("");
   const [detailAddress, setDetailAddress] = useState("");
 
-  // URL params에서 선택된 상품 가져오기
-  const selectedItems = useMemo(() => {
+  // URL params에서 상품 확인
+  const isValidOrder = useMemo(() => {
     const items = searchParams.get("items");
-    if (!items) return [];
-    return items.split(",").filter((id) => subjects.some((s) => s.id === id));
+    return items === "bundle";
   }, [searchParams]);
 
-  const orderItems = useMemo(() => {
-    return subjects.filter((s) => selectedItems.includes(s.id));
-  }, [selectedItems]);
-
   const shippingFee = 4500;
-
-  const { totalPrice, discountedPrice, discount } = useMemo(() => {
-    const total = orderItems.reduce((sum, item) => sum + item.price, 0);
-    const hasDiscount = orderItems.length >= 2;
-    const discountAmount = hasDiscount ? 10000 : 0;
-    return {
-      totalPrice: total,
-      discountedPrice: total - discountAmount + shippingFee,
-      discount: discountAmount,
-    };
-  }, [orderItems]);
+  const totalPrice = BUNDLE_PRICE + shippingFee;
 
   const formatPrice = (price: number) => {
     return price.toLocaleString("ko-KR");
@@ -130,12 +95,12 @@ const Payment = () => {
     }
   }, [user, loading, navigate]);
 
-  // 상품이 없으면 summit으로 리다이렉트
+  // 유효하지 않은 주문이면 summit으로 리다이렉트
   useEffect(() => {
-    if (selectedItems.length === 0) {
+    if (!isValidOrder) {
       navigate("/summit");
     }
-  }, [selectedItems, navigate]);
+  }, [isValidOrder, navigate]);
 
   const handlePayment = async () => {
     if (!buyerName.trim()) {
@@ -197,20 +162,15 @@ const Payment = () => {
               <section className="space-y-4">
                 <h2 className="text-lg font-medium">주문 상품</h2>
                 <div className="border border-border rounded-lg divide-y divide-border">
-                  {orderItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-4 flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="font-medium">SUMMIT {item.name} 모의고사</p>
-                        <p className="text-sm text-muted-foreground">
-                          {item.description}
-                        </p>
-                      </div>
-                      <p className="font-medium">{formatPrice(item.price)}원</p>
+                  <div className="p-4 flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">SUMMIT 전과목 PACK</p>
+                      <p className="text-sm text-muted-foreground">
+                        재무회계 + 세법 모의고사 각 2회분
+                      </p>
                     </div>
-                  ))}
+                    <p className="font-medium">{formatPrice(BUNDLE_PRICE)}원</p>
+                  </div>
                 </div>
               </section>
 
@@ -351,18 +311,12 @@ const Payment = () => {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">상품 금액</span>
-                    <span>{formatPrice(totalPrice)}원</span>
+                    <span>{formatPrice(BUNDLE_PRICE)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">배송비</span>
                     <span>{formatPrice(shippingFee)}원</span>
                   </div>
-                  {discount > 0 && (
-                    <div className="flex justify-between text-primary">
-                      <span>할인 금액</span>
-                      <span>-{formatPrice(discount)}원</span>
-                    </div>
-                  )}
                 </div>
 
                 <Separator />
@@ -370,7 +324,7 @@ const Payment = () => {
                 <div className="flex justify-between items-center">
                   <span className="font-medium">총 결제 금액</span>
                   <span className="text-xl font-medium">
-                    {formatPrice(discountedPrice)}원
+                    {formatPrice(totalPrice)}원
                   </span>
                 </div>
 
@@ -379,7 +333,7 @@ const Payment = () => {
                   onClick={handlePayment}
                   disabled={isProcessing}
                 >
-                  {isProcessing ? "결제 처리 중..." : `${formatPrice(discountedPrice)}원 결제하기`}
+                  {isProcessing ? "결제 처리 중..." : `${formatPrice(totalPrice)}원 결제하기`}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">

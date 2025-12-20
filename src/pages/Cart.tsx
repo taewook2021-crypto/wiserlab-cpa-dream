@@ -107,23 +107,17 @@ const Cart = () => {
   const handlePurchase = () => {
     if (selectedItems.length === 0) return;
 
-    // 선택된 상품들의 product_type을 기반으로 items 파라미터 생성
+    // 선택된 상품 중 summit_bundle이 있는지 확인
     const selectedProducts = cartItems.filter((item) =>
       selectedItems.includes(item.id)
     );
 
-    // product_type에서 items 파라미터로 변환 (financial_accounting -> financial, tax_law -> tax)
-    const itemParams = selectedProducts
-      .map((item) => {
-        if (item.product_type === "financial_accounting") return "financial";
-        if (item.product_type === "tax_law") return "tax";
-        return null;
-      })
-      .filter(Boolean)
-      .join(",");
+    const hasBundleProduct = selectedProducts.some(
+      (item) => item.product_type === "summit_bundle"
+    );
 
-    if (itemParams) {
-      navigate(`/payment?items=${itemParams}`);
+    if (hasBundleProduct) {
+      navigate("/payment?items=bundle");
     }
   };
 

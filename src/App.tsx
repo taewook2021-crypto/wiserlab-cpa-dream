@@ -17,6 +17,8 @@ import QuestionAnalysis from "./pages/QuestionAnalysis";
 import MyPage from "./pages/MyPage";
 import Cart from "./pages/Cart";
 import Notice from "./pages/Notice";
+import NoticeDetail from "./pages/NoticeDetail";
+import NoticeAdmin from "./pages/NoticeAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const App = () => (
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/notice" element={<Notice />} />
+            <Route path="/notice/:id" element={<NoticeDetail />} />
+            <Route path="/noticeadmin" element={<NoticeAdmin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -50,7 +50,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      // scope: 'local'을 사용하여 서버 세션 상태와 관계없이 로컬 세션 정리
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+    // 상태 명시적 초기화
+    setUser(null);
+    setSession(null);
   };
 
   return (

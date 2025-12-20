@@ -35,8 +35,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signInWithKakao = async () => {
-    const redirectUrl = `${window.location.origin}/`;
+  const signInWithKakao = async (redirectPath?: string) => {
+    // 로그인 후 돌아갈 경로 저장
+    const pathToRedirect = redirectPath || window.location.pathname;
+    sessionStorage.setItem('auth_redirect', pathToRedirect);
+    
+    const redirectUrl = `${window.location.origin}/auth`;
     await supabase.auth.signInWithOAuth({
       provider: "kakao",
       options: {

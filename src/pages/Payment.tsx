@@ -79,13 +79,15 @@ const Payment = () => {
     return subjects.filter((s) => selectedItems.includes(s.id));
   }, [selectedItems]);
 
+  const shippingFee = 4500;
+
   const { totalPrice, discountedPrice, discount } = useMemo(() => {
     const total = orderItems.reduce((sum, item) => sum + item.price, 0);
     const hasDiscount = orderItems.length >= 2;
     const discountAmount = hasDiscount ? 10000 : 0;
     return {
       totalPrice: total,
-      discountedPrice: total - discountAmount,
+      discountedPrice: total - discountAmount + shippingFee,
       discount: discountAmount,
     };
   }, [orderItems]);
@@ -350,6 +352,10 @@ const Payment = () => {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">상품 금액</span>
                     <span>{formatPrice(totalPrice)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">배송비</span>
+                    <span>{formatPrice(shippingFee)}원</span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-primary">

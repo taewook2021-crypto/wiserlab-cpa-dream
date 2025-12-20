@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -44,15 +42,6 @@ const Notice = () => {
       
       <main className="flex-1 container mx-auto px-6 py-12">
         <div className="max-w-3xl mx-auto">
-          {/* Back Button */}
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-black transition-colors mb-8"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
-          </Link>
-
           {/* Title */}
           <h1 className="text-2xl font-bold mb-8">공지사항</h1>
 

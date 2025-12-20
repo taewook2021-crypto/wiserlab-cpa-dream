@@ -48,10 +48,14 @@ const Footer = () => {
 
           {/* Support Hours */}
           <div>
-            <h4 className="font-normal mb-6 tracking-wide flex items-center gap-2">
+            <a 
+              href="http://pf.kakao.com/_uSAyn" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="font-normal mb-6 tracking-wide hover:text-gray-300 transition-colors block"
+            >
               문의하기
-              <span className="inline-block w-8 h-8 bg-white rounded-full"></span>
-            </h4>
+            </a>
             <p className="text-sm text-gray-400">
               평일 10:00~18:00 (점심시간 12:00~13:00)
             </p>

@@ -49,7 +49,7 @@ const Auth = () => {
 
         <div className="space-y-4">
           <Button
-            onClick={signInWithKakao}
+            onClick={() => signInWithKakao()}
             className="w-full h-12 bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#191919] font-medium"
           >
             <svg 

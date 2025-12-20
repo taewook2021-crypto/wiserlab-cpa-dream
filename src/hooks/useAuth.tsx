@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signInWithKakao: () => Promise<void>;
+  signInWithKakao: (redirectPath?: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 

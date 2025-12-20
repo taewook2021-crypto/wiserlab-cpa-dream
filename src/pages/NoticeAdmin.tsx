@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Trash2, Edit, Plus, X } from "lucide-react";
+import { Trash2, Edit, Plus, X, Paperclip, FileText } from "lucide-react";
 import { format } from "date-fns";
 
 interface Notice {
@@ -18,6 +18,8 @@ interface Notice {
   content: string;
   is_important: boolean;
   created_at: string;
+  attachment_url: string | null;
+  attachment_name: string | null;
 }
 
 const NoticeAdmin = () => {
@@ -28,6 +30,9 @@ const NoticeAdmin = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isImportant, setIsImportant] = useState(false);
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [existingAttachment, setExistingAttachment] = useState<{ url: string; name: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: isAdmin, isLoading: isCheckingAdmin } = useQuery({
     queryKey: ["isAdmin", user?.id],
@@ -56,8 +61,28 @@ const NoticeAdmin = () => {
     },
   });
 
+  const uploadFile = async (file: File): Promise<{ url: string; name: string } | null> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('notice-attachments')
+      .upload(fileName, file);
+    
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      return null;
+    }
+    
+    const { data: { publicUrl } } = supabase.storage
+      .from('notice-attachments')
+      .getPublicUrl(fileName);
+    
+    return { url: publicUrl, name: file.name };
+  };
+
   const createMutation = useMutation({
-    mutationFn: async (data: { title: string; content: string; is_important: boolean }) => {
+    mutationFn: async (data: { title: string; content: string; is_important: boolean; attachment_url?: string | null; attachment_name?: string | null }) => {
       const { error } = await supabase.from("notices").insert(data);
       if (error) throw error;
     },
@@ -72,7 +97,7 @@ const NoticeAdmin = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: { title: string; content: string; is_important: boolean } }) => {
+    mutationFn: async ({ id, data }: { id: string; data: { title: string; content: string; is_important: boolean; attachment_url?: string | null; attachment_name?: string | null } }) => {
       const { error } = await supabase.from("notices").update(data).eq("id", id);
       if (error) throw error;
     },
@@ -106,6 +131,11 @@ const NoticeAdmin = () => {
     setIsImportant(false);
     setEditingNotice(null);
     setIsFormOpen(false);
+    setAttachmentFile(null);
+    setExistingAttachment(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleEdit = (notice: Notice) => {
@@ -114,21 +144,63 @@ const NoticeAdmin = () => {
     setContent(notice.content);
     setIsImportant(notice.is_important);
     setIsFormOpen(true);
+    setAttachmentFile(null);
+    if (notice.attachment_url && notice.attachment_name) {
+      setExistingAttachment({ url: notice.attachment_url, name: notice.attachment_name });
+    } else {
+      setExistingAttachment(null);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
       toast.error("제목과 내용을 입력해주세요.");
       return;
     }
 
-    const data = { title: title.trim(), content: content.trim(), is_important: isImportant };
+    let attachmentData: { attachment_url: string | null; attachment_name: string | null } = {
+      attachment_url: existingAttachment?.url || null,
+      attachment_name: existingAttachment?.name || null,
+    };
+
+    if (attachmentFile) {
+      const uploaded = await uploadFile(attachmentFile);
+      if (uploaded) {
+        attachmentData = { attachment_url: uploaded.url, attachment_name: uploaded.name };
+      } else {
+        toast.error("파일 업로드에 실패했습니다.");
+        return;
+      }
+    }
+
+    const data = { 
+      title: title.trim(), 
+      content: content.trim(), 
+      is_important: isImportant,
+      ...attachmentData
+    };
 
     if (editingNotice) {
       updateMutation.mutate({ id: editingNotice.id, data });
     } else {
       createMutation.mutate(data);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAttachmentFile(file);
+      setExistingAttachment(null);
+    }
+  };
+
+  const removeAttachment = () => {
+    setAttachmentFile(null);
+    setExistingAttachment(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -231,6 +303,47 @@ const NoticeAdmin = () => {
                   <label htmlFor="isImportant" className="text-sm cursor-pointer">
                     중요 공지로 표시
                   </label>
+                </div>
+                
+                {/* 파일 첨부 */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">파일 첨부</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="gap-2"
+                    >
+                      <Paperclip className="w-4 h-4" />
+                      파일 선택
+                    </Button>
+                  </div>
+                  
+                  {/* 선택된 파일 표시 */}
+                  {(attachmentFile || existingAttachment) && (
+                    <div className="flex items-center gap-2 p-2 bg-white rounded border">
+                      <FileText className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm flex-1 truncate">
+                        {attachmentFile?.name || existingAttachment?.name}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={removeAttachment}
+                        className="h-6 w-6"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>

@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download, FileText } from "lucide-react";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
 
 const NoticeDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,18 @@ const NoticeDetail = () => {
     },
     enabled: !!id,
   });
+
+  const handleDownload = () => {
+    if (notice?.attachment_url && notice?.attachment_name) {
+      const link = document.createElement('a');
+      link.href = notice.attachment_url;
+      link.download = notice.attachment_name;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -72,9 +85,25 @@ const NoticeDetail = () => {
                 </time>
               </header>
 
-              <div className="prose prose-gray max-w-none whitespace-pre-wrap">
+              <div className="prose prose-gray max-w-none whitespace-pre-wrap mb-8">
                 {notice.content}
               </div>
+
+              {/* 첨부파일 다운로드 */}
+              {notice.attachment_url && notice.attachment_name && (
+                <div className="border-t border-gray-200 pt-6">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">첨부파일</h3>
+                  <Button
+                    variant="outline"
+                    onClick={handleDownload}
+                    className="gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span className="truncate max-w-[200px]">{notice.attachment_name}</span>
+                    <Download className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
             </article>
           )}
         </div>

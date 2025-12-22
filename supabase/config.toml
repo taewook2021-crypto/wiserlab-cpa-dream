@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.toss-payment]
 verify_jwt = false
+
+[functions.toss-refund]
+verify_jwt = false

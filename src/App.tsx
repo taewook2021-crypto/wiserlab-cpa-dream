@@ -22,6 +22,7 @@ import PaymentFail from "./pages/PaymentFail";
 import Notice from "./pages/Notice";
 import NoticeDetail from "./pages/NoticeDetail";
 import NoticeAdmin from "./pages/NoticeAdmin";
+import OrderAdmin from "./pages/OrderAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/notice" element={<Notice />} />
             <Route path="/notice/:id" element={<NoticeDetail />} />
             <Route path="/noticeadmin" element={<NoticeAdmin />} />
+            <Route path="/orderadmin" element={<OrderAdmin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

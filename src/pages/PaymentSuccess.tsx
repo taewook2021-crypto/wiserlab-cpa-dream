@@ -6,10 +6,12 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const [isConfirming, setIsConfirming] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderInfo, setOrderInfo] = useState<{
@@ -46,6 +48,34 @@ const PaymentSuccess = () => {
         }
 
         if (data.success) {
+          // 로컬스토리지에서 주문 정보 가져오기
+          const pendingOrderStr = localStorage.getItem("pendingOrder");
+          const pendingOrder = pendingOrderStr ? JSON.parse(pendingOrderStr) : null;
+
+          // 주문 정보를 DB에 저장
+          if (user && pendingOrder) {
+            const { error: orderError } = await supabase.from("orders").insert({
+              user_id: user.id,
+              order_id: data.orderId,
+              payment_key: paymentKey,
+              product_name: "SUMMIT 전과목 PACK",
+              amount: data.totalAmount,
+              status: "paid",
+              buyer_name: pendingOrder.buyerName,
+              buyer_email: user.email || "",
+              buyer_phone: pendingOrder.buyerPhone,
+              shipping_address: pendingOrder.address,
+              shipping_detail_address: pendingOrder.detailAddress,
+              shipping_postal_code: pendingOrder.postcode,
+              paid_at: new Date().toISOString(),
+            });
+
+            if (orderError) {
+              console.error("Failed to save order:", orderError);
+              // 주문 저장 실패해도 결제는 성공이므로 계속 진행
+            }
+          }
+
           setIsSuccess(true);
           setOrderInfo({
             orderId: data.orderId,
@@ -70,7 +100,7 @@ const PaymentSuccess = () => {
     };
 
     confirmPayment();
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, user]);
 
   const formatPrice = (price: number) => {
     return price.toLocaleString("ko-KR");

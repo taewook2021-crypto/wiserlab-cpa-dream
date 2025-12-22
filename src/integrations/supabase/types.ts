@@ -104,6 +104,69 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          amount: number
+          buyer_email: string
+          buyer_name: string
+          buyer_phone: string
+          created_at: string
+          id: string
+          order_id: string
+          paid_at: string | null
+          payment_key: string | null
+          product_name: string
+          refund_reason: string | null
+          refunded_at: string | null
+          shipping_address: string
+          shipping_detail_address: string | null
+          shipping_postal_code: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          buyer_email: string
+          buyer_name: string
+          buyer_phone: string
+          created_at?: string
+          id?: string
+          order_id: string
+          paid_at?: string | null
+          payment_key?: string | null
+          product_name: string
+          refund_reason?: string | null
+          refunded_at?: string | null
+          shipping_address: string
+          shipping_detail_address?: string | null
+          shipping_postal_code: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          buyer_email?: string
+          buyer_name?: string
+          buyer_phone?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          paid_at?: string | null
+          payment_key?: string | null
+          product_name?: string
+          refund_reason?: string | null
+          refunded_at?: string | null
+          shipping_address?: string
+          shipping_detail_address?: string | null
+          shipping_postal_code?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scoring_results: {
         Row: {
           correct_count: number

@@ -5,7 +5,8 @@ import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User, FileText, Trophy, ShoppingCart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { User, FileText, Trophy, ShoppingCart, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ScoringResult {
@@ -26,9 +27,32 @@ interface CartItem {
   price: number;
 }
 
+interface Order {
+  id: string;
+  order_id: string;
+  product_name: string;
+  amount: number;
+  status: string;
+  created_at: string;
+}
+
 const subjectNames: Record<string, string> = {
   financial_accounting: "재무회계",
   tax_law: "세법",
+};
+
+const statusColors: Record<string, string> = {
+  pending: "bg-yellow-500",
+  paid: "bg-green-500",
+  refunded: "bg-red-500",
+  cancelled: "bg-gray-500",
+};
+
+const statusLabels: Record<string, string> = {
+  pending: "대기중",
+  paid: "결제완료",
+  refunded: "환불완료",
+  cancelled: "취소",
 };
 
 const MyPage = () => {
@@ -38,6 +62,8 @@ const MyPage = () => {
   const [loadingResults, setLoadingResults] = useState(true);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loadingCart, setLoadingCart] = useState(true);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -76,11 +102,39 @@ const MyPage = () => {
       setLoadingCart(false);
     };
 
+    const fetchOrders = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("orders")
+        .select("id, order_id, product_name, amount, status, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (!error && data) {
+        setOrders(data);
+      }
+      setLoadingOrders(false);
+    };
+
     if (user) {
       fetchResults();
       fetchCartItems();
+      fetchOrders();
     }
   }, [user]);
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString("ko-KR");
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
 
   if (loading) {
     return (
@@ -126,6 +180,54 @@ const MyPage = () => {
                   <p className="text-sm text-muted-foreground">{email}</p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* 주문 내역 카드 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg font-normal">
+                <Package className="w-5 h-5" />
+                주문 내역
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingOrders ? (
+                <p className="text-muted-foreground text-sm animate-pulse">불러오는 중...</p>
+              ) : orders.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  주문 내역이 없습니다.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {orders.slice(0, 3).map((order) => (
+                    <div
+                      key={order.id}
+                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium text-sm">{order.product_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(order.created_at)}
+                        </p>
+                      </div>
+                      <div className="text-right flex items-center gap-2">
+                        <span className="text-sm">{formatPrice(order.amount)}원</span>
+                        <Badge
+                          className={`${statusColors[order.status] || "bg-gray-500"} text-white text-xs`}
+                        >
+                          {statusLabels[order.status] || order.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  {orders.length > 3 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      외 {orders.length - 3}건의 주문
+                    </p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -2,7 +2,13 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo-black.png";
@@ -100,14 +106,24 @@ const Header = () => {
                 </Link>
               )}
               {isAdmin && (
-                <Link to="/order-admin" className={`text-sm ${textColor} transition-colors`}>
-                  주문관리
-                </Link>
-              )}
-              {isAdmin && (
-                <Link to="/notice-admin" className={`text-sm ${textColor} transition-colors`}>
-                  공지관리
-                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className={`text-sm ${textColor} transition-colors flex items-center gap-1`}>
+                    관리자
+                    <ChevronDown className="w-3 h-3" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-background border z-50">
+                    <DropdownMenuItem asChild>
+                      <Link to="/order-admin" className="cursor-pointer">
+                        주문관리
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/notice-admin" className="cursor-pointer">
+                        공지관리
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
               {!loading && (
                 user ? (
@@ -156,22 +172,23 @@ const Header = () => {
                     </Link>
                   )}
                   {isAdmin && (
-                    <Link 
-                      to="/order-admin" 
-                      onClick={() => setOpen(false)}
-                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
-                    >
-                      주문관리
-                    </Link>
-                  )}
-                  {isAdmin && (
-                    <Link 
-                      to="/notice-admin" 
-                      onClick={() => setOpen(false)}
-                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
-                    >
-                      공지관리
-                    </Link>
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground font-medium">관리자</p>
+                      <Link 
+                        to="/order-admin" 
+                        onClick={() => setOpen(false)}
+                        className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
+                      >
+                        주문관리
+                      </Link>
+                      <Link 
+                        to="/notice-admin" 
+                        onClick={() => setOpen(false)}
+                        className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
+                      >
+                        공지관리
+                      </Link>
+                    </div>
                   )}
                   {!loading && (
                     user ? (

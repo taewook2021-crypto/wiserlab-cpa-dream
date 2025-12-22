@@ -2,3 +2,6 @@ project_id = "ipholpmeblfnkbbereih"
 
 [functions.seed-answer-keys]
 verify_jwt = false
+
+[functions.toss-payment]
+verify_jwt = false

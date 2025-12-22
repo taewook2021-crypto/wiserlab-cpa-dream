@@ -1,15 +1,34 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, CreditCard, Building2, Smartphone, Search } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
+declare global {
+  interface Window {
+    TossPayments: new (clientKey: string) => TossPaymentsInstance;
+  }
+}
+
+interface TossPaymentsInstance {
+  requestPayment: (method: string, options: TossPaymentOptions) => Promise<void>;
+}
+
+interface TossPaymentOptions {
+  amount: number;
+  orderId: string;
+  orderName: string;
+  customerName: string;
+  successUrl: string;
+  failUrl: string;
+}
 
 declare global {
   interface Window {
@@ -30,13 +49,13 @@ interface DaumPostcodeData {
 }
 
 const BUNDLE_PRICE = 50000;
+const TOSS_CLIENT_KEY = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq"; // 테스트용 클라이언트 키
 
 const Payment = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [paymentMethod, setPaymentMethod] = useState("card");
   const [isProcessing, setIsProcessing] = useState(false);
 
   // 구매자 정보
@@ -61,15 +80,23 @@ const Payment = () => {
     return price.toLocaleString("ko-KR");
   };
 
-  // 다음 우편번호 스크립트 로드
+  // 다음 우편번호 + 토스페이먼츠 스크립트 로드
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-    script.async = true;
-    document.head.appendChild(script);
+    // 다음 우편번호 스크립트
+    const daumScript = document.createElement("script");
+    daumScript.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    daumScript.async = true;
+    document.head.appendChild(daumScript);
+
+    // 토스페이먼츠 SDK 스크립트
+    const tossScript = document.createElement("script");
+    tossScript.src = "https://js.tosspayments.com/v1/payment";
+    tossScript.async = true;
+    document.head.appendChild(tossScript);
 
     return () => {
-      document.head.removeChild(script);
+      document.head.removeChild(daumScript);
+      document.head.removeChild(tossScript);
     };
   }, []);
 
@@ -120,14 +147,42 @@ const Payment = () => {
       return;
     }
 
+    if (!window.TossPayments) {
+      toast.error("결제 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
     setIsProcessing(true);
 
-    // 결제 처리 시뮬레이션
-    setTimeout(() => {
-      toast.success("결제가 완료되었습니다.");
+    try {
+      const tossPayments = new window.TossPayments(TOSS_CLIENT_KEY);
+      const orderId = `ORDER_${Date.now()}_${user?.id?.slice(0, 8)}`;
+      
+      // 배송 정보를 localStorage에 저장 (결제 성공 후 사용)
+      localStorage.setItem('pendingOrder', JSON.stringify({
+        orderId,
+        buyerName,
+        buyerPhone,
+        postcode,
+        address,
+        detailAddress,
+        totalPrice,
+      }));
+
+      await tossPayments.requestPayment("카드", {
+        amount: totalPrice,
+        orderId,
+        orderName: "SUMMIT 전과목 PACK",
+        customerName: buyerName,
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      });
+    } catch (error: unknown) {
+      console.error("Payment error:", error);
+      const errorMessage = error instanceof Error ? error.message : "결제 처리 중 오류가 발생했습니다.";
+      toast.error(errorMessage);
       setIsProcessing(false);
-      navigate("/mypage");
-    }, 2000);
+    }
   };
 
   if (loading) {
@@ -251,55 +306,16 @@ const Payment = () => {
 
               <Separator />
 
-              {/* 결제 수단 */}
+              {/* 결제 수단 안내 */}
               <section className="space-y-4">
                 <h2 className="text-lg font-medium">결제 수단</h2>
-                <RadioGroup
-                  value={paymentMethod}
-                  onValueChange={setPaymentMethod}
-                  className="grid grid-cols-3 gap-4"
-                >
-                  <label
-                    htmlFor="card"
-                    className={`flex flex-col items-center gap-2 p-4 border rounded-lg cursor-pointer transition-colors ${
-                      paymentMethod === "card"
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-muted-foreground"
-                    }`}
-                  >
-                    <RadioGroupItem value="card" id="card" className="sr-only" />
-                    <CreditCard className="w-6 h-6" />
-                    <span className="text-sm">신용/체크카드</span>
-                  </label>
-                  <label
-                    htmlFor="bank"
-                    className={`flex flex-col items-center gap-2 p-4 border rounded-lg cursor-pointer transition-colors ${
-                      paymentMethod === "bank"
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-muted-foreground"
-                    }`}
-                  >
-                    <RadioGroupItem value="bank" id="bank" className="sr-only" />
-                    <Building2 className="w-6 h-6" />
-                    <span className="text-sm">무통장입금</span>
-                  </label>
-                  <label
-                    htmlFor="mobile"
-                    className={`flex flex-col items-center gap-2 p-4 border rounded-lg cursor-pointer transition-colors ${
-                      paymentMethod === "mobile"
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-muted-foreground"
-                    }`}
-                  >
-                    <RadioGroupItem
-                      value="mobile"
-                      id="mobile"
-                      className="sr-only"
-                    />
-                    <Smartphone className="w-6 h-6" />
-                    <span className="text-sm">휴대폰결제</span>
-                  </label>
-                </RadioGroup>
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    결제하기 버튼을 누르면 토스페이먼츠 결제창이 열립니다.
+                    <br />
+                    신용카드, 체크카드, 계좌이체 등 다양한 결제 수단을 이용하실 수 있습니다.
+                  </p>
+                </div>
               </section>
             </div>
 

@@ -17,6 +17,8 @@ import QuestionAnalysis from "./pages/QuestionAnalysis";
 import MyPage from "./pages/MyPage";
 import Cart from "./pages/Cart";
 import Payment from "./pages/Payment";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFail from "./pages/PaymentFail";
 import Notice from "./pages/Notice";
 import NoticeDetail from "./pages/NoticeDetail";
 import NoticeAdmin from "./pages/NoticeAdmin";
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/fail" element={<PaymentFail />} />
             <Route path="/notice" element={<Notice />} />
             <Route path="/notice/:id" element={<NoticeDetail />} />
             <Route path="/noticeadmin" element={<NoticeAdmin />} />

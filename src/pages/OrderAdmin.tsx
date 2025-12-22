@@ -66,40 +66,36 @@ const OrderAdmin = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isCheckingAdmin, setIsCheckingAdmin] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [refundReason, setRefundReason] = useState("");
   const [isRefunding, setIsRefunding] = useState(false);
   const [showRefundDialog, setShowRefundDialog] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    }
-  }, [user, loading, navigate]);
-
-  useEffect(() => {
     const checkAdminRole = async () => {
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .single();
-
-      if (!error && data) {
-        setIsAdmin(true);
-      } else {
-        navigate("/");
-        toast.error("접근 권한이 없습니다.");
+      if (!user) {
+        setIsCheckingAdmin(false);
+        return;
       }
+
+      const { data } = await supabase.rpc("has_role", {
+        _user_id: user.id,
+        _role: "admin",
+      });
+
+      setIsAdmin(data === true);
+      setIsCheckingAdmin(false);
     };
 
-    if (user) {
-      checkAdminRole();
+    if (!loading) {
+      if (user) {
+        checkAdminRole();
+      } else {
+        setIsCheckingAdmin(false);
+      }
     }
-  }, [user, navigate]);
+  }, [user, loading]);
 
   const fetchOrders = async () => {
     setLoadingOrders(true);
@@ -179,10 +175,44 @@ const OrderAdmin = () => {
     });
   };
 
-  if (loading || !isAdmin) {
+  if (loading || isCheckingAdmin) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground animate-pulse">로딩 중...</p>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 container mx-auto px-6 py-28">
+          <div className="max-w-3xl mx-auto text-center py-20">
+            <p className="text-muted-foreground">권한 확인 중...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 container mx-auto px-6 py-28">
+          <div className="max-w-3xl mx-auto text-center py-20">
+            <p className="text-muted-foreground">로그인이 필요합니다.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 container mx-auto px-6 py-28">
+          <div className="max-w-3xl mx-auto text-center py-20">
+            <p className="text-muted-foreground">관리자 권한이 필요합니다.</p>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }

@@ -118,8 +118,11 @@ const Summit = () => {
                   </div>
                 </div>
 
-                {/* Notice */}
+                {/* Delivery & Notice */}
                 <div className="space-y-3 text-sm text-muted-foreground">
+                  <p className="text-foreground font-medium">
+                    📦 배송 안내: 결제 완료 후 즉시 이용 가능 (디지털 콘텐츠)
+                  </p>
                   <p>
                     * 본 상품은 2025년 CPA 1차 시험 대비용 콘텐츠로, 시험 종료
                     후에는 구매가 불가합니다.

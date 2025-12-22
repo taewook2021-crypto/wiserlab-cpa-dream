@@ -104,6 +104,11 @@ const Header = () => {
                   주문관리
                 </Link>
               )}
+              {isAdmin && (
+                <Link to="/notice-admin" className={`text-sm ${textColor} transition-colors`}>
+                  공지관리
+                </Link>
+              )}
               {!loading && (
                 user ? (
                   <button 
@@ -157,6 +162,15 @@ const Header = () => {
                       className="text-lg text-foreground hover:text-muted-foreground transition-colors"
                     >
                       주문관리
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link 
+                      to="/notice-admin" 
+                      onClick={() => setOpen(false)}
+                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
+                    >
+                      공지관리
                     </Link>
                   )}
                   {!loading && (

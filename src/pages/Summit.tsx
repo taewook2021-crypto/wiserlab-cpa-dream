@@ -121,7 +121,7 @@ const Summit = () => {
                 {/* Delivery & Notice */}
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <p className="text-foreground font-medium">
-                    📦 배송 안내: 결제 완료 후 영업일 기준 2~3일 이내 출고
+                    배송 안내: 결제 완료 후 영업일 기준 2~3일 이내 출고
                   </p>
                   <p>
                     * 본 상품은 2026년 CPA 1차 시험 대비용 모의고사로, 시험 종료

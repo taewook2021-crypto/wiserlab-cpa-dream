@@ -121,10 +121,10 @@ const Summit = () => {
                 {/* Delivery & Notice */}
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <p className="text-foreground font-medium">
-                    📦 배송 안내: 결제 완료 후 즉시 이용 가능 (디지털 콘텐츠)
+                    📦 배송 안내: 결제 완료 후 영업일 기준 2~3일 이내 출고
                   </p>
                   <p>
-                    * 본 상품은 2025년 CPA 1차 시험 대비용 콘텐츠로, 시험 종료
+                    * 본 상품은 2026년 CPA 1차 시험 대비용 모의고사로, 시험 종료
                     후에는 구매가 불가합니다.
                   </p>
                   <p>* 재무회계, 세법 개별 구매는 불가합니다.</p>

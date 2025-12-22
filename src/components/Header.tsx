@@ -1,19 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo-black.png";
 import wiserLabLogo from "@/assets/wiser-lab-logo.svg";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   const isHomePage = location.pathname === "/";
+
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+      
+      const { data } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin'
+      });
+      
+      setIsAdmin(data === true);
+    };
+    
+    checkAdminRole();
+  }, [user]);
 
   const handleQuickScoringClick = (e: React.MouseEvent) => {
     if (!user) {
@@ -79,6 +99,11 @@ const Header = () => {
                   마이페이지
                 </Link>
               )}
+              {isAdmin && (
+                <Link to="/order-admin" className={`text-sm ${textColor} transition-colors`}>
+                  주문관리
+                </Link>
+              )}
               {!loading && (
                 user ? (
                   <button 
@@ -123,6 +148,15 @@ const Header = () => {
                       className="text-lg text-foreground hover:text-muted-foreground transition-colors"
                     >
                       마이페이지
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link 
+                      to="/order-admin" 
+                      onClick={() => setOpen(false)}
+                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
+                    >
+                      주문관리
                     </Link>
                   )}
                   {!loading && (

@@ -64,9 +64,19 @@ const Terms = () => {
             <h2 className="text-lg font-normal mb-4 text-black">제6조 (결제 및 환불)</h2>
             <ol className="list-decimal list-inside space-y-2">
               <li>유료 서비스의 이용요금은 서비스 내에 표시된 금액을 기준으로 합니다.</li>
-              <li>결제는 회사가 제공하는 결제 수단을 통해 진행됩니다.</li>
-              <li>환불은 관련 법령 및 회사의 환불 정책에 따라 처리됩니다.</li>
-              <li>디지털 콘텐츠의 특성상 서비스 이용 후에는 환불이 제한될 수 있습니다.</li>
+              <li>결제는 회사가 제공하는 결제 수단(신용카드, 간편결제 등)을 통해 진행됩니다.</li>
+              <li>환불 정책:
+                <ul className="list-disc list-inside ml-4 mt-2 space-y-1">
+                  <li><strong>결제 후 7일 이내, 서비스 미이용 시:</strong> 전액 환불</li>
+                  <li><strong>결제 후 7일 이내, 서비스 일부 이용 시:</strong> 이용일수에 해당하는 금액을 차감한 후 환불</li>
+                  <li><strong>결제 후 7일 경과:</strong> 환불 불가</li>
+                  <li><strong>모의고사 응시 후:</strong> 해당 회차 환불 불가 (미응시 회차에 한해 부분 환불 가능)</li>
+                </ul>
+              </li>
+              <li>환불 신청은 고객센터(이메일: support@wiserlab.io) 또는 서비스 내 문의를 통해 접수할 수 있습니다.</li>
+              <li>환불 처리는 신청일로부터 영업일 기준 3~5일 이내에 완료됩니다.</li>
+              <li>결제 수단에 따라 환불 방법이 상이할 수 있으며, 카드 결제의 경우 카드사 정책에 따라 환불 기간이 달라질 수 있습니다.</li>
+              <li>디지털 콘텐츠의 특성상, 콘텐츠를 다운로드하거나 열람한 경우 해당 콘텐츠에 대한 환불이 제한됩니다.</li>
             </ol>
           </section>
 

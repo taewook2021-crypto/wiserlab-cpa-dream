@@ -113,12 +113,12 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-background border z-50">
                     <DropdownMenuItem asChild>
-                      <Link to="/order-admin" className="cursor-pointer">
+                      <Link to="/orderadmin" className="cursor-pointer">
                         주문관리
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/notice-admin" className="cursor-pointer">
+                      <Link to="/noticeadmin" className="cursor-pointer">
                         공지관리
                       </Link>
                     </DropdownMenuItem>
@@ -127,90 +127,114 @@ const Header = () => {
               )}
               {!loading && (
                 user ? (
-                  <button 
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
                     onClick={signOut}
-                    className={`text-sm ${textColor} transition-colors`}
+                    className={`${textColor} hover:bg-transparent`}
                   >
                     로그아웃
-                  </button>
+                  </Button>
                 ) : (
-                  <Link to="/auth" className={`text-sm ${textColor} transition-colors`}>
-                    로그인
+                  <Link to="/auth">
+                    <Button variant="ghost" size="sm" className={`${textColor} hover:bg-transparent`}>
+                      로그인
+                    </Button>
                   </Link>
                 )
               )}
             </div>
             
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon" className={menuButtonStyle}>
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px]">
-                <div className="flex flex-col gap-6 mt-8">
-                  {navLinks.map(link => (
-                    <Link key={link.to} to={link.to} onClick={() => setOpen(false)} className="text-lg text-foreground hover:text-muted-foreground transition-colors">
-                      {link.label}
-                    </Link>
-                  ))}
-                  <Link to="/quick-scoring" onClick={(e) => { handleQuickScoringClick(e); setOpen(false); }}>
-                    <Button variant="default" className="w-full font-normal">
-                      빠른 채점하기
-                    </Button>
-                  </Link>
-                  <Link to="/cart" onClick={() => setOpen(false)} className="text-lg text-foreground hover:text-muted-foreground transition-colors">
-                    장바구니
-                  </Link>
-                  {user && (
-                    <Link 
-                      to="/mypage" 
-                      onClick={() => setOpen(false)}
-                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
-                    >
-                      마이페이지
-                    </Link>
-                  )}
-                  {isAdmin && (
-                    <div className="space-y-4">
-                      <p className="text-sm text-muted-foreground font-medium">관리자</p>
+            <div className="md:hidden">
+              <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className={menuButtonStyle}>
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[280px] bg-background">
+                  <nav className="flex flex-col space-y-6 mt-8">
+                    {navLinks.map(link => (
                       <Link 
-                        to="/order-admin" 
-                        onClick={() => setOpen(false)}
-                        className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
-                      >
-                        주문관리
-                      </Link>
-                      <Link 
-                        to="/notice-admin" 
-                        onClick={() => setOpen(false)}
-                        className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
-                      >
-                        공지관리
-                      </Link>
-                    </div>
-                  )}
-                  {!loading && (
-                    user ? (
-                      <button 
-                        onClick={() => { signOut(); setOpen(false); }}
-                        className="text-lg text-foreground hover:text-muted-foreground transition-colors text-left"
-                      >
-                        로그아웃
-                      </button>
-                    ) : (
-                      <Link 
-                        to="/auth" 
+                        key={link.to} 
+                        to={link.to} 
                         onClick={() => setOpen(false)}
                         className="text-lg text-foreground hover:text-muted-foreground transition-colors"
                       >
-                        로그인
+                        {link.label}
                       </Link>
-                    )
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
+                    ))}
+                    <Link 
+                      to="/quick-scoring" 
+                      onClick={(e) => {
+                        handleQuickScoringClick(e);
+                        setOpen(false);
+                      }}
+                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
+                    >
+                      빠른 채점하기
+                    </Link>
+                    <Link 
+                      to="/cart" 
+                      onClick={() => setOpen(false)}
+                      className="text-lg text-foreground hover:text-muted-foreground transition-colors"
+                    >
+                      장바구니
+                    </Link>
+                    {user && (
+                      <Link 
+                        to="/mypage" 
+                        onClick={() => setOpen(false)}
+                        className="text-lg text-foreground hover:text-muted-foreground transition-colors"
+                      >
+                        마이페이지
+                      </Link>
+                    )}
+                    {isAdmin && (
+                      <div className="space-y-4">
+                        <p className="text-sm text-muted-foreground font-medium">관리자</p>
+                        <Link 
+                          to="/orderadmin" 
+                          onClick={() => setOpen(false)}
+                          className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
+                        >
+                          주문관리
+                        </Link>
+                        <Link 
+                          to="/noticeadmin" 
+                          onClick={() => setOpen(false)}
+                          className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
+                        >
+                          공지관리
+                        </Link>
+                      </div>
+                    )}
+                    {!loading && (
+                      user ? (
+                        <Button 
+                          variant="ghost" 
+                          onClick={() => {
+                            signOut();
+                            setOpen(false);
+                          }}
+                          className="justify-start p-0 h-auto text-lg text-foreground hover:text-muted-foreground hover:bg-transparent"
+                        >
+                          로그아웃
+                        </Button>
+                      ) : (
+                        <Link 
+                          to="/auth" 
+                          onClick={() => setOpen(false)}
+                          className="text-lg text-foreground hover:text-muted-foreground transition-colors"
+                        >
+                          로그인
+                        </Link>
+                      )
+                    )}
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </nav>
       </div>

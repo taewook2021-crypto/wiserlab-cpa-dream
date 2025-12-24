@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Users, TrendingUp, Award, RefreshCw, Download, BookOpen, Hash } from "lucide-react";
+import { ArrowLeft, Users, TrendingUp, Award, RefreshCw, Download, BookOpen, Hash, Target } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -59,6 +59,15 @@ interface ScoringWithExamNumber extends ScoringResult {
   university?: string;
 }
 
+interface ScoringAnswer {
+  id: string;
+  scoring_result_id: string;
+  question_number: number;
+  user_answer: number;
+  correct_answer: number;
+  is_correct: boolean;
+}
+
 const getUniversity = (examNumber: string | undefined): string => {
   if (!examNumber) return "기타";
   if (examNumber.startsWith("WLP-S")) return "서울대";
@@ -77,6 +86,7 @@ const StatisticsAdmin = () => {
   const [selectedTab, setSelectedTab] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [selectedRound, setSelectedRound] = useState("all");
+  const [scoringAnswers, setScoringAnswers] = useState<ScoringAnswer[]>([]);
 
   // 관리자 권한 확인
   useEffect(() => {
@@ -111,6 +121,13 @@ const StatisticsAdmin = () => {
       .from("scoring_results")
       .select("*")
       .order("created_at", { ascending: false });
+
+    // 개별 답안 조회
+    const { data: answersData } = await supabase
+      .from("scoring_answers")
+      .select("*");
+
+    setScoringAnswers(answersData || []);
 
     // 수험번호와 매핑
     const examNumberMap = new Map(
@@ -265,6 +282,41 @@ const StatisticsAdmin = () => {
       }))
       .sort((a, b) => a.round - b.round);
   }, [filteredResults]);
+
+  // 문항별 정답률 계산
+  const questionStats = useMemo(() => {
+    // 필터된 결과의 ID 목록
+    const filteredResultIds = new Set(filteredResults.map(r => r.id));
+    
+    // 필터된 결과에 해당하는 답안만 필터링
+    const relevantAnswers = scoringAnswers.filter(a => 
+      filteredResultIds.has(a.scoring_result_id)
+    );
+
+    if (relevantAnswers.length === 0) return [];
+
+    // 문항번호별 통계 계산
+    const questionGroups: Record<number, { correct: number; total: number }> = {};
+    
+    relevantAnswers.forEach((answer) => {
+      if (!questionGroups[answer.question_number]) {
+        questionGroups[answer.question_number] = { correct: 0, total: 0 };
+      }
+      questionGroups[answer.question_number].total++;
+      if (answer.is_correct) {
+        questionGroups[answer.question_number].correct++;
+      }
+    });
+
+    return Object.entries(questionGroups)
+      .map(([qNum, stats]) => ({
+        question: parseInt(qNum),
+        correctRate: Math.round((stats.correct / stats.total) * 100),
+        correct: stats.correct,
+        total: stats.total,
+      }))
+      .sort((a, b) => a.question - b.question);
+  }, [filteredResults, scoringAnswers]);
 
   // CSV 다운로드
   const handleDownloadCSV = () => {
@@ -550,6 +602,147 @@ const StatisticsAdmin = () => {
                         />
                       </LineChart>
                     </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* 문항별 정답률 분석 */}
+            {questionStats.length > 0 && (
+              <Card className="mb-8">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    문항별 정답률 분석
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    총 {questionStats[0]?.total || 0}명 응시 기준
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  {/* 정답률 차트 */}
+                  <div className="h-80 mb-6">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={questionStats}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis 
+                          dataKey="question" 
+                          fontSize={11} 
+                          tickFormatter={(v) => `${v}번`}
+                          interval={0}
+                          angle={-45}
+                          textAnchor="end"
+                          height={50}
+                        />
+                        <YAxis 
+                          fontSize={12} 
+                          domain={[0, 100]}
+                          tickFormatter={(v) => `${v}%`}
+                        />
+                        <Tooltip 
+                          formatter={(value: number) => [`${value}%`, "정답률"]}
+                          labelFormatter={(v) => `${v}번 문항`}
+                        />
+                        <Bar 
+                          dataKey="correctRate" 
+                          name="정답률"
+                          radius={[4, 4, 0, 0]}
+                        >
+                          {questionStats.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={
+                                entry.correctRate >= 80 
+                                  ? "hsl(142, 76%, 36%)" 
+                                  : entry.correctRate >= 60 
+                                  ? "hsl(var(--primary))" 
+                                  : entry.correctRate >= 40 
+                                  ? "hsl(45, 93%, 47%)" 
+                                  : "hsl(0, 84%, 60%)"
+                              }
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* 난이도별 문항 분류 */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                      <p className="text-sm font-medium text-green-800 dark:text-green-200">쉬움 (80%↑)</p>
+                      <p className="text-xl font-bold text-green-700 dark:text-green-300 mt-1">
+                        {questionStats.filter(q => q.correctRate >= 80).length}문항
+                      </p>
+                      <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                        {questionStats.filter(q => q.correctRate >= 80).map(q => `${q.question}번`).join(", ") || "-"}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                      <p className="text-sm font-medium text-blue-800 dark:text-blue-200">보통 (60-79%)</p>
+                      <p className="text-xl font-bold text-blue-700 dark:text-blue-300 mt-1">
+                        {questionStats.filter(q => q.correctRate >= 60 && q.correctRate < 80).length}문항
+                      </p>
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                        {questionStats.filter(q => q.correctRate >= 60 && q.correctRate < 80).map(q => `${q.question}번`).join(", ") || "-"}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                      <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">어려움 (40-59%)</p>
+                      <p className="text-xl font-bold text-yellow-700 dark:text-yellow-300 mt-1">
+                        {questionStats.filter(q => q.correctRate >= 40 && q.correctRate < 60).length}문항
+                      </p>
+                      <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                        {questionStats.filter(q => q.correctRate >= 40 && q.correctRate < 60).map(q => `${q.question}번`).join(", ") || "-"}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                      <p className="text-sm font-medium text-red-800 dark:text-red-200">킬러 (40%↓)</p>
+                      <p className="text-xl font-bold text-red-700 dark:text-red-300 mt-1">
+                        {questionStats.filter(q => q.correctRate < 40).length}문항
+                      </p>
+                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                        {questionStats.filter(q => q.correctRate < 40).map(q => `${q.question}번`).join(", ") || "-"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 문항별 상세 테이블 */}
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-20">문항</TableHead>
+                          <TableHead className="text-right">정답자</TableHead>
+                          <TableHead className="text-right">응시자</TableHead>
+                          <TableHead className="text-right">정답률</TableHead>
+                          <TableHead>난이도</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {questionStats.map((q) => (
+                          <TableRow key={q.question}>
+                            <TableCell className="font-medium">{q.question}번</TableCell>
+                            <TableCell className="text-right">{q.correct}명</TableCell>
+                            <TableCell className="text-right">{q.total}명</TableCell>
+                            <TableCell className="text-right font-medium">{q.correctRate}%</TableCell>
+                            <TableCell>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                q.correctRate >= 80 
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                  : q.correctRate >= 60
+                                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                                  : q.correctRate >= 40
+                                  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                  : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                              }`}>
+                                {q.correctRate >= 80 ? "쉬움" : q.correctRate >= 60 ? "보통" : q.correctRate >= 40 ? "어려움" : "킬러"}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
                 </CardContent>
               </Card>

@@ -34,6 +34,7 @@ interface Order {
   amount: number;
   status: string;
   created_at: string;
+  exam_number: string | null;
 }
 
 const subjectNames: Record<string, string> = {
@@ -107,7 +108,7 @@ const MyPage = () => {
 
       const { data, error } = await supabase
         .from("orders")
-        .select("id, order_id, product_name, amount, status, created_at")
+        .select("id, order_id, product_name, amount, status, created_at, exam_number")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -178,6 +179,14 @@ const MyPage = () => {
                 <div>
                   <p className="font-medium">{fullName}</p>
                   <p className="text-sm text-muted-foreground">{email}</p>
+                  {/* 유료 구입자 수험번호 표시 */}
+                  {orders.find(o => o.status === "paid" && o.exam_number) && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <Badge variant="secondary" className="font-mono">
+                        {orders.find(o => o.status === "paid" && o.exam_number)?.exam_number}
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

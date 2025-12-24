@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -130,6 +131,7 @@ const ExamNumbersAdmin = () => {
         <section className="py-20">
           <div className="container mx-auto px-6">
             <div className="max-w-5xl mx-auto">
+              <AdminNav />
               <h1 className="text-3xl font-light mb-8">수험번호 관리</h1>
 
               {/* Stats */}

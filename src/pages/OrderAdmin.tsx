@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -222,6 +223,7 @@ const OrderAdmin = () => {
       <Header />
 
       <main className="container mx-auto px-6 pt-24 pb-16">
+        <AdminNav />
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-light flex items-center gap-2">
             <Package className="w-6 h-6" />

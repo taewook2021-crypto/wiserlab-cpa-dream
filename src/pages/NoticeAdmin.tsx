@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -252,6 +253,7 @@ const NoticeAdmin = () => {
 
       <main className="flex-1 container mx-auto px-6 py-28">
         <div className="max-w-3xl mx-auto">
+          <AdminNav />
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold">공지사항 관리</h1>
             {!isFormOpen && (

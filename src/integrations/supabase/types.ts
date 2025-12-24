@@ -197,6 +197,44 @@ export type Database = {
         }
         Relationships: []
       }
+      scoring_answers: {
+        Row: {
+          correct_answer: number
+          created_at: string
+          id: string
+          is_correct: boolean
+          question_number: number
+          scoring_result_id: string
+          user_answer: number
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string
+          id?: string
+          is_correct: boolean
+          question_number: number
+          scoring_result_id: string
+          user_answer: number
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          question_number?: number
+          scoring_result_id?: string
+          user_answer?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scoring_answers_scoring_result_id_fkey"
+            columns: ["scoring_result_id"]
+            isOneToOne: false
+            referencedRelation: "scoring_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scoring_results: {
         Row: {
           correct_count: number

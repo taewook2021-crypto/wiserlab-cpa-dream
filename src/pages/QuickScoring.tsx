@@ -257,7 +257,7 @@ const QuickScoring = () => {
       // 수험번호 모드: 결과 저장 + 수험번호 사용 처리
       if (accessMode === "exam-number" && examNumberRecord) {
         // 결과 저장 (exam_number_id 포함)
-        const { error: saveError } = await supabase
+        const { data: insertedResult, error: saveError } = await supabase
           .from("scoring_results")
           .insert({
             user_id: "00000000-0000-0000-0000-000000000000", // 익명 사용자용 UUID
@@ -268,10 +268,29 @@ const QuickScoring = () => {
             total_questions: scoringResults.length,
             score_percentage: scorePercentage,
             exam_number_id: examNumberRecord.id,
-          });
+          })
+          .select("id")
+          .single();
 
         if (saveError) {
           console.error("Save error:", saveError);
+        } else if (insertedResult) {
+          // 개별 답안 저장
+          const answersToInsert = scoringResults.map((r) => ({
+            scoring_result_id: insertedResult.id,
+            question_number: r.questionNumber,
+            user_answer: r.userAnswer,
+            correct_answer: r.correctAnswer,
+            is_correct: r.isCorrect,
+          }));
+
+          const { error: answersError } = await supabase
+            .from("scoring_answers")
+            .insert(answersToInsert);
+
+          if (answersError) {
+            console.error("Answers save error:", answersError);
+          }
         }
 
         // 수험번호 사용 처리
@@ -289,7 +308,7 @@ const QuickScoring = () => {
 
       // 로그인 모드: 기존 로직
       if (accessMode === "login" && user && !existingResult) {
-        const { error: saveError } = await supabase
+        const { data: insertedResult, error: saveError } = await supabase
           .from("scoring_results")
           .insert({
             user_id: user.id,
@@ -299,11 +318,30 @@ const QuickScoring = () => {
             correct_count: correctCount,
             total_questions: scoringResults.length,
             score_percentage: scorePercentage,
-          });
+          })
+          .select("id")
+          .single();
 
         if (saveError) {
           console.error("Save error:", saveError);
-        } else {
+        } else if (insertedResult) {
+          // 개별 답안 저장
+          const answersToInsert = scoringResults.map((r) => ({
+            scoring_result_id: insertedResult.id,
+            question_number: r.questionNumber,
+            user_answer: r.userAnswer,
+            correct_answer: r.correctAnswer,
+            is_correct: r.isCorrect,
+          }));
+
+          const { error: answersError } = await supabase
+            .from("scoring_answers")
+            .insert(answersToInsert);
+
+          if (answersError) {
+            console.error("Answers save error:", answersError);
+          }
+          
           setResultSaved(true);
         }
       }

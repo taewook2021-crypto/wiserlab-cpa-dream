@@ -5,6 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -12,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Users, TrendingUp, Award, RefreshCw, Download } from "lucide-react";
+import { ArrowLeft, Users, TrendingUp, Award, RefreshCw, Download, BookOpen, Hash } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -22,6 +29,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  LineChart,
+  Line,
+  Legend,
 } from "recharts";
 
 interface ScoringResult {
@@ -65,6 +75,8 @@ const StatisticsAdmin = () => {
   const [examNumbers, setExamNumbers] = useState<ExamNumber[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState("all");
+  const [selectedSubject, setSelectedSubject] = useState("all");
+  const [selectedRound, setSelectedRound] = useState("all");
 
   // 관리자 권한 확인
   useEffect(() => {
@@ -126,15 +138,40 @@ const StatisticsAdmin = () => {
     }
   }, [isAdmin]);
 
+  // 과목 목록
+  const subjects = useMemo(() => {
+    const subjectSet = new Set(scoringResults.map(r => r.subject));
+    return Array.from(subjectSet).sort();
+  }, [scoringResults]);
+
+  // 시험 회차 목록
+  const examRounds = useMemo(() => {
+    const roundSet = new Set(scoringResults.map(r => r.exam_round));
+    return Array.from(roundSet).sort((a, b) => a - b);
+  }, [scoringResults]);
+
   // 필터된 결과
   const filteredResults = useMemo(() => {
-    if (selectedTab === "all") return scoringResults;
-    if (selectedTab === "snu") return scoringResults.filter(r => r.university === "서울대");
-    if (selectedTab === "ysu") return scoringResults.filter(r => r.university === "연세대");
-    if (selectedTab === "paid") return scoringResults.filter(r => r.university === "유료");
-    if (selectedTab === "free") return scoringResults.filter(r => r.university === "무료" || r.university === "기타");
-    return scoringResults;
-  }, [scoringResults, selectedTab]);
+    let results = scoringResults;
+    
+    // 대학별 필터
+    if (selectedTab === "snu") results = results.filter(r => r.university === "서울대");
+    else if (selectedTab === "ysu") results = results.filter(r => r.university === "연세대");
+    else if (selectedTab === "paid") results = results.filter(r => r.university === "유료");
+    else if (selectedTab === "free") results = results.filter(r => r.university === "무료" || r.university === "기타");
+    
+    // 과목별 필터
+    if (selectedSubject !== "all") {
+      results = results.filter(r => r.subject === selectedSubject);
+    }
+    
+    // 회차별 필터
+    if (selectedRound !== "all") {
+      results = results.filter(r => r.exam_round === parseInt(selectedRound));
+    }
+    
+    return results;
+  }, [scoringResults, selectedTab, selectedSubject, selectedRound]);
 
   // 통계 계산
   const stats = useMemo(() => {
@@ -193,6 +230,41 @@ const StatisticsAdmin = () => {
         : 0,
     })).filter(g => g.count > 0);
   }, [scoringResults]);
+
+  // 과목별 통계
+  const subjectStats = useMemo(() => {
+    const groups: Record<string, number[]> = {};
+    filteredResults.forEach((r) => {
+      if (!groups[r.subject]) groups[r.subject] = [];
+      groups[r.subject].push(r.correct_count);
+    });
+    return Object.entries(groups).map(([name, scores]) => ({
+      name,
+      count: scores.length,
+      avg: scores.length > 0 
+        ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10 
+        : 0,
+      max: scores.length > 0 ? Math.max(...scores) : 0,
+    })).sort((a, b) => b.count - a.count);
+  }, [filteredResults]);
+
+  // 회차별 통계
+  const roundStats = useMemo(() => {
+    const groups: Record<number, number[]> = {};
+    filteredResults.forEach((r) => {
+      if (!groups[r.exam_round]) groups[r.exam_round] = [];
+      groups[r.exam_round].push(r.correct_count);
+    });
+    return Object.entries(groups)
+      .map(([round, scores]) => ({
+        round: parseInt(round),
+        count: scores.length,
+        avg: scores.length > 0 
+          ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10 
+          : 0,
+      }))
+      .sort((a, b) => a.round - b.round);
+  }, [filteredResults]);
 
   // CSV 다운로드
   const handleDownloadCSV = () => {
@@ -284,6 +356,45 @@ const StatisticsAdmin = () => {
           ))}
         </div>
 
+        {/* 필터 영역 */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          {/* 과목 필터 */}
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="과목 선택" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">전체 과목</SelectItem>
+                {subjects.map((subject) => (
+                  <SelectItem key={subject} value={subject}>
+                    {subject}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 회차 필터 */}
+          <div className="flex items-center gap-2">
+            <Hash className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedRound} onValueChange={setSelectedRound}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="회차 선택" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">전체 회차</SelectItem>
+                {examRounds.map((round) => (
+                  <SelectItem key={round} value={round.toString()}>
+                    {round}회차
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         {/* 탭 필터 */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="mb-8">
           <TabsList className="grid w-full grid-cols-5">
@@ -361,6 +472,88 @@ const StatisticsAdmin = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* 과목별 통계 */}
+            {subjectStats.length > 0 && (
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle>과목별 통계</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    {subjectStats.map((stat) => (
+                      <div key={stat.name} className="p-4 rounded-lg border bg-card">
+                        <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
+                        <p className="text-xl font-bold mt-1">{stat.count}명</p>
+                        <p className="text-xs text-muted-foreground">
+                          평균 {stat.avg}점 / 최고 {stat.max}점
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={subjectStats} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" fontSize={12} />
+                        <YAxis dataKey="name" type="category" fontSize={12} width={80} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="avg" name="평균 점수" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                        <Bar dataKey="count" name="응시자 수" fill="hsl(var(--muted-foreground) / 0.5)" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* 회차별 분석 */}
+            {roundStats.length > 0 && (
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle>회차별 분석</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    {roundStats.map((stat) => (
+                      <div key={stat.round} className="p-4 rounded-lg border bg-card">
+                        <p className="text-sm font-medium text-muted-foreground">{stat.round}회차</p>
+                        <p className="text-xl font-bold mt-1">{stat.count}명</p>
+                        <p className="text-xs text-muted-foreground">평균 {stat.avg}점</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={roundStats}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="round" fontSize={12} tickFormatter={(v) => `${v}회`} />
+                        <YAxis fontSize={12} />
+                        <Tooltip labelFormatter={(v) => `${v}회차`} />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="avg" 
+                          name="평균 점수" 
+                          stroke="hsl(var(--primary))" 
+                          strokeWidth={2}
+                          dot={{ fill: "hsl(var(--primary))" }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="count" 
+                          name="응시자 수" 
+                          stroke="hsl(var(--muted-foreground))" 
+                          strokeWidth={2}
+                          dot={{ fill: "hsl(var(--muted-foreground))" }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* 상세 데이터 테이블 */}
             <Card>

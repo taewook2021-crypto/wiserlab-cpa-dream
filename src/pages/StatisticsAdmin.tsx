@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import AdminNav from "@/components/AdminNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Users, TrendingUp, Award, RefreshCw, Download, BookOpen, Hash, Target } from "lucide-react";
+import { Users, TrendingUp, Award, RefreshCw, Download, BookOpen, Hash, Target } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -369,14 +370,11 @@ const StatisticsAdmin = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        <AdminNav />
+        
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-2xl font-bold">채점 통계 관리</h1>
-          </div>
+          <h1 className="text-2xl font-bold">채점 통계 관리</h1>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={fetchData}>
               <RefreshCw className="h-4 w-4 mr-2" />

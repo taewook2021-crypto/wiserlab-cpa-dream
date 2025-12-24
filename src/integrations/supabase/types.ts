@@ -71,6 +71,33 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_numbers: {
+        Row: {
+          batch_name: string
+          created_at: string
+          exam_number: string
+          id: string
+          is_used: boolean
+          used_at: string | null
+        }
+        Insert: {
+          batch_name: string
+          created_at?: string
+          exam_number: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+        }
+        Update: {
+          batch_name?: string
+          created_at?: string
+          exam_number?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       notices: {
         Row: {
           attachment_name: string | null
@@ -172,6 +199,7 @@ export type Database = {
           correct_count: number
           created_at: string
           exam_name: string
+          exam_number_id: string | null
           exam_round: number
           id: string
           score_percentage: number
@@ -183,6 +211,7 @@ export type Database = {
           correct_count: number
           created_at?: string
           exam_name: string
+          exam_number_id?: string | null
           exam_round: number
           id?: string
           score_percentage: number
@@ -194,6 +223,7 @@ export type Database = {
           correct_count?: number
           created_at?: string
           exam_name?: string
+          exam_number_id?: string | null
           exam_round?: number
           id?: string
           score_percentage?: number
@@ -201,7 +231,15 @@ export type Database = {
           total_questions?: number
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "scoring_results_exam_number_id_fkey"
+            columns: ["exam_number_id"]
+            isOneToOne: false
+            referencedRelation: "exam_numbers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

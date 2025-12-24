@@ -122,6 +122,11 @@ const Header = () => {
                         공지관리
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/exam-numbers-admin" className="cursor-pointer">
+                        수험번호 관리
+                      </Link>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
@@ -206,6 +211,13 @@ const Header = () => {
                           className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
                         >
                           공지관리
+                        </Link>
+                        <Link 
+                          to="/exam-numbers-admin" 
+                          onClick={() => setOpen(false)}
+                          className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
+                        >
+                          수험번호 관리
                         </Link>
                       </div>
                     )}

@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -27,30 +25,12 @@ interface ExamNumber {
   created_at: string;
 }
 
-// 혼동 문자 제외: 0, O, 1, I, L
-const VALID_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
-
-const generateRandomCode = (length: number): string => {
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += VALID_CHARS.charAt(Math.floor(Math.random() * VALID_CHARS.length));
-  }
-  return result;
-};
-
-const generateExamNumber = (): string => {
-  return `WLP-${generateRandomCode(4)}`;
-};
-
 const ExamNumbersAdmin = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [examNumbers, setExamNumbers] = useState<ExamNumber[]>([]);
-  const [generating, setGenerating] = useState(false);
-  const [batchName, setBatchName] = useState("서울대/연세대 150명");
-  const [count, setCount] = useState(150);
 
   // Check admin role
   useEffect(() => {
@@ -93,47 +73,6 @@ const ExamNumbersAdmin = () => {
       fetchExamNumbers();
     }
   }, [isAdmin]);
-
-  // Generate exam numbers
-  const handleGenerate = async () => {
-    if (!batchName.trim()) {
-      toast.error("배치명을 입력해주세요");
-      return;
-    }
-
-    setGenerating(true);
-
-    try {
-      // Generate unique exam numbers
-      const existingNumbers = new Set(examNumbers.map((e) => e.exam_number));
-      const newNumbers: string[] = [];
-
-      while (newNumbers.length < count) {
-        const num = generateExamNumber();
-        if (!existingNumbers.has(num) && !newNumbers.includes(num)) {
-          newNumbers.push(num);
-        }
-      }
-
-      // Insert to database
-      const { error } = await supabase.from("exam_numbers").insert(
-        newNumbers.map((num) => ({
-          exam_number: num,
-          batch_name: batchName,
-        }))
-      );
-
-      if (error) throw error;
-
-      toast.success(`${count}개의 수험번호가 생성되었습니다`);
-      fetchExamNumbers();
-    } catch (error) {
-      console.error("Generate error:", error);
-      toast.error("수험번호 생성에 실패했습니다");
-    } finally {
-      setGenerating(false);
-    }
-  };
 
   // Download CSV
   const handleDownloadCSV = () => {
@@ -226,34 +165,19 @@ const ExamNumbersAdmin = () => {
                 </div>
               </div>
 
-              {/* Generate Form */}
-              <div className="border border-border rounded-lg p-6 mb-8">
-                <h2 className="text-lg font-medium mb-4">수험번호 생성</h2>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <Label>배치명</Label>
-                    <Input
-                      value={batchName}
-                      onChange={(e) => setBatchName(e.target.value)}
-                      placeholder="예: 서울대/연세대 150명"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>생성 개수</Label>
-                    <Input
-                      type="number"
-                      value={count}
-                      onChange={(e) => setCount(parseInt(e.target.value) || 0)}
-                      min={1}
-                      max={500}
-                    />
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  * 형식: WLP-XXXX (4자리 랜덤 영숫자, 혼동 문자 제외)
-                </p>
-                <Button onClick={handleGenerate} disabled={generating}>
-                  {generating ? "생성 중..." : `${count}개 생성하기`}
+              {/* Actions */}
+              <div className="flex gap-4 mb-6">
+                <Button variant="outline" onClick={fetchExamNumbers}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  새로고침
+                </Button>
+                <Button variant="outline" onClick={handleDownloadCSV}>
+                  <Download className="w-4 h-4 mr-2" />
+                  CSV 다운로드 (미사용만)
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteUnused}>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  미사용 전체 삭제
                 </Button>
               </div>
 

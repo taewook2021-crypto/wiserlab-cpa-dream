@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2, Copy, Check } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { generateUniqueExamNumber } from "@/lib/examNumberUtils";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -14,9 +15,11 @@ const PaymentSuccess = () => {
   const { user } = useAuth();
   const [isConfirming, setIsConfirming] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [orderInfo, setOrderInfo] = useState<{
     orderId: string;
     totalAmount: number;
+    examNumber: string;
   } | null>(null);
 
   useEffect(() => {
@@ -53,7 +56,11 @@ const PaymentSuccess = () => {
           const pendingOrder = pendingOrderStr ? JSON.parse(pendingOrderStr) : null;
 
           // 주문 정보를 DB에 저장
+          let generatedExamNumber = "";
           if (user && pendingOrder) {
+            // 고유 수험번호 생성
+            generatedExamNumber = await generateUniqueExamNumber();
+            
             const { error: orderError } = await supabase.from("orders").insert({
               user_id: user.id,
               order_id: data.orderId,
@@ -68,6 +75,7 @@ const PaymentSuccess = () => {
               shipping_detail_address: pendingOrder.detailAddress,
               shipping_postal_code: pendingOrder.postcode,
               paid_at: new Date().toISOString(),
+              exam_number: generatedExamNumber,
             });
 
             if (orderError) {
@@ -80,6 +88,7 @@ const PaymentSuccess = () => {
           setOrderInfo({
             orderId: data.orderId,
             totalAmount: data.totalAmount,
+            examNumber: generatedExamNumber,
           });
 
           // 로컬스토리지의 주문 정보 삭제
@@ -144,6 +153,25 @@ const PaymentSuccess = () => {
                 <span className="text-muted-foreground">결제금액</span>
                 <span className="font-medium">{formatPrice(orderInfo.totalAmount)}원</span>
               </div>
+              {orderInfo.examNumber && (
+                <div className="flex justify-between items-center pt-3 border-t border-border">
+                  <span className="text-muted-foreground">수험번호</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-primary">{orderInfo.examNumber}</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(orderInfo.examNumber);
+                        setCopied(true);
+                        toast.success("수험번호가 복사되었습니다");
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="p-1 hover:bg-muted rounded"
+                    >
+                      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

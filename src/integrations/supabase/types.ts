@@ -138,6 +138,7 @@ export type Database = {
           buyer_name: string
           buyer_phone: string
           created_at: string
+          exam_number: string | null
           id: string
           order_id: string
           paid_at: string | null
@@ -158,6 +159,7 @@ export type Database = {
           buyer_name: string
           buyer_phone: string
           created_at?: string
+          exam_number?: string | null
           id?: string
           order_id: string
           paid_at?: string | null
@@ -178,6 +180,7 @@ export type Database = {
           buyer_name?: string
           buyer_phone?: string
           created_at?: string
+          exam_number?: string | null
           id?: string
           order_id?: string
           paid_at?: string | null

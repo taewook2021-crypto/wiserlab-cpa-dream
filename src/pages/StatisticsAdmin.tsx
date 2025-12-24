@@ -615,9 +615,39 @@ const StatisticsAdmin = () => {
                     <Target className="h-5 w-5" />
                     문항별 정답률 분석
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    총 {questionStats[0]?.total || 0}명 응시 기준
-                  </p>
+                  <div className="flex items-center gap-4">
+                    <p className="text-sm text-muted-foreground">
+                      총 {questionStats[0]?.total || 0}명 응시 기준
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => {
+                        const headers = ["문항번호", "정답자수", "응시자수", "정답률", "난이도"];
+                        const rows = questionStats.map((q) => [
+                          q.question,
+                          q.correct,
+                          q.total,
+                          `${q.correctRate}%`,
+                          q.correctRate >= 80 ? "쉬움" : q.correctRate >= 60 ? "보통" : q.correctRate >= 40 ? "어려움" : "킬러"
+                        ]);
+                        const csvContent = [
+                          headers.join(","),
+                          ...rows.map((row) => row.join(",")),
+                        ].join("\n");
+                        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+                        const link = document.createElement("a");
+                        link.href = URL.createObjectURL(blob);
+                        const subjectLabel = selectedSubject === "all" ? "전체과목" : selectedSubject;
+                        const roundLabel = selectedRound === "all" ? "전체회차" : `${selectedRound}회차`;
+                        link.download = `문항별정답률_${subjectLabel}_${roundLabel}_${new Date().toISOString().split("T")[0]}.csv`;
+                        link.click();
+                      }}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      CSV
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {/* 정답률 차트 */}

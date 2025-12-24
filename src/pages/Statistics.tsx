@@ -18,23 +18,23 @@ const TOTAL_PARTICIPANTS = 150;
 const SAFE_ZONE_CUTOFF = 28; // 80점
 const COMPETITIVE_ZONE_CUTOFF = 22; // 약 63점
 
-// Mock billboard data - 전국 응시자 (서울대/연대 제외)
+// Mock billboard data - 전국 응시자 (수험번호로 표시)
 const mockBillboard = [
-  { rank: 1, nickname: "재무왕", score: 35 },
-  { rank: 2, nickname: "회계마스터", score: 34 },
-  { rank: 3, nickname: "CPA예비생", score: 34 },
-  { rank: 4, nickname: "합격기원", score: 33 },
-  { rank: 5, nickname: "열공중", score: 33 },
-  { rank: 6, nickname: "막차탑승", score: 32 },
-  { rank: 7, nickname: "파이팅", score: 32 },
-  { rank: 8, nickname: "새벽공부", score: 31 },
-  { rank: 9, nickname: "합격예정", score: 31 },
-  { rank: 10, nickname: "끝까지", score: 30 },
-  { rank: 11, nickname: "도전자", score: 30 },
-  { rank: 12, nickname: "열정맨", score: 29 },
-  { rank: 13, nickname: "노력파", score: 29 },
-  { rank: 14, nickname: "성실이", score: 28 },
-  { rank: 15, nickname: "꾸준히", score: 28 },
+  { rank: 1, examNumber: "WLS-K7M3", score: 35 },
+  { rank: 2, examNumber: "WLS-P4N8", score: 34 },
+  { rank: 3, examNumber: "WLP-A2B5", score: 34 },
+  { rank: 4, examNumber: "WLS-R9T2", score: 33 },
+  { rank: 5, examNumber: "WLP-C3D7", score: 33 },
+  { rank: 6, examNumber: "WLS-H6J4", score: 32 },
+  { rank: 7, examNumber: "WLP-E8F1", score: 32 },
+  { rank: 8, examNumber: "WLS-U5V9", score: 31 },
+  { rank: 9, examNumber: "WLP-G2K6", score: 31 },
+  { rank: 10, examNumber: "WLS-W4X8", score: 30 },
+  { rank: 11, examNumber: "WLP-L7Q3", score: 30 },
+  { rank: 12, examNumber: "WLS-Y1Z5", score: 29 },
+  { rank: 13, examNumber: "WLP-M9N2", score: 29 },
+  { rank: 14, examNumber: "WLS-S6T4", score: 28 },
+  { rank: 15, examNumber: "WLP-B3C7", score: 28 },
 ];
 
 const getZoneInfo = (score: number) => {
@@ -226,10 +226,10 @@ const Statistics = () => {
                         </span>
                       </div>
 
-                      {/* 닉네임 */}
+                      {/* 수험번호 */}
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate text-foreground/80">
-                          {entry.nickname}
+                        <p className="font-mono text-sm truncate text-foreground/80">
+                          {entry.examNumber}
                         </p>
                       </div>
 

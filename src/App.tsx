@@ -24,6 +24,7 @@ import NoticeDetail from "./pages/NoticeDetail";
 import NoticeAdmin from "./pages/NoticeAdmin";
 import OrderAdmin from "./pages/OrderAdmin";
 import ExamNumbersAdmin from "./pages/ExamNumbersAdmin";
+import StatisticsAdmin from "./pages/StatisticsAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/noticeadmin" element={<NoticeAdmin />} />
             <Route path="/orderadmin" element={<OrderAdmin />} />
             <Route path="/exam-numbers-admin" element={<ExamNumbersAdmin />} />
+            <Route path="/statistics-admin" element={<StatisticsAdmin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

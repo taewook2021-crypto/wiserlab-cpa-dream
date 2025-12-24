@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { Download, RefreshCw, Trash2 } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
 
 interface ExamNumber {
   id: string;
@@ -95,23 +95,6 @@ const ExamNumbersAdmin = () => {
     link.click();
   };
 
-  // Delete all unused
-  const handleDeleteUnused = async () => {
-    if (!confirm("미사용 수험번호를 모두 삭제하시겠습니까?")) return;
-
-    const { error } = await supabase
-      .from("exam_numbers")
-      .delete()
-      .eq("is_used", false);
-
-    if (error) {
-      toast.error("삭제에 실패했습니다");
-      return;
-    }
-
-    toast.success("미사용 수험번호가 삭제되었습니다");
-    fetchExamNumbers();
-  };
 
   if (loading) {
     return (
@@ -174,26 +157,6 @@ const ExamNumbersAdmin = () => {
                 <Button variant="outline" onClick={handleDownloadCSV}>
                   <Download className="w-4 h-4 mr-2" />
                   CSV 다운로드 (미사용만)
-                </Button>
-                <Button variant="destructive" onClick={handleDeleteUnused}>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  미사용 전체 삭제
-                </Button>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-4 mb-6">
-                <Button variant="outline" onClick={fetchExamNumbers}>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  새로고침
-                </Button>
-                <Button variant="outline" onClick={handleDownloadCSV}>
-                  <Download className="w-4 h-4 mr-2" />
-                  CSV 다운로드 (미사용만)
-                </Button>
-                <Button variant="destructive" onClick={handleDeleteUnused}>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  미사용 전체 삭제
                 </Button>
               </div>
 

@@ -87,7 +87,7 @@ const Summit = () => {
                     src={summitCover}
                     alt="Wiser Lab SUMMIT 모의고사 패키지"
                     className="w-full h-auto object-contain"
-                    containerClassName="w-[180px] sm:w-[180px] md:w-[400px]"
+                    containerClassName="w-[180px] sm:w-[180px] md:w-[280px] lg:w-[400px]"
                   />
                 </div>
               </div>

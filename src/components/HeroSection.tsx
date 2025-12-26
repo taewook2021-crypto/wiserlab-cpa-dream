@@ -103,21 +103,21 @@ const HeroSection = () => {
 
         {/* Overlay White Card */}
         <div className="relative z-10 h-full flex items-center">
-          <div className="ml-8 sm:ml-16 lg:ml-24 bg-white/95 backdrop-blur-sm p-8 sm:p-10 w-[320px] sm:w-[420px] lg:w-[480px] min-h-[440px] sm:min-h-[520px] flex flex-col justify-between relative">
-            <div className="space-y-0 mt-8 sm:mt-12">
-              <h1 className="text-[1.4rem] sm:text-[2rem] lg:text-[2.5rem] font-light animate-text-1">
+          <div className="ml-6 sm:ml-12 lg:ml-24 bg-white/95 backdrop-blur-sm p-6 sm:p-8 lg:p-10 w-[260px] sm:w-[340px] lg:w-[480px] min-h-[360px] sm:min-h-[420px] lg:min-h-[520px] flex flex-col justify-between relative">
+            <div className="space-y-0 mt-6 sm:mt-8 lg:mt-12">
+              <h1 className="text-[1.15rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-1">
                 실전을 넘어
               </h1>
-              <h1 className="text-[1.4rem] sm:text-[2rem] lg:text-[2.5rem] font-light animate-text-2">
+              <h1 className="text-[1.15rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-2">
                 정상으로
               </h1>
-              <h1 className="text-[1.4rem] sm:text-[2rem] lg:text-[2.5rem] font-light animate-text-3 whitespace-nowrap">
+              <h1 className="text-[1.15rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-3 whitespace-nowrap">
                 공인회계사 1차 모의고사
               </h1>
             </div>
             
             <div className="flex justify-between items-end">
-              <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
+              <div className="flex flex-col space-y-1 sm:space-y-2 text-xs sm:text-sm text-muted-foreground">
                 <Link to="/summit" className="hover:text-foreground transition-colors">
                   SUMMIT Contents
                 </Link>
@@ -128,7 +128,7 @@ const HeroSection = () => {
                   로그인
                 </Link>
               </div>
-              <img src={summitLogo} alt="SUMMIT" className="h-6" />
+              <img src={summitLogo} alt="SUMMIT" className="h-4 sm:h-5 lg:h-6" />
             </div>
           </div>
         </div>
@@ -142,13 +142,13 @@ const HeroSection = () => {
       </div>
 
       {/* Content Section */}
-      <div ref={sectionRef} className="relative bg-background py-32 overflow-hidden">
+      <div ref={sectionRef} className="relative bg-background py-20 sm:py-24 lg:py-32 overflow-hidden">
         <ConcentricCircles animationKey={animationKey} />
         <div className="container mx-auto px-6 relative z-10">
-          <div className="grid sm:grid-cols-2 gap-12 sm:gap-20 items-start">
+          <div className="grid sm:grid-cols-2 gap-10 sm:gap-16 lg:gap-20 items-start">
             {/* Left Column */}
-            <div className="space-y-12">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light leading-relaxed">
+            <div className="space-y-8 sm:space-y-10 lg:space-y-12">
+              <h2 className="text-xl sm:text-2xl lg:text-4xl font-light leading-relaxed">
                 단순한 등수가 아닌,<br />
                 <strong className="font-medium">서울대 데이터 기반</strong>의<br />
                 합격 가능성을 확인하세요.
@@ -156,16 +156,16 @@ const HeroSection = () => {
             </div>
             
             {/* Right Column */}
-            <div className="space-y-10 text-foreground">
-              <div className="space-y-8">
-                <div className="space-y-4">
+            <div className="space-y-6 sm:space-y-8 lg:space-y-10 text-foreground">
+              <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-1">
-                    <p className="font-medium">양질의 표본</p>
-                    <p className="text-muted-foreground">Wiser Lab 응시자 + 서울대학교 CPA 응시자 표본</p>
+                    <p className="text-sm sm:text-sm lg:text-base font-medium">양질의 표본</p>
+                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">Wiser Lab 응시자 + 서울대학교 CPA 응시자 표본</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
-                    <p className="text-muted-foreground">문항 별 정답률 기반의 취약 유형 분석 + 관련 기출 제공</p>
+                    <p className="text-sm sm:text-sm lg:text-base font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
+                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">문항 별 정답률 기반의 취약 유형 분석 + 관련 기출 제공</p>
                   </div>
                 </div>
               </div>

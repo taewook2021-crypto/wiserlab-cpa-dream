@@ -103,15 +103,15 @@ const HeroSection = () => {
 
         {/* Overlay White Card */}
         <div className="relative z-10 h-full flex items-center">
-          <div className="ml-8 lg:ml-24 bg-white/95 backdrop-blur-sm p-8 lg:p-10 w-[480px] min-h-[520px] flex flex-col justify-between relative">
-            <div className="space-y-0 mt-12">
-              <h1 className="text-[1.65rem] lg:text-[2.5rem] font-light animate-text-1">
+          <div className="ml-8 sm:ml-16 lg:ml-24 bg-white/95 backdrop-blur-sm p-8 sm:p-10 w-[320px] sm:w-[420px] lg:w-[480px] min-h-[440px] sm:min-h-[520px] flex flex-col justify-between relative">
+            <div className="space-y-0 mt-8 sm:mt-12">
+              <h1 className="text-[1.4rem] sm:text-[2rem] lg:text-[2.5rem] font-light animate-text-1">
                 실전을 넘어
               </h1>
-              <h1 className="text-[1.65rem] lg:text-[2.5rem] font-light animate-text-2">
+              <h1 className="text-[1.4rem] sm:text-[2rem] lg:text-[2.5rem] font-light animate-text-2">
                 정상으로
               </h1>
-              <h1 className="text-[1.65rem] lg:text-[2.5rem] font-light animate-text-3 whitespace-nowrap">
+              <h1 className="text-[1.4rem] sm:text-[2rem] lg:text-[2.5rem] font-light animate-text-3 whitespace-nowrap">
                 공인회계사 1차 모의고사
               </h1>
             </div>
@@ -145,10 +145,10 @@ const HeroSection = () => {
       <div ref={sectionRef} className="relative bg-background py-32 overflow-hidden">
         <ConcentricCircles animationKey={animationKey} />
         <div className="container mx-auto px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-20 items-start">
+          <div className="grid sm:grid-cols-2 gap-12 sm:gap-20 items-start">
             {/* Left Column */}
             <div className="space-y-12">
-              <h2 className="text-3xl lg:text-4xl font-light leading-relaxed">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light leading-relaxed">
                 단순한 등수가 아닌,<br />
                 <strong className="font-medium">서울대 데이터 기반</strong>의<br />
                 합격 가능성을 확인하세요.

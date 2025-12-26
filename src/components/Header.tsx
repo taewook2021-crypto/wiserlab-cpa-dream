@@ -81,7 +81,7 @@ const Header = () => {
             <Link to="/" className="flex items-center gap-3">
               <img src={wiserLabLogo} alt="Wiser Lab" className="h-5" style={logoFilter} />
             </Link>
-            <div className="hidden md:flex items-center space-x-10">
+            <div className="hidden sm:flex items-center space-x-10">
               {navLinks.map(link => (
                 <Link key={link.to} to={link.to} className={`text-sm ${textColorNav} transition-colors`}>
                   {link.label}
@@ -91,7 +91,7 @@ const Header = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden sm:flex items-center gap-6">
               <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
                 <Button variant="default" size="sm" className={buttonStyle}>
                   빠른 채점하기
@@ -155,7 +155,7 @@ const Header = () => {
               )}
             </div>
             
-            <div className="md:hidden">
+            <div className="sm:hidden">
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className={menuButtonStyle}>

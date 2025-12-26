@@ -6,7 +6,7 @@ const adminRoutes = [
   { path: "/statistics-admin", label: "채점 통계", icon: BarChart3 },
   { path: "/exam-numbers-admin", label: "수험번호", icon: Hash },
   { path: "/noticeadmin", label: "공지사항", icon: FileText },
-  { path: "/order-admin", label: "주문 관리", icon: ShoppingCart },
+  { path: "/orderadmin", label: "주문 관리", icon: ShoppingCart },
 ];
 
 const AdminNav = () => {

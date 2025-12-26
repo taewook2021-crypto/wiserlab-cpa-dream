@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -87,6 +87,8 @@ const QuickScoring = () => {
     }
     return groups;
   });
+  
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // 로그인 모드에서 구입이력 확인
   useEffect(() => {
@@ -188,6 +190,11 @@ const QuickScoring = () => {
       )
     );
     if (results) setResults(null);
+    
+    // 입력이 완료되면 다음 입력칸으로 자동 이동
+    if (numericValue.length === maxLength && index < answers.length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
   };
 
   const handleSubmit = async () => {
@@ -574,6 +581,7 @@ const QuickScoring = () => {
                               {group.startNum}번 ~ {group.endNum}번
                             </Label>
                             <Input
+                              ref={(el) => (inputRefs.current[index] = el)}
                               type="text"
                               inputMode="numeric"
                               placeholder="54312"

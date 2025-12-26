@@ -127,6 +127,11 @@ const Header = () => {
                         수험번호 관리
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/statistics-admin" className="cursor-pointer">
+                        통계 관리
+                      </Link>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
@@ -218,6 +223,13 @@ const Header = () => {
                           className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
                         >
                           수험번호 관리
+                        </Link>
+                        <Link 
+                          to="/statistics-admin" 
+                          onClick={() => setOpen(false)}
+                          className="block text-lg text-foreground hover:text-muted-foreground transition-colors pl-4"
+                        >
+                          통계 관리
                         </Link>
                       </div>
                     )}

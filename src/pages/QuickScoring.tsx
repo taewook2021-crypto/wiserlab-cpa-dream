@@ -31,6 +31,7 @@ interface ScoringResult {
 }
 
 interface ExistingResult {
+  id: string;
   correct_count: number;
   total_questions: number;
   score_percentage: number;
@@ -163,7 +164,7 @@ const QuickScoring = () => {
       setCheckingExisting(true);
       const { data, error } = await supabase
         .from("scoring_results")
-        .select("correct_count, total_questions, score_percentage")
+        .select("id, correct_count, total_questions, score_percentage")
         .eq("user_id", user.id)
         .eq("subject", subject.dbValue)
         .eq("exam_round", exam.round)
@@ -557,7 +558,29 @@ const QuickScoring = () => {
                         </Button>
                         <Button
                           className="flex-1 h-12"
-                          onClick={() => navigate(`/edge?subject=${selectedSubject}&exam=${selectedExam}`)}
+                          onClick={async () => {
+                            const { data, error } = await supabase
+                              .from("scoring_answers")
+                              .select("question_number")
+                              .eq("scoring_result_id", existingResult.id)
+                              .eq("is_correct", false)
+                              .order("question_number");
+
+                            if (error) {
+                              toast.error("오답 정보를 불러오지 못했습니다");
+                              return;
+                            }
+
+                            const wrongQuestions = (data || []).map((d) => d.question_number);
+                            if (wrongQuestions.length === 0) {
+                              toast.info("틀린 문제가 없어 Edge를 생성할 수 없습니다");
+                              return;
+                            }
+
+                            navigate(
+                              `/edge?subject=${selectedSubject}&exam=${selectedExam}&wrong=${wrongQuestions.join(",")}`
+                            );
+                          }}
                         >
                           Edge
                         </Button>

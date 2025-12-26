@@ -93,33 +93,33 @@ const Summit = () => {
               </div>
 
               {/* Right: Product Info */}
-              <div className="space-y-3 sm:space-y-4 md:space-y-10">
+              <div className="space-y-3 sm:space-y-3 md:space-y-6 lg:space-y-10">
                 <div>
-                  <h1 className="text-lg sm:text-lg md:text-3xl font-light mb-2 sm:mb-3 md:mb-6">
+                  <h1 className="text-lg sm:text-lg md:text-xl lg:text-3xl font-light mb-2 sm:mb-2 md:mb-4 lg:mb-6">
                     Wiser Lab SUMMIT PACK
                   </h1>
-                  <p className="text-[10px] sm:text-[11px] md:text-base text-muted-foreground leading-relaxed">
+                  <p className="text-[10px] sm:text-[11px] md:text-xs lg:text-base text-muted-foreground leading-relaxed">
                     가장 실전적인 모의고사, SUMMIT
                   </p>
                 </div>
 
                 {/* Product Info */}
-                <div className="space-y-3 sm:space-y-4 md:space-y-6 py-4 sm:py-6 md:py-8 border-y border-border">
+                <div className="space-y-3 sm:space-y-3 md:space-y-4 lg:space-y-6 py-4 sm:py-4 md:py-5 lg:py-8 border-y border-border">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs sm:text-sm md:text-base font-medium">전과목 PACK</p>
-                      <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-xs md:text-sm lg:text-base font-medium">전과목 PACK</p>
+                      <p className="text-[10px] sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">
                         재무회계 + 세법 모의고사 각 2회분
                       </p>
                     </div>
-                    <p className="text-lg sm:text-xl md:text-2xl font-medium">
+                    <p className="text-lg sm:text-lg md:text-lg lg:text-2xl font-medium">
                       {formatPrice(BUNDLE_PRICE)}원
                     </p>
                   </div>
                 </div>
 
                 {/* Delivery & Notice */}
-                <div className="space-y-1 sm:space-y-2 md:space-y-3 text-[10px] sm:text-xs md:text-sm text-muted-foreground">
+                <div className="space-y-1 sm:space-y-1 md:space-y-2 lg:space-y-3 text-[10px] sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">
                   <p className="text-foreground font-medium">
                     배송 안내: 결제 완료 후 영업일 기준 2~3일 이내 출고
                   </p>
@@ -131,25 +131,25 @@ const Summit = () => {
                 </div>
 
                 {/* Total & CTA */}
-                <div className="pt-4 sm:pt-6 md:pt-8 border-t border-border space-y-3 sm:space-y-4 md:space-y-6">
+                <div className="pt-4 sm:pt-4 md:pt-5 lg:pt-8 border-t border-border space-y-3 sm:space-y-3 md:space-y-4 lg:space-y-6">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">총 상품금액</p>
-                    <p className="text-lg sm:text-xl md:text-2xl font-medium">
+                    <p className="text-[10px] sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">총 상품금액</p>
+                    <p className="text-lg sm:text-lg md:text-lg lg:text-2xl font-medium">
                       {formatPrice(BUNDLE_PRICE)}원
                     </p>
                   </div>
-                  <div className="flex gap-2 sm:gap-3">
+                  <div className="flex gap-2 sm:gap-2 md:gap-2 lg:gap-3">
                     <Button
                       variant="outline"
-                      className="flex-1 h-10 sm:h-12 md:h-14 text-xs sm:text-sm md:text-base font-normal"
+                      className="flex-1 h-10 sm:h-10 md:h-11 lg:h-14 text-xs sm:text-xs md:text-xs lg:text-base font-normal"
                       disabled={isAddingToCart}
                       onClick={handleAddToCart}
                     >
-                      <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <ShoppingCart className="w-3 h-3 sm:w-3 sm:h-3 md:w-3 md:h-3 lg:w-4 lg:h-4 mr-1 sm:mr-1 md:mr-1 lg:mr-2" />
                       {isAddingToCart ? "담는 중..." : "장바구니에 담기"}
                     </Button>
                     <Button
-                      className="flex-1 h-10 sm:h-12 md:h-14 text-xs sm:text-sm md:text-base font-normal"
+                      className="flex-1 h-10 sm:h-10 md:h-11 lg:h-14 text-xs sm:text-xs md:text-xs lg:text-base font-normal"
                       onClick={handlePurchase}
                     >
                       바로구매 하기

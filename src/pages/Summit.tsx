@@ -78,8 +78,8 @@ const Summit = () => {
       <main className="pt-16">
         {/* Product Hero Section */}
         <section className="border-b border-border">
-          <div className="container mx-auto px-6 py-16 sm:py-20 md:py-28">
-            <div className="grid sm:grid-cols-2 gap-10 sm:gap-12 md:gap-20 items-start">
+          <div className="container mx-auto px-6 py-12 sm:py-16 md:py-28">
+            <div className="grid sm:grid-cols-2 gap-8 sm:gap-10 md:gap-20 items-start">
               {/* Left: Product Image */}
               <div className="flex items-center justify-center">
                 <div className="shadow-xl rounded-sm overflow-hidden">
@@ -87,18 +87,18 @@ const Summit = () => {
                     src={summitCover}
                     alt="Wiser Lab SUMMIT 모의고사 패키지"
                     className="w-full h-auto object-contain"
-                    containerClassName="w-[280px] sm:w-[320px] md:w-[400px]"
+                    containerClassName="w-[220px] sm:w-[260px] md:w-[400px]"
                   />
                 </div>
               </div>
 
               {/* Right: Product Info */}
-              <div className="space-y-4 sm:space-y-6 md:space-y-10">
+              <div className="space-y-3 sm:space-y-4 md:space-y-10">
                 <div>
-                  <h1 className="text-xl sm:text-xl md:text-3xl font-light mb-3 sm:mb-4 md:mb-6">
+                  <h1 className="text-lg sm:text-lg md:text-3xl font-light mb-2 sm:mb-3 md:mb-6">
                     Wiser Lab SUMMIT PACK
                   </h1>
-                  <p className="text-xs sm:text-xs md:text-base text-muted-foreground leading-relaxed">
+                  <p className="text-[10px] sm:text-[11px] md:text-base text-muted-foreground leading-relaxed">
                     가장 실전적인 모의고사, SUMMIT
                   </p>
                 </div>

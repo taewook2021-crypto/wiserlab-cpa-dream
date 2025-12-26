@@ -266,6 +266,25 @@ const MyPage = () => {
                     const subjectId = subjectIds[result.subject] || result.subject;
                     const examId = `summit-${result.exam_round}`;
                     
+                    const handleEdgeClick = async () => {
+                      // 틀린 문제 번호 조회
+                      const { data: answers, error } = await supabase
+                        .from("scoring_answers")
+                        .select("question_number")
+                        .eq("scoring_result_id", result.id)
+                        .eq("is_correct", false)
+                        .order("question_number");
+                      
+                      if (error || !answers || answers.length === 0) {
+                        // 틀린 문제가 없으면 통계 페이지로
+                        navigate(`/statistics?subject=${subjectId}&exam=${examId}&score=${result.correct_count}&total=${result.total_questions}`);
+                        return;
+                      }
+                      
+                      const wrongNumbers = answers.map(a => a.question_number).join(",");
+                      navigate(`/edge?subject=${subjectId}&exam=${examId}&wrong=${wrongNumbers}`);
+                    };
+                    
                     return (
                       <div
                         key={result.id}
@@ -307,7 +326,7 @@ const MyPage = () => {
                             variant="outline"
                             size="sm"
                             className="flex-1 h-8 text-xs"
-                            onClick={() => navigate(`/edge?subject=${subjectId}&exam=${examId}`)}
+                            onClick={handleEdgeClick}
                           >
                             <Zap className="w-3 h-3 mr-1" />
                             Edge

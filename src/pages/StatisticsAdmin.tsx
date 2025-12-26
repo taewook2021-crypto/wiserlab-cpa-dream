@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import AdminNav from "@/components/AdminNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -346,30 +349,36 @@ const StatisticsAdmin = () => {
 
   if (isAdmin === null || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 container mx-auto px-6 py-28">
+          <div className="max-w-3xl mx-auto text-center py-20">
+            <p className="text-muted-foreground">권한 확인 중...</p>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="pt-6 text-center">
-            <p className="text-destructive font-medium">접근 권한이 없습니다</p>
-            <Button className="mt-4" onClick={() => navigate("/")}>
-              홈으로 돌아가기
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 container mx-auto px-6 py-28">
+          <div className="max-w-3xl mx-auto text-center py-20">
+            <p className="text-muted-foreground">관리자 권한이 필요합니다.</p>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      <main className="flex-1 container mx-auto px-6 pt-24 pb-16">
         <AdminNav />
         
         {/* 헤더 */}
@@ -845,7 +854,8 @@ const StatisticsAdmin = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 };

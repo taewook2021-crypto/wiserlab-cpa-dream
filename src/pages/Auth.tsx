@@ -1,8 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import iconWiserlab from "@/assets/icon-wiserlab.png";
+
+// Preload the image
+const preloadImage = new Image();
+preloadImage.src = iconWiserlab;
 
 const Auth = () => {
   const { user, loading, signInWithKakao } = useAuth();
@@ -38,8 +42,15 @@ const Auth = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-16 h-16 rounded-lg overflow-hidden">
-            <img src={iconWiserlab} alt="Wiser Lab" className="w-full h-full object-cover" />
+          <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
+            <img 
+              src={iconWiserlab} 
+              alt="Wiser Lab" 
+              className="w-full h-full object-cover"
+              loading="eager"
+              decoding="sync"
+              fetchPriority="high"
+            />
           </div>
           <h1 className="text-2xl font-light tracking-wide">Wiser Lab</h1>
           <p className="text-muted-foreground text-sm text-center">

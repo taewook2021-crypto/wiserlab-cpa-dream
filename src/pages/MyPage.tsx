@@ -6,8 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ScoringResult {
   id: string;
@@ -62,7 +74,7 @@ const statusLabels: Record<string, string> = {
 };
 
 const MyPage = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [scoringResults, setScoringResults] = useState<ScoringResult[]>([]);
   const [loadingResults, setLoadingResults] = useState(true);
@@ -70,6 +82,28 @@ const MyPage = () => {
   const [loadingCart, setLoadingCart] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      // Call the edge function to delete user account
+      const { error } = await supabase.functions.invoke('delete-user');
+      
+      if (error) {
+        throw error;
+      }
+
+      toast.success("회원 탈퇴가 완료되었습니다.");
+      await signOut();
+      navigate("/");
+    } catch (error: any) {
+      console.error("Error deleting account:", error);
+      toast.error("회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -193,6 +227,40 @@ const MyPage = () => {
                     </div>
                   )}
                 </div>
+              </div>
+              
+              {/* 회원 탈퇴 버튼 */}
+              <div className="mt-6 pt-4 border-t border-border">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      회원 탈퇴
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>회원 탈퇴</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        정말 탈퇴하시겠습니까? 탈퇴 후에는 모든 데이터가 삭제되며 복구할 수 없습니다.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>취소</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={deletingAccount}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {deletingAccount ? "탈퇴 중..." : "탈퇴하기"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </CardContent>
           </Card>

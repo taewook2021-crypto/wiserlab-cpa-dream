@@ -139,7 +139,7 @@ const HeroSection = () => {
             <div className="space-y-8 sm:space-y-10 lg:space-y-12">
               <h2 className="text-xl sm:text-2xl lg:text-4xl font-light leading-relaxed">
                 단순한 등수가 아닌,<br />
-                <span className="font-medium text-inherit">서울대학교·연세대학교 응시자 표본을 포함한 통계 기반 분석 제공</span>의<br />
+                <strong className="font-medium">최상위권 표본 기반</strong>의<br />
                 합격 가능성을 확인하세요.
               </h2>
             </div>
@@ -149,13 +149,12 @@ const HeroSection = () => {
               <div className="space-y-4 sm:space-y-6 lg:space-y-8">
                 <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-1">
-                    <p className="text-base sm:text-lg lg:text-xl font-medium">양질의 표본</p>
-                    <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">Wiser Lab 응시자 + 서울대학교 CPA 응시자 표본</p>
+                    <p className="text-sm sm:text-sm lg:text-base font-medium">양질의 표본</p>
+                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">Wiser Lab 응시자 + 서울대학교 CPA 응시자 표본</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-base sm:text-lg lg:text-xl font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
-                    <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">누적 통계 기반의 안정권·경합권 구간 제시</p>
-                    <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">오답 문항과 연계된 기출 문제 제공</p>
+                    <p className="text-sm sm:text-sm lg:text-base font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
+                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">문항 별 정답률 기반의 취약 유형 분석 + 관련 기출 제공</p>
                   </div>
                 </div>
               </div>

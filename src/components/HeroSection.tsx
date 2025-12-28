@@ -155,7 +155,7 @@ const HeroSection = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm sm:text-sm lg:text-base font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
-                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">문항 별 정답률 기반의 취약 유형 분석 + 관련 기출 제공</p>
+                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">누적 통계 기반의 안정권·경합권 구간 제시 / 오답 문항과 연계된 기출 문제 제공</p>
                   </div>
                 </div>
               </div>

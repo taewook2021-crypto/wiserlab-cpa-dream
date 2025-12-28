@@ -139,7 +139,9 @@ const HeroSection = () => {
             <div className="space-y-8 sm:space-y-10 lg:space-y-12">
               <h2 className="text-xl sm:text-2xl lg:text-4xl font-light leading-relaxed">
                 단순한 등수가 아닌,<br />
-                <strong className="font-medium">최상위권 표본 기반 분석</strong>의<br />
+                <strong className="font-medium">서울대학교·연세대학교 응시자 표본을 기반으로
+
+안정권·경합권·레드라인을 구분해 제공합니다.</strong>의<br />
                 합격 가능성을 확인하세요.
               </h2>
             </div>
@@ -154,7 +156,7 @@ const HeroSection = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm sm:text-sm lg:text-base font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
-                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">오답 문항과 연계된 기출문제를 실전 시험지 형식으로 제공합니다.</p>
+                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">문항 별 정답률 기반의 취약 유형 분석 + 관련 기출 제공</p>
                   </div>
                 </div>
               </div>

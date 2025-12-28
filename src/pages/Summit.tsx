@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import OptimizedImage from "@/components/OptimizedImage";
+
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -164,12 +164,13 @@ const Summit = () => {
         <section className="py-16 sm:py-20 md:py-28 border-b border-border">
           <div className="grid sm:grid-cols-2">
             {/* Left: Image */}
-            <OptimizedImage
-              src={summitFeature}
-              alt="SUMMIT 모의고사 특징"
-              className="w-full h-full object-cover"
-              containerClassName="aspect-square sm:aspect-auto sm:min-h-[500px] md:min-h-[700px]"
-            />
+            <div className="aspect-square sm:aspect-auto sm:min-h-[500px] md:min-h-[700px] overflow-hidden">
+              <img
+                src={summitFeature}
+                alt="SUMMIT 모의고사 특징"
+                className="w-full h-full object-cover"
+              />
+            </div>
 
             {/* Right: Features */}
             <div className="bg-background p-8 sm:p-10 md:p-24 flex flex-col justify-center">

@@ -2,100 +2,89 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useRef, useState } from "react";
 import summitLogo from "@/assets/summit-logo.svg";
-
-const ConcentricCircles = ({ animationKey }: { animationKey: number }) => {
-  const circles = [
-    { size: 200, delay: 0 },
-    { size: 400, delay: 0.15 },
-    { size: 600, delay: 0.3 },
-    { size: 800, delay: 0.45 },
-    { size: 1000, delay: 0.6 },
-    { size: 1200, delay: 0.75 },
-  ];
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div 
-        className="absolute"
-        style={{
-          left: '10%',
-          top: '50%',
-          transform: 'translateY(-50%)',
-        }}
-      >
-        {circles.map((circle, index) => (
-          <div
-            key={`${animationKey}-${index}`}
-            className="absolute rounded-full border border-muted-foreground/30 animate-circle-appear"
-            style={{
-              width: circle.size,
-              height: circle.size,
-              left: -circle.size / 2,
-              top: -circle.size / 2,
-              animationDelay: `${circle.delay}s`,
-            }}
-          />
-        ))}
+const ConcentricCircles = ({
+  animationKey
+}: {
+  animationKey: number;
+}) => {
+  const circles = [{
+    size: 200,
+    delay: 0
+  }, {
+    size: 400,
+    delay: 0.15
+  }, {
+    size: 600,
+    delay: 0.3
+  }, {
+    size: 800,
+    delay: 0.45
+  }, {
+    size: 1000,
+    delay: 0.6
+  }, {
+    size: 1200,
+    delay: 0.75
+  }];
+  return <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute" style={{
+      left: '10%',
+      top: '50%',
+      transform: 'translateY(-50%)'
+    }}>
+        {circles.map((circle, index) => <div key={`${animationKey}-${index}`} className="absolute rounded-full border border-muted-foreground/30 animate-circle-appear" style={{
+        width: circle.size,
+        height: circle.size,
+        left: -circle.size / 2,
+        top: -circle.size / 2,
+        animationDelay: `${circle.delay}s`
+      }} />)}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 const HeroSection = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [animationKey, setAnimationKey] = useState(0);
-
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
-    
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setAnimationKey(prev => prev + 1);
-          
-          // 7초마다 애니메이션 반복
-          intervalId = setInterval(() => {
-            setAnimationKey(prev => prev + 1);
-          }, 7000);
-        } else {
-          if (intervalId) clearInterval(intervalId);
-        }
-      },
-      { threshold: 0.3 }
-    );
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setAnimationKey(prev => prev + 1);
 
+        // 7초마다 애니메이션 반복
+        intervalId = setInterval(() => {
+          setAnimationKey(prev => prev + 1);
+        }, 7000);
+      } else {
+        if (intervalId) clearInterval(intervalId);
+      }
+    }, {
+      threshold: 0.3
+    });
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
-
     return () => {
       observer.disconnect();
       if (intervalId) clearInterval(intervalId);
     };
   }, []);
-
   const handleQuickScoringClick = (e: React.MouseEvent) => {
     if (!user) {
       e.preventDefault();
       navigate("/auth?redirect=/quick-scoring");
     }
   };
-
-  return (
-    <section className="min-h-screen">
+  return <section className="min-h-screen">
       {/* Full-bleed Hero with Overlay Card */}
       <div className="relative h-screen">
         {/* Background Video */}
         <div className="absolute inset-0 bg-muted">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover grayscale-[70%]"
-          >
+          <video autoPlay loop muted playsInline className="w-full h-full object-cover grayscale-[70%]">
             <source src="/videos/mountain-bw.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
@@ -150,7 +139,7 @@ const HeroSection = () => {
             <div className="space-y-8 sm:space-y-10 lg:space-y-12">
               <h2 className="text-xl sm:text-2xl lg:text-4xl font-light leading-relaxed">
                 단순한 등수가 아닌,<br />
-                <strong className="font-medium">서울대 데이터 기반</strong>의<br />
+                <strong className="font-medium">최상위권 표본 기반</strong>의<br />
                 합격 가능성을 확인하세요.
               </h2>
             </div>
@@ -173,8 +162,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;

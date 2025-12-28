@@ -150,7 +150,7 @@ const HeroSection = () => {
                 <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-1">
                     <p className="text-sm sm:text-sm lg:text-base font-medium">양질의 표본</p>
-                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">Wiser Lab 응시자 + 서울대학교 CPA 응시자 표본</p>
+                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">서울대학교·연세대학교 응시자 표본을 기반으로 안정권·경합권·레드라인을 구분해 제공합니다.</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm sm:text-sm lg:text-base font-medium">Wiser Lab 데이터룸의 정밀 분석</p>

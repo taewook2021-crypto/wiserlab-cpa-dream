@@ -197,6 +197,27 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          exam_number: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          exam_number: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          exam_number?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scoring_answers: {
         Row: {
           correct_answer: number
@@ -305,6 +326,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_exam_number: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -178,8 +178,18 @@ const Payment = () => {
         failUrl: `${window.location.origin}/payment/fail`,
       });
     } catch (error: unknown) {
-      console.error("Payment error:", error);
-      const errorMessage = error instanceof Error ? error.message : "결제 처리 중 오류가 발생했습니다.";
+      console.error("Payment error details:", error);
+      console.error("Error type:", typeof error);
+      console.error("Error JSON:", JSON.stringify(error, null, 2));
+      
+      let errorMessage = "결제 처리 중 오류가 발생했습니다.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        const errObj = error as { message?: string; code?: string };
+        errorMessage = errObj.message || errObj.code || errorMessage;
+      }
+      
       toast.error(errorMessage);
       setIsProcessing(false);
     }

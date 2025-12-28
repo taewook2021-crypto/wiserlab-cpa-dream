@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -13,16 +13,63 @@ import { useState } from "react";
 
 const BUNDLE_PRICE = 50000;
 
+// Preload critical images
+const preloadImages = [summitCover, summitFeature];
+
+// Static data moved outside component to prevent recreation
+const FEATURES = [
+  {
+    title: "모든 곳에서 완벽함을 추구하다",
+    description: "문항의 배치부터 시험지의 양식까지, SUMMIT 모의고사는 실제 CPA 시험지와 동일하게 구현했습니다.",
+  },
+  {
+    title: "객관적 평가가 가능한 모의고사를",
+    description: "서울대 데이터 기반의 정밀 분석으로 객관적 평가 기회를 제공합니다.",
+  },
+  {
+    title: "트렌디하며 기본에 충실한 모의고사를",
+    description: "출제 가능성이 전혀 없는 주제를 다루지 않으며, 최근 1차 시험의 난이도를 반영한 가장 실전적인 모의고사입니다.",
+  },
+] as const;
+
+const INSTRUCTORS = {
+  financial: {
+    subject: "재무회계",
+    name: "김용재",
+    title: "스마트 경영 아카데미 재무회계 강사",
+    teamDescription: "서울대학교 출신 공인회계사 7명 출제팀",
+    credentials: [
+      { main: "2024년 2차 재무회계 133점", sub: "(서울대학교 경제학부 출신 공인회계사)" },
+      { main: "2025년 2차 고급회계 42점", sub: "(서울대학교 경영학과 출신 공인회계사)" },
+    ],
+  },
+  tax: {
+    subject: "세법",
+    name: "오정화",
+    title: "바른생각 세법 강사",
+    teamDescription: "서울대학교 출신 공인회계사 5명 출제팀",
+    credentials: [
+      { main: "전원 2025년 세법 2차 75점 이상", sub: "" },
+    ],
+  },
+} as const;
+
+const formatPrice = (price: number) => price.toLocaleString("ko-KR");
+
 const Summit = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  const formatPrice = (price: number) => {
-    return price.toLocaleString("ko-KR");
-  };
+  // Preload images on mount
+  useEffect(() => {
+    preloadImages.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = useCallback(async () => {
     if (!user) {
       navigate("/auth?redirect=/summit");
       return;
@@ -31,7 +78,6 @@ const Summit = () => {
     setIsAddingToCart(true);
 
     try {
-      // 이미 장바구니에 있는지 확인
       const { data: existingItems } = await supabase
         .from("cart_items")
         .select("product_type")
@@ -61,15 +107,15 @@ const Summit = () => {
     } finally {
       setIsAddingToCart(false);
     }
-  };
+  }, [user, navigate]);
 
-  const handlePurchase = () => {
+  const handlePurchase = useCallback(() => {
     if (!user) {
       navigate("/auth?redirect=/summit");
       return;
     }
     navigate("/payment?items=bundle");
-  };
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,6 +133,9 @@ const Summit = () => {
                     src={summitCover}
                     alt="Wiser Lab SUMMIT 모의고사 패키지"
                     className="w-full h-auto object-contain"
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
                   />
                 </div>
               </div>
@@ -169,41 +218,27 @@ const Summit = () => {
                 src={summitFeature}
                 alt="SUMMIT 모의고사 특징"
                 className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
               />
             </div>
 
             {/* Right: Features */}
             <div className="bg-background p-8 sm:p-10 md:p-24 flex flex-col justify-center">
               <div className="space-y-8 sm:space-y-10 md:space-y-16">
-                <div className="pb-8 sm:pb-10 md:pb-16 border-b border-border">
-                  <h3 className="text-sm sm:text-base md:text-xl font-medium mb-3 sm:mb-4 md:mb-6">
-                    모든 곳에서 완벽함을 추구하다
-                  </h3>
-                  <p className="text-xs sm:text-xs md:text-base text-muted-foreground leading-relaxed">
-                    문항의 배치부터 시험지의 양식까지, SUMMIT 모의고사는 실제
-                    CPA 시험지와 동일하게 구현했습니다.
-                  </p>
-                </div>
-
-                <div className="pb-8 sm:pb-10 md:pb-16 border-b border-border">
-                  <h3 className="text-sm sm:text-base md:text-xl font-medium mb-3 sm:mb-4 md:mb-6">
-                    객관적 평가가 가능한 모의고사를
-                  </h3>
-                  <p className="text-xs sm:text-xs md:text-base text-muted-foreground leading-relaxed">
-                    서울대 데이터 기반의 정밀 분석으로 객관적 평가 기회를
-                    제공합니다.
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-sm sm:text-base md:text-xl font-medium mb-3 sm:mb-4 md:mb-6">
-                    트렌디하며 기본에 충실한 모의고사를
-                  </h3>
-                  <p className="text-xs sm:text-xs md:text-base text-muted-foreground leading-relaxed">
-                    출제 가능성이 전혀 없는 주제를 다루지 않으며, 최근 1차
-                    시험의 난이도를 반영한 가장 실전적인 모의고사입니다.
-                  </p>
-                </div>
+                {FEATURES.map((feature, index) => (
+                  <div
+                    key={index}
+                    className={index < FEATURES.length - 1 ? "pb-8 sm:pb-10 md:pb-16 border-b border-border" : ""}
+                  >
+                    <h3 className="text-sm sm:text-base md:text-xl font-medium mb-3 sm:mb-4 md:mb-6">
+                      {feature.title}
+                    </h3>
+                    <p className="text-xs sm:text-xs md:text-base text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -218,56 +253,32 @@ const Summit = () => {
               </h2>
 
               <div className="grid sm:grid-cols-2 gap-8 sm:gap-12 md:gap-24">
-                {/* 재무회계 */}
-                <div className="space-y-4 sm:space-y-6 md:space-y-10">
-                  <h3 className="text-sm sm:text-base md:text-xl font-medium border-b border-border pb-3 sm:pb-4 md:pb-6">
-                    재무회계
-                  </h3>
-                  <div className="space-y-1 sm:space-y-2 md:space-y-3">
-                    <p className="text-sm sm:text-base md:text-lg font-medium">김용재</p>
-                    <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">
-                      스마트 경영 아카데미 재무회계 강사
-                    </p>
-                  </div>
-                  <div className="space-y-2 sm:space-y-3 md:space-y-4 text-[10px] sm:text-xs md:text-sm text-muted-foreground leading-relaxed">
-                    <p className="font-medium text-foreground">
-                      서울대학교 출신 공인회계사 7명 출제팀
-                    </p>
-                    <div className="space-y-1 pl-3 sm:pl-4 border-l-2 border-border">
-                      <p>2024년 2차 재무회계 133점</p>
-                      <p className="text-[9px] sm:text-[10px] md:text-xs">
-                        (서울대학교 경제학부 출신 공인회계사)
+                {Object.values(INSTRUCTORS).map((instructor) => (
+                  <div key={instructor.subject} className="space-y-4 sm:space-y-6 md:space-y-10">
+                    <h3 className="text-sm sm:text-base md:text-xl font-medium border-b border-border pb-3 sm:pb-4 md:pb-6">
+                      {instructor.subject}
+                    </h3>
+                    <div className="space-y-1 sm:space-y-2 md:space-y-3">
+                      <p className="text-sm sm:text-base md:text-lg font-medium">{instructor.name}</p>
+                      <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">
+                        {instructor.title}
                       </p>
                     </div>
-                    <div className="space-y-1 pl-3 sm:pl-4 border-l-2 border-border">
-                      <p>2025년 2차 고급회계 42점</p>
-                      <p className="text-[9px] sm:text-[10px] md:text-xs">
-                        (서울대학교 경영학과 출신 공인회계사)
+                    <div className="space-y-2 sm:space-y-3 md:space-y-4 text-[10px] sm:text-xs md:text-sm text-muted-foreground leading-relaxed">
+                      <p className="font-medium text-foreground">
+                        {instructor.teamDescription}
                       </p>
+                      {instructor.credentials.map((cred, index) => (
+                        <div key={index} className="space-y-1 pl-3 sm:pl-4 border-l-2 border-border">
+                          <p>{cred.main}</p>
+                          {cred.sub && (
+                            <p className="text-[9px] sm:text-[10px] md:text-xs">{cred.sub}</p>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-
-                {/* 세법 */}
-                <div className="space-y-4 sm:space-y-6 md:space-y-10">
-                  <h3 className="text-sm sm:text-base md:text-xl font-medium border-b border-border pb-3 sm:pb-4 md:pb-6">
-                    세법
-                  </h3>
-                  <div className="space-y-1 sm:space-y-2 md:space-y-3">
-                    <p className="text-sm sm:text-base md:text-lg font-medium">오정화</p>
-                    <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">
-                      바른생각 세법 강사
-                    </p>
-                  </div>
-                  <div className="space-y-2 sm:space-y-3 md:space-y-4 text-[10px] sm:text-xs md:text-sm text-muted-foreground leading-relaxed">
-                    <p className="font-medium text-foreground">
-                      서울대학교 출신 공인회계사 5명 출제팀
-                    </p>
-                    <div className="pl-3 sm:pl-4 border-l-2 border-border">
-                      <p>전원 2025년 세법 2차 75점 이상</p>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>

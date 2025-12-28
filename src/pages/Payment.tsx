@@ -49,7 +49,7 @@ interface DaumPostcodeData {
 }
 
 const BUNDLE_PRICE = 50000;
-const TOSS_CLIENT_KEY = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq"; // 테스트용 클라이언트 키
+const TOSS_CLIENT_KEY = "live_gck_6BYq7GWPVvGA6xv4vg04rNE5vbo1";
 
 const Payment = () => {
   const { user, loading } = useAuth();

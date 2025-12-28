@@ -139,7 +139,7 @@ const HeroSection = () => {
             <div className="space-y-8 sm:space-y-10 lg:space-y-12">
               <h2 className="text-xl sm:text-2xl lg:text-4xl font-light leading-relaxed">
                 단순한 등수가 아닌,<br />
-                <strong className="font-medium">최상위권 표본 기반</strong>의<br />
+                <strong className="font-medium">​서울대학교, 연세대학교 CPA 1차 응시자 표본 기반 분석</strong>의<br />
                 합격 가능성을 확인하세요.
               </h2>
             </div>

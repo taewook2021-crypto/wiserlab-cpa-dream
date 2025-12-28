@@ -103,7 +103,7 @@ const HeroSection = () => {
 
         {/* Overlay White Card */}
         <div className="relative z-10 h-full flex items-center">
-          <div className="ml-6 sm:ml-12 lg:ml-24 bg-white/95 backdrop-blur-sm p-6 sm:p-8 lg:p-10 w-[260px] sm:w-[340px] lg:w-[480px] min-h-[360px] sm:min-h-[420px] lg:min-h-[520px] flex flex-col justify-between relative">
+          <div className="ml-6 sm:ml-12 lg:ml-24 bg-white/95 backdrop-blur-sm p-8 sm:p-10 lg:p-12 w-[300px] sm:w-[400px] lg:w-[560px] min-h-[420px] sm:min-h-[500px] lg:min-h-[620px] flex flex-col justify-between relative">
             <div className="space-y-0 mt-6 sm:mt-8 lg:mt-12">
               <h1 className="text-[1.15rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-1">
                 실전을 넘어

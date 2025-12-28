@@ -150,13 +150,13 @@ const HeroSection = () => {
               <div className="space-y-4 sm:space-y-6 lg:space-y-8">
                 <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-1">
-                    <p className="text-sm sm:text-sm lg:text-base font-medium">양질의 표본</p>
-                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">Wiser Lab 응시자 + 서울대학교 CPA 응시자 표본</p>
+                    <p className="text-base sm:text-lg lg:text-xl font-medium">양질의 표본</p>
+                    <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">Wiser Lab 응시자 + 서울대학교 CPA 응시자 표본</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm sm:text-sm lg:text-base font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
-                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">누적 통계 기반의 안정권·경합권 구간 제시</p>
-                    <p className="text-xs sm:text-xs lg:text-base text-muted-foreground">오답 문항과 연계된 기출 문제 제공</p>
+                    <p className="text-base sm:text-lg lg:text-xl font-medium">Wiser Lab 데이터룸의 정밀 분석</p>
+                    <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">누적 통계 기반의 안정권·경합권 구간 제시</p>
+                    <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">오답 문항과 연계된 기출 문제 제공</p>
                   </div>
                 </div>
               </div>

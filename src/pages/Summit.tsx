@@ -13,8 +13,11 @@ import { useState } from "react";
 
 const BUNDLE_PRICE = 50000;
 
-// Preload critical images
-const preloadImages = [summitCover, summitFeature];
+// Preload critical images immediately (outside component)
+const preloadedCover = new Image();
+preloadedCover.src = summitCover;
+const preloadedFeature = new Image();
+preloadedFeature.src = summitFeature;
 
 // Static data moved outside component to prevent recreation
 const FEATURES = [
@@ -61,13 +64,6 @@ const Summit = () => {
   const navigate = useNavigate();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  // Preload images on mount
-  useEffect(() => {
-    preloadImages.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []);
 
   const handleAddToCart = useCallback(async () => {
     if (!user) {

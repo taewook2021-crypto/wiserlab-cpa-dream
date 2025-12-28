@@ -139,9 +139,8 @@ const HeroSection = () => {
             <div className="space-y-8 sm:space-y-10 lg:space-y-12">
               <h2 className="text-xl sm:text-2xl lg:text-4xl font-light leading-relaxed">
                 단순한 등수가 아닌,<br />
-                <strong className="font-medium">서울대학교·연세대학교 응시자 표본을 기반으로
-
-안정권·경합권·레드라인을 구분해 제공합니다.</strong>의<br />
+                <strong className="font-medium">최상위권 표본</strong>을 기반으로<br />
+                안정권·경합권·레드라인을 구분해<br />
                 합격 가능성을 확인하세요.
               </h2>
             </div>

@@ -17,7 +17,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -47,6 +57,7 @@ interface Order {
   status: string;
   created_at: string;
   exam_number: string | null;
+  payment_key: string | null;
 }
 
 const subjectNames: Record<string, string> = {
@@ -63,6 +74,7 @@ const statusColors: Record<string, string> = {
   pending: "bg-yellow-500",
   paid: "bg-green-500",
   refunded: "bg-red-500",
+  refund_requested: "bg-orange-500",
   cancelled: "bg-gray-500",
 };
 
@@ -70,8 +82,10 @@ const statusLabels: Record<string, string> = {
   pending: "대기중",
   paid: "결제완료",
   refunded: "환불완료",
+  refund_requested: "환불요청",
   cancelled: "취소",
 };
+
 
 const MyPage = () => {
   const { user, loading, signOut } = useAuth();
@@ -85,6 +99,10 @@ const MyPage = () => {
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [profile, setProfile] = useState<{ exam_number: string } | null>(null);
   const [copiedExamNumber, setCopiedExamNumber] = useState(false);
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [refundReason, setRefundReason] = useState("");
+  const [processingRefund, setProcessingRefund] = useState(false);
 
   const copyExamNumber = async () => {
     if (!profile?.exam_number) return;
@@ -92,6 +110,58 @@ const MyPage = () => {
     setCopiedExamNumber(true);
     toast.success("수험번호가 복사되었습니다.");
     setTimeout(() => setCopiedExamNumber(false), 2000);
+  };
+
+  const handleRefundRequest = (order: Order) => {
+    setSelectedOrder(order);
+    setRefundReason("");
+    setRefundDialogOpen(true);
+  };
+
+  const handleRefundSubmit = async () => {
+    if (!selectedOrder || !refundReason.trim()) {
+      toast.error("환불 사유를 입력해주세요.");
+      return;
+    }
+
+    if (refundReason.trim().length < 5) {
+      toast.error("환불 사유를 5자 이상 입력해주세요.");
+      return;
+    }
+
+    setProcessingRefund(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('toss-refund', {
+        body: {
+          paymentKey: selectedOrder.payment_key,
+          cancelReason: refundReason.trim(),
+          orderId: selectedOrder.order_id,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      toast.success("환불이 완료되었습니다.");
+      setRefundDialogOpen(false);
+      
+      // 주문 목록 새로고침
+      setOrders(prev => prev.map(o => 
+        o.id === selectedOrder.id 
+          ? { ...o, status: 'refunded' } 
+          : o
+      ));
+    } catch (error: any) {
+      console.error("Refund error:", error);
+      toast.error(error.message || "환불 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setProcessingRefund(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -157,7 +227,7 @@ const MyPage = () => {
 
       const { data, error } = await supabase
         .from("orders")
-        .select("id, order_id, product_name, amount, status, created_at, exam_number")
+        .select("id, order_id, product_name, amount, status, created_at, exam_number, payment_key")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -318,30 +388,46 @@ const MyPage = () => {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {orders.slice(0, 3).map((order) => (
+                  {orders.slice(0, 5).map((order) => (
                     <div
                       key={order.id}
-                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                      className="p-3 bg-muted/50 rounded-lg"
                     >
-                      <div>
-                        <p className="font-medium text-sm">{order.product_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(order.created_at)}
-                        </p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-sm">{order.product_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(order.created_at)}
+                          </p>
+                        </div>
+                        <div className="text-right flex items-center gap-2">
+                          <span className="text-sm">{formatPrice(order.amount)}원</span>
+                          <Badge
+                            className={`${statusColors[order.status] || "bg-gray-500"} text-white text-xs`}
+                          >
+                            {statusLabels[order.status] || order.status}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="text-right flex items-center gap-2">
-                        <span className="text-sm">{formatPrice(order.amount)}원</span>
-                        <Badge
-                          className={`${statusColors[order.status] || "bg-gray-500"} text-white text-xs`}
-                        >
-                          {statusLabels[order.status] || order.status}
-                        </Badge>
-                      </div>
+                      {/* 환불 신청 버튼 - 결제완료 상태인 경우만 표시 */}
+                      {order.status === "paid" && order.payment_key && (
+                        <div className="mt-2 pt-2 border-t border-border/50">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs text-muted-foreground hover:text-destructive"
+                            onClick={() => handleRefundRequest(order)}
+                          >
+                            <RotateCcw className="w-3 h-3 mr-1" />
+                            환불 신청
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ))}
-                  {orders.length > 3 && (
+                  {orders.length > 5 && (
                     <p className="text-xs text-muted-foreground text-center">
-                      외 {orders.length - 3}건의 주문
+                      외 {orders.length - 5}건의 주문
                     </p>
                   )}
                 </div>
@@ -488,6 +574,58 @@ const MyPage = () => {
           </Card>
         </div>
       </main>
+
+      {/* 환불 신청 다이얼로그 */}
+      <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>환불 신청</DialogTitle>
+            <DialogDescription>
+              환불 사유를 입력해주세요. 환불은 즉시 처리됩니다.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-4">
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="font-medium text-sm">{selectedOrder.product_name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {formatPrice(selectedOrder.amount)}원
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="refund-reason">환불 사유</Label>
+                <Textarea
+                  id="refund-reason"
+                  placeholder="환불 사유를 입력해주세요 (5자 이상)"
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  className="min-h-[100px]"
+                  maxLength={500}
+                />
+                <p className="text-xs text-muted-foreground text-right">
+                  {refundReason.length}/500
+                </p>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setRefundDialogOpen(false)}
+              disabled={processingRefund}
+            >
+              취소
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRefundSubmit}
+              disabled={processingRefund || refundReason.trim().length < 5}
+            >
+              {processingRefund ? "처리 중..." : "환불 신청"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

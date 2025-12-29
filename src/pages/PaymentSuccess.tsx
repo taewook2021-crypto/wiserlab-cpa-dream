@@ -9,6 +9,18 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { generateUniqueExamNumber } from "@/lib/examNumberUtils";
 
+// user 세션 로드 대기 함수
+const waitForUser = async (maxRetries = 10, delay = 300): Promise<string | null> => {
+  for (let i = 0; i < maxRetries; i++) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user?.id) {
+      return session.user.id;
+    }
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  return null;
+};
+
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -64,33 +76,54 @@ const PaymentSuccess = () => {
           const pendingOrderStr = localStorage.getItem("pendingOrder");
           const pendingOrder = pendingOrderStr ? JSON.parse(pendingOrderStr) : null;
 
+          // user 세션 대기 (비동기 로드 대기)
+          const userId = user?.id || await waitForUser();
+          
           // 주문 정보를 DB에 저장
           let generatedExamNumber = "";
-          if (user && pendingOrder) {
+          if (userId && pendingOrder) {
             // 고유 수험번호 생성
             generatedExamNumber = await generateUniqueExamNumber();
             
-            const { error: orderError } = await supabase.from("orders").insert({
-              user_id: user.id,
-              order_id: data.orderId,
-              payment_key: paymentKey,
-              product_name: "SUMMIT 전과목 PACK",
-              amount: data.totalAmount,
-              status: "paid",
-              buyer_name: pendingOrder.buyerName,
-              buyer_email: user.email || "",
-              buyer_phone: pendingOrder.buyerPhone,
-              shipping_address: pendingOrder.address,
-              shipping_detail_address: pendingOrder.detailAddress,
-              shipping_postal_code: pendingOrder.postcode,
-              paid_at: new Date().toISOString(),
-              exam_number: generatedExamNumber,
-            });
+            // 이미 저장된 주문인지 확인
+            const { data: existingOrder } = await supabase
+              .from("orders")
+              .select("id")
+              .eq("order_id", data.orderId)
+              .maybeSingle();
+            
+            if (existingOrder) {
+              console.log("Order already exists, skipping insert");
+            } else {
+              const { data: { session } } = await supabase.auth.getSession();
+              const userEmail = session?.user?.email || user?.email || "";
+              
+              const { error: orderError } = await supabase.from("orders").insert({
+                user_id: userId,
+                order_id: data.orderId,
+                payment_key: paymentKey,
+                product_name: "SUMMIT 전과목 PACK",
+                amount: data.totalAmount,
+                status: "paid",
+                buyer_name: pendingOrder.buyerName,
+                buyer_email: userEmail,
+                buyer_phone: pendingOrder.buyerPhone,
+                shipping_address: pendingOrder.address,
+                shipping_detail_address: pendingOrder.detailAddress,
+                shipping_postal_code: pendingOrder.postcode,
+                paid_at: new Date().toISOString(),
+                exam_number: generatedExamNumber,
+              });
 
-            if (orderError) {
-              console.error("Failed to save order:", orderError);
-              // 주문 저장 실패해도 결제는 성공이므로 계속 진행
+              if (orderError) {
+                console.error("Failed to save order:", orderError);
+                // 주문 저장 실패해도 결제는 성공이므로 계속 진행
+              } else {
+                console.log("Order saved successfully:", data.orderId);
+              }
             }
+          } else {
+            console.error("No user session found for order save. userId:", userId, "pendingOrder:", !!pendingOrder);
           }
 
           setIsSuccess(true);

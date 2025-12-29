@@ -197,6 +197,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_orders: {
+        Row: {
+          amount: number
+          buyer_email: string | null
+          buyer_name: string
+          buyer_phone: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          order_id: string
+          product_name: string
+          shipping_address: string
+          shipping_detail_address: string | null
+          shipping_postal_code: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          buyer_email?: string | null
+          buyer_name: string
+          buyer_phone: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          order_id: string
+          product_name: string
+          shipping_address: string
+          shipping_detail_address?: string | null
+          shipping_postal_code: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          buyer_email?: string | null
+          buyer_name?: string
+          buyer_phone?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          order_id?: string
+          product_name?: string
+          shipping_address?: string
+          shipping_detail_address?: string | null
+          shipping_postal_code?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

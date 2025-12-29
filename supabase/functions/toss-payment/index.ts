@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -57,6 +58,100 @@ serve(async (req) => {
 
     console.log('Payment confirmed successfully:', data.orderId);
 
+    // 결제 승인 성공 후 주문 저장 시도 (서버 사이드에서 직접 처리)
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+      // 이미 저장된 주문인지 확인
+      const { data: existingOrder } = await supabase
+        .from('orders')
+        .select('id, exam_number')
+        .eq('order_id', data.orderId)
+        .maybeSingle();
+
+      if (existingOrder) {
+        console.log('Order already exists:', data.orderId);
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            orderId: data.orderId,
+            method: data.method,
+            totalAmount: data.totalAmount,
+            status: data.status,
+            examNumber: existingOrder.exam_number,
+            orderSaved: true,
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // pending_orders에서 배송 정보 조회
+      const { data: pendingOrder, error: pendingError } = await supabase
+        .from('pending_orders')
+        .select('*')
+        .eq('order_id', orderId)
+        .maybeSingle();
+
+      if (pendingError) {
+        console.error('Error fetching pending order:', pendingError);
+      }
+
+      if (pendingOrder) {
+        // 수험번호 생성
+        const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+        let examNumber = 'WLS-';
+        for (let i = 0; i < 4; i++) {
+          examNumber += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        // 주문 저장
+        const { error: orderError } = await supabase.from('orders').insert({
+          user_id: pendingOrder.user_id,
+          order_id: data.orderId,
+          payment_key: paymentKey,
+          product_name: pendingOrder.product_name,
+          amount: data.totalAmount,
+          status: 'paid',
+          buyer_name: pendingOrder.buyer_name,
+          buyer_email: pendingOrder.buyer_email || '',
+          buyer_phone: pendingOrder.buyer_phone,
+          shipping_address: pendingOrder.shipping_address,
+          shipping_detail_address: pendingOrder.shipping_detail_address,
+          shipping_postal_code: pendingOrder.shipping_postal_code,
+          paid_at: new Date().toISOString(),
+          exam_number: examNumber,
+        });
+
+        if (orderError) {
+          console.error('Failed to save order:', orderError);
+        } else {
+          console.log('Order saved successfully from toss-payment:', data.orderId, 'examNumber:', examNumber);
+          
+          // pending_order 삭제
+          await supabase.from('pending_orders').delete().eq('order_id', orderId);
+
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              orderId: data.orderId,
+              method: data.method,
+              totalAmount: data.totalAmount,
+              status: data.status,
+              examNumber: examNumber,
+              orderSaved: true,
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      } else {
+        console.log('No pending order found for:', orderId);
+      }
+    } catch (saveError) {
+      console.error('Error saving order in toss-payment:', saveError);
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -64,6 +159,7 @@ serve(async (req) => {
         method: data.method,
         totalAmount: data.totalAmount,
         status: data.status,
+        orderSaved: false,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

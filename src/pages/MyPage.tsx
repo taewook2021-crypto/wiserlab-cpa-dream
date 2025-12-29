@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2 } from "lucide-react";
+import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -83,6 +83,16 @@ const MyPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [profile, setProfile] = useState<{ exam_number: string } | null>(null);
+  const [copiedExamNumber, setCopiedExamNumber] = useState(false);
+
+  const copyExamNumber = async () => {
+    if (!profile?.exam_number) return;
+    await navigator.clipboard.writeText(profile.exam_number);
+    setCopiedExamNumber(true);
+    toast.success("수험번호가 복사되었습니다.");
+    setTimeout(() => setCopiedExamNumber(false), 2000);
+  };
 
   const handleDeleteAccount = async () => {
     setDeletingAccount(true);
@@ -157,10 +167,21 @@ const MyPage = () => {
       setLoadingOrders(false);
     };
 
+    const fetchProfile = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("exam_number")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data) setProfile(data);
+    };
+
     if (user) {
       fetchResults();
       fetchCartItems();
       fetchOrders();
+      fetchProfile();
     }
   }, [user]);
 
@@ -215,20 +236,35 @@ const MyPage = () => {
                   <AvatarImage src={avatarUrl} alt={fullName} />
                   <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div>
+                <div className="flex-1">
                   <p className="font-medium">{fullName}</p>
                   <p className="text-sm text-muted-foreground">{email}</p>
-                  {/* 유료 구입자 수험번호 표시 */}
-                  {orders.find(o => o.status === "paid" && o.exam_number) && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <Badge variant="secondary" className="font-mono">
-                        {orders.find(o => o.status === "paid" && o.exam_number)?.exam_number}
-                      </Badge>
-                    </div>
-                  )}
                 </div>
               </div>
               
+              {/* 내 수험번호 표시 */}
+              {profile?.exam_number && (
+                <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-2">내 수험번호</p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="font-mono text-base px-3 py-1.5">
+                      {profile.exam_number}
+                    </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={copyExamNumber}
+                      className="h-8 w-8 p-0"
+                    >
+                      {copiedExamNumber ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
               {/* 회원 탈퇴 버튼 */}
               <div className="mt-6 pt-4 border-t border-border">
                 <AlertDialog>

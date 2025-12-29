@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle, Loader2, Copy, Check } from "lucide-react";
 import Header from "@/components/Header";
@@ -21,9 +21,18 @@ const PaymentSuccess = () => {
     totalAmount: number;
     examNumber: string;
   } | null>(null);
+  
+  // 중복 실행 방지를 위한 ref
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
     const confirmPayment = async () => {
+      // 이미 처리 중이면 중복 실행 방지
+      if (isProcessingRef.current) {
+        return;
+      }
+      isProcessingRef.current = true;
+      
       const paymentKey = searchParams.get("paymentKey");
       const orderId = searchParams.get("orderId");
       const amount = searchParams.get("amount");
@@ -109,7 +118,7 @@ const PaymentSuccess = () => {
     };
 
     confirmPayment();
-  }, [searchParams, navigate, user]);
+  }, [searchParams, navigate]); // user 의존성 제거 - 중복 호출 방지
 
   const formatPrice = (price: number) => {
     return price.toLocaleString("ko-KR");

@@ -67,6 +67,7 @@ const QuickScoring = () => {
   const [verifyingExamNumber, setVerifyingExamNumber] = useState(false);
   const [hasPurchaseHistory, setHasPurchaseHistory] = useState<boolean | null>(null);
   const [checkingPurchase, setCheckingPurchase] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedExam, setSelectedExam] = useState<string>("");
@@ -91,15 +92,33 @@ const QuickScoring = () => {
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // 로그인 모드에서 구입이력 확인
+  // 로그인 모드에서 구입이력 및 관리자 여부 확인
   useEffect(() => {
-    const checkPurchase = async () => {
+    const checkAccess = async () => {
       if (!user || accessMode !== "login") {
         setHasPurchaseHistory(null);
+        setIsAdmin(false);
         return;
       }
 
       setCheckingPurchase(true);
+
+      // 관리자 여부 확인
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (roleData) {
+        setIsAdmin(true);
+        setHasPurchaseHistory(true); // 관리자는 구매 없이 접근 가능
+        setCheckingPurchase(false);
+        return;
+      }
+
+      // 일반 사용자: 구입이력 확인
       const { data, error } = await supabase
         .from("orders")
         .select("id")
@@ -115,7 +134,7 @@ const QuickScoring = () => {
       setCheckingPurchase(false);
     };
 
-    checkPurchase();
+    checkAccess();
   }, [user, accessMode]);
 
   // 수험번호 검증
@@ -473,8 +492,8 @@ const QuickScoring = () => {
                 </div>
               )}
 
-              {/* 구입이력 없음 안내 (로그인 모드) */}
-              {accessMode === "login" && user && !checkingPurchase && hasPurchaseHistory === false && (
+              {/* 구입이력 없음 안내 (로그인 모드 - 관리자 제외) */}
+              {accessMode === "login" && user && !checkingPurchase && hasPurchaseHistory === false && !isAdmin && (
                 <div className="bg-muted border border-border rounded-lg p-6 mb-8 text-center">
                   <p className="text-muted-foreground mb-4">
                     상품 구입 후 빠른 채점을 이용할 수 있습니다

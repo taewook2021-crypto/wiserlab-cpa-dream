@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -10,32 +11,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-
-// Mock data - 150명 기준 통계
-const TOTAL_PARTICIPANTS = 150;
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 // 상위 40% 컷라인 점수 (35문제 기준)
 const SAFE_ZONE_CUTOFF = 28; // 80점
 const COMPETITIVE_ZONE_CUTOFF = 22; // 약 63점
 
-// Mock billboard data - 전국 응시자 (수험번호로 표시)
-const mockBillboard = [
-  { rank: 1, examNumber: "WLS-K7M3", score: 35 },
-  { rank: 2, examNumber: "WLS-P4N8", score: 34 },
-  { rank: 3, examNumber: "WLP-A2B5", score: 34 },
-  { rank: 4, examNumber: "WLS-R9T2", score: 33 },
-  { rank: 5, examNumber: "WLP-C3D7", score: 33 },
-  { rank: 6, examNumber: "WLS-H6J4", score: 32 },
-  { rank: 7, examNumber: "WLP-E8F1", score: 32 },
-  { rank: 8, examNumber: "WLS-U5V9", score: 31 },
-  { rank: 9, examNumber: "WLP-G2K6", score: 31 },
-  { rank: 10, examNumber: "WLS-W4X8", score: 30 },
-  { rank: 11, examNumber: "WLP-L7Q3", score: 30 },
-  { rank: 12, examNumber: "WLS-Y1Z5", score: 29 },
-  { rank: 13, examNumber: "WLP-M9N2", score: 29 },
-  { rank: 14, examNumber: "WLS-S6T4", score: 28 },
-  { rank: 15, examNumber: "WLP-B3C7", score: 28 },
-];
+interface BillboardEntry {
+  rank: number;
+  examNumber: string;
+  score: number;
+  isMe: boolean;
+}
 
 const getZoneInfo = (score: number) => {
   if (score >= SAFE_ZONE_CUTOFF) {
@@ -59,19 +47,15 @@ const getZoneInfo = (score: number) => {
   }
 };
 
-// 점수 기반 예상 등수 계산 (35문제 기준)
-const estimateRank = (score: number): number => {
-  // 점수별 예상 상위 퍼센트 (대략적인 정규분포 가정)
-  const scoreToPercentile: Record<number, number> = {
-    35: 1, 34: 3, 33: 6, 32: 10, 31: 15, 30: 21,
-    29: 28, 28: 36, 27: 44, 26: 52, 25: 60, 24: 67,
-    23: 73, 22: 78, 21: 82, 20: 86, 19: 89, 18: 92,
-  };
-  const percentile = scoreToPercentile[score] ?? Math.min(95, 100 - score * 2);
-  return Math.max(1, Math.round((percentile / 100) * TOTAL_PARTICIPANTS));
+// subject 파라미터를 DB 값으로 변환
+const getSubjectDbValue = (subject: string): string => {
+  if (subject === "financial") return "financial_accounting";
+  if (subject === "tax") return "tax_law";
+  return subject;
 };
 
 const Statistics = () => {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   
   // URL에서 채점 결과 읽기
@@ -82,12 +66,98 @@ const Statistics = () => {
   const [selectedSubject, setSelectedSubject] = useState<string>(subjectFromUrl || "financial");
   const [selectedExam, setSelectedExam] = useState<string>(examFromUrl || "summit-1");
   
-  // 실제 점수 또는 기본값
-  const userScore = scoreFromUrl ? parseInt(scoreFromUrl, 10) : null;
-  const userRank = userScore !== null ? estimateRank(userScore) : null;
+  // 실제 데이터 상태
+  const [myExamNumber, setMyExamNumber] = useState<string | null>(null);
+  const [myRank, setMyRank] = useState<number | null>(null);
+  const [totalParticipants, setTotalParticipants] = useState<number>(0);
+  const [billboard, setBillboard] = useState<BillboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // 실제 점수
+  const userScore = scoreFromUrl ? parseInt(scoreFromUrl, 10) : null;
   const userZone = userScore !== null ? getZoneInfo(userScore) : null;
-  const percentile = userRank !== null ? Math.round((userRank / TOTAL_PARTICIPANTS) * 100) : null;
+  const percentile = myRank !== null && totalParticipants > 0 
+    ? Math.round((myRank / totalParticipants) * 100) 
+    : null;
+
+  // exam 파라미터에서 회차 추출 (예: "summit-1" -> 1)
+  const getExamRound = (exam: string): number => {
+    const match = exam.match(/summit-(\d+)/);
+    return match ? parseInt(match[1], 10) : 1;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      
+      const subjectDbValue = getSubjectDbValue(selectedSubject);
+      const examRound = getExamRound(selectedExam);
+
+      // 1. 내 프로필 조회 (수험번호)
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("exam_number")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (profile) {
+          setMyExamNumber(profile.exam_number);
+        }
+      }
+
+      // 2. 해당 과목/회차의 모든 채점 결과 조회 (익명 제외, 점수순 정렬)
+      const { data: allResults } = await supabase
+        .from("scoring_results")
+        .select("user_id, correct_count")
+        .eq("subject", subjectDbValue)
+        .eq("exam_round", examRound)
+        .neq("user_id", "00000000-0000-0000-0000-000000000000")
+        .order("correct_count", { ascending: false });
+
+      if (allResults && allResults.length > 0) {
+        setTotalParticipants(allResults.length);
+
+        // 내 등수 찾기
+        if (user && userScore !== null) {
+          const myIndex = allResults.findIndex(r => r.user_id === user.id);
+          if (myIndex !== -1) {
+            setMyRank(myIndex + 1);
+          } else {
+            // 내 결과가 없으면 점수 기준으로 예상 등수 계산
+            const higherCount = allResults.filter(r => r.correct_count > userScore).length;
+            setMyRank(higherCount + 1);
+          }
+        }
+
+        // 3. 빌보드 데이터 생성 (상위 15명 또는 안정권 진입자)
+        const topResults = allResults.slice(0, 15);
+        const userIds = topResults.map(r => r.user_id);
+
+        // profiles에서 exam_number 조회
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, exam_number")
+          .in("id", userIds);
+
+        const billboardData: BillboardEntry[] = topResults.map((r, i) => ({
+          rank: i + 1,
+          examNumber: profiles?.find(p => p.id === r.user_id)?.exam_number || "???",
+          score: r.correct_count,
+          isMe: user?.id === r.user_id,
+        }));
+
+        setBillboard(billboardData);
+      } else {
+        setTotalParticipants(0);
+        setMyRank(null);
+        setBillboard([]);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [user, selectedSubject, selectedExam, userScore]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -101,7 +171,9 @@ const Statistics = () => {
               <div className="text-center mb-12">
                 <h1 className="text-3xl font-light mb-2">나의 통계</h1>
                 <p className="text-muted-foreground text-sm">
-                  서울대학교 · 연세대학교 고시반 {TOTAL_PARTICIPANTS}명 기준
+                  {totalParticipants > 0 
+                    ? `전체 응시자 ${totalParticipants}명 기준`
+                    : "채점 결과를 불러오는 중..."}
                 </p>
               </div>
 
@@ -134,9 +206,15 @@ const Statistics = () => {
               </div>
 
               {/* 내 점수 & 존 표시 */}
-              {userScore !== null && userZone && userRank !== null ? (
+              {userScore !== null && userZone ? (
                 <div className="border border-border rounded-none p-8 mb-8 bg-card">
                   <div className="text-center">
+                    {/* 내 수험번호 표시 */}
+                    {myExamNumber && (
+                      <Badge variant="outline" className="font-mono text-sm mb-4">
+                        {myExamNumber}
+                      </Badge>
+                    )}
                     <p className="text-sm text-muted-foreground mb-2">내 점수</p>
                     <p className="text-5xl font-light mb-1">
                       <span className="text-foreground">{userScore}</span>
@@ -153,9 +231,16 @@ const Statistics = () => {
                         {userZone.zone}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {TOTAL_PARTICIPANTS}명 중 <span className="font-medium text-foreground">{userRank}등</span> · 상위 {percentile}%
-                    </p>
+                    {/* 실제 등수 표시 */}
+                    {totalParticipants > 0 && myRank !== null ? (
+                      <p className="text-sm text-muted-foreground">
+                        {totalParticipants}명 중 <span className="font-medium text-foreground">{myRank}등</span> · 상위 {percentile}%
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground animate-pulse">
+                        등수 계산 중...
+                      </p>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -206,49 +291,66 @@ const Statistics = () => {
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h2 className="text-xl font-light">전국 빌보드</h2>
-                    <p className="text-sm text-muted-foreground">안정권 진입자 랭킹</p>
+                    <p className="text-sm text-muted-foreground">상위 응시자 랭킹</p>
                   </div>
                   <span className="text-xs text-muted-foreground border border-border px-3 py-1">
-                    TOP {mockBillboard.length}
+                    TOP {billboard.length}
                   </span>
                 </div>
 
-                <div className="border border-border divide-y divide-border">
-                  {mockBillboard.map((entry) => (
-                    <div
-                      key={entry.rank}
-                      className="flex items-center gap-4 p-4 bg-card hover:bg-muted/50 transition-colors"
-                    >
-                      {/* 순위 */}
-                      <div className="w-10 text-center">
-                        <span className="font-mono text-sm text-muted-foreground">
-                          {entry.rank}
-                        </span>
-                      </div>
+                {loading ? (
+                  <div className="border border-border p-8 text-center">
+                    <p className="text-muted-foreground animate-pulse">불러오는 중...</p>
+                  </div>
+                ) : billboard.length > 0 ? (
+                  <div className="border border-border divide-y divide-border">
+                    {billboard.map((entry) => (
+                      <div
+                        key={entry.rank}
+                        className={`flex items-center gap-4 p-4 transition-colors ${
+                          entry.isMe 
+                            ? "bg-primary/10 border-l-2 border-l-primary" 
+                            : "bg-card hover:bg-muted/50"
+                        }`}
+                      >
+                        {/* 순위 */}
+                        <div className="w-10 text-center">
+                          <span className={`font-mono text-sm ${entry.isMe ? "text-primary font-medium" : "text-muted-foreground"}`}>
+                            {entry.rank}
+                          </span>
+                        </div>
 
-                      {/* 수험번호 */}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-mono text-sm truncate text-foreground/80">
-                          {entry.examNumber}
-                        </p>
-                      </div>
+                        {/* 수험번호 */}
+                        <div className="flex-1 min-w-0 flex items-center gap-2">
+                          <p className={`font-mono text-sm truncate ${entry.isMe ? "text-primary font-medium" : "text-foreground/80"}`}>
+                            {entry.examNumber}
+                          </p>
+                          {entry.isMe && (
+                            <Badge variant="secondary" className="text-xs">나</Badge>
+                          )}
+                        </div>
 
-                      {/* 점수 */}
-                      <div className="text-right">
-                        <p className="font-mono text-muted-foreground">
-                          {entry.score}
-                          <span className="text-xs text-muted-foreground">/35</span>
-                        </p>
+                        {/* 점수 */}
+                        <div className="text-right">
+                          <p className={`font-mono ${entry.isMe ? "text-primary" : "text-muted-foreground"}`}>
+                            {entry.score}
+                            <span className="text-xs text-muted-foreground">/35</span>
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="border border-border p-8 text-center">
+                    <p className="text-muted-foreground">아직 응시 데이터가 없습니다.</p>
+                  </div>
+                )}
               </div>
 
               {/* 안내 */}
               <div className="border border-border p-6 text-center bg-muted/30">
                 <p className="text-sm text-muted-foreground">
-                  통계는 서울대학교, 연세대학교 고시반 응시자 데이터를 기반으로 합니다.
+                  통계는 실제 응시자 데이터를 기반으로 합니다.
                 </p>
               </div>
             </div>

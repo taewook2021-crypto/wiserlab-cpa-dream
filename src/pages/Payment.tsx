@@ -49,7 +49,7 @@ interface DaumPostcodeData {
 }
 
 const BUNDLE_PRICE = 50000;
-const TOSS_CLIENT_KEY = "live_ck_E92LAa5PVbvQKmjoRwGPV7YmpXyJ";
+const TOSS_CLIENT_KEY = "live_ck_Poxy1XQL8RbE1qJpGGAZ87nO5Wml";
 
 const Payment = () => {
   const { user, loading } = useAuth();

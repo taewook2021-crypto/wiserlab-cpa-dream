@@ -158,16 +158,26 @@ const Payment = () => {
       const tossPayments = new window.TossPayments(TOSS_CLIENT_KEY);
       const orderId = `ORDER_${Date.now()}_${user?.id?.slice(0, 8)}`;
       
-      // 배송 정보를 localStorage에 저장 (결제 성공 후 사용)
-      localStorage.setItem('pendingOrder', JSON.stringify({
-        orderId,
-        buyerName,
-        buyerPhone,
-        postcode,
-        address,
-        detailAddress,
-        totalPrice,
-      }));
+      // pending_orders 테이블에 배송 정보 저장 (서버 사이드 처리를 위해)
+      const { error: pendingError } = await supabase.from('pending_orders').insert({
+        user_id: user!.id,
+        order_id: orderId,
+        buyer_name: buyerName,
+        buyer_email: user?.email || '',
+        buyer_phone: buyerPhone,
+        shipping_address: address,
+        shipping_detail_address: detailAddress,
+        shipping_postal_code: postcode,
+        product_name: 'SUMMIT 전과목 PACK',
+        amount: totalPrice,
+      });
+
+      if (pendingError) {
+        console.error('Failed to save pending order:', pendingError);
+        toast.error('주문 정보 저장에 실패했습니다. 다시 시도해주세요.');
+        setIsProcessing(false);
+        return;
+      }
 
       await tossPayments.requestPayment("카드", {
         amount: totalPrice,

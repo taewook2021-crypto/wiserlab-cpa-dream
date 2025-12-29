@@ -6,25 +6,10 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
-import { generateUniqueExamNumber } from "@/lib/examNumberUtils";
-
-// user 세션 로드 대기 함수
-const waitForUser = async (maxRetries = 10, delay = 300): Promise<string | null> => {
-  for (let i = 0; i < maxRetries; i++) {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user?.id) {
-      return session.user.id;
-    }
-    await new Promise(resolve => setTimeout(resolve, delay));
-  }
-  return null;
-};
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
   const [isConfirming, setIsConfirming] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -56,6 +41,7 @@ const PaymentSuccess = () => {
       }
 
       try {
+        // toss-payment Edge Function 호출 (결제 승인 + 주문 저장)
         const { data, error } = await supabase.functions.invoke("toss-payment", {
           body: {
             paymentKey,
@@ -72,68 +58,32 @@ const PaymentSuccess = () => {
         }
 
         if (data.success) {
-          // 로컬스토리지에서 주문 정보 가져오기
-          const pendingOrderStr = localStorage.getItem("pendingOrder");
-          const pendingOrder = pendingOrderStr ? JSON.parse(pendingOrderStr) : null;
+          let examNumber = data.examNumber || '';
 
-          // user 세션 대기 (비동기 로드 대기)
-          const userId = user?.id || await waitForUser();
-          
-          // 주문 정보를 DB에 저장
-          let generatedExamNumber = "";
-          if (userId && pendingOrder) {
-            // 고유 수험번호 생성
-            generatedExamNumber = await generateUniqueExamNumber();
+          // 서버에서 주문이 저장되지 않은 경우, DB에서 조회 시도
+          if (!data.orderSaved || !examNumber) {
+            // 잠시 대기 후 주문 조회 (서버 처리 시간 확보)
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
-            // 이미 저장된 주문인지 확인
-            const { data: existingOrder } = await supabase
-              .from("orders")
-              .select("id")
-              .eq("order_id", data.orderId)
+            const { data: savedOrder } = await supabase
+              .from('orders')
+              .select('exam_number')
+              .eq('order_id', data.orderId)
               .maybeSingle();
-            
-            if (existingOrder) {
-              console.log("Order already exists, skipping insert");
-            } else {
-              const { data: { session } } = await supabase.auth.getSession();
-              const userEmail = session?.user?.email || user?.email || "";
-              
-              const { error: orderError } = await supabase.from("orders").insert({
-                user_id: userId,
-                order_id: data.orderId,
-                payment_key: paymentKey,
-                product_name: "SUMMIT 전과목 PACK",
-                amount: data.totalAmount,
-                status: "paid",
-                buyer_name: pendingOrder.buyerName,
-                buyer_email: userEmail,
-                buyer_phone: pendingOrder.buyerPhone,
-                shipping_address: pendingOrder.address,
-                shipping_detail_address: pendingOrder.detailAddress,
-                shipping_postal_code: pendingOrder.postcode,
-                paid_at: new Date().toISOString(),
-                exam_number: generatedExamNumber,
-              });
 
-              if (orderError) {
-                console.error("Failed to save order:", orderError);
-                // 주문 저장 실패해도 결제는 성공이므로 계속 진행
-              } else {
-                console.log("Order saved successfully:", data.orderId);
-              }
+            if (savedOrder?.exam_number) {
+              examNumber = savedOrder.exam_number;
             }
-          } else {
-            console.error("No user session found for order save. userId:", userId, "pendingOrder:", !!pendingOrder);
           }
 
           setIsSuccess(true);
           setOrderInfo({
             orderId: data.orderId,
             totalAmount: data.totalAmount,
-            examNumber: generatedExamNumber,
+            examNumber: examNumber,
           });
 
-          // 로컬스토리지의 주문 정보 삭제
+          // 로컬스토리지의 주문 정보 삭제 (이전 버전 호환)
           localStorage.removeItem("pendingOrder");
 
           toast.success("결제가 완료되었습니다!");
@@ -151,7 +101,7 @@ const PaymentSuccess = () => {
     };
 
     confirmPayment();
-  }, [searchParams, navigate]); // user 의존성 제거 - 중복 호출 방지
+  }, [searchParams, navigate]);
 
   const formatPrice = (price: number) => {
     return price.toLocaleString("ko-KR");

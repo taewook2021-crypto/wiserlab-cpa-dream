@@ -27,7 +27,7 @@ const FEATURES = [
   },
   {
     title: "객관적 평가가 가능한 모의고사를",
-    description: "서울대학교, 연세대학교 최상위권의 데이터를 기반으로 객관적인 평가 기회를 제공합니다.",
+    description: "서울대학교, 연세대학교 최상위권의 데이터를\n기반으로 객관적인 평가 기회를 제공합니다.",
   },
   {
     title: "트렌디하며 기본에 충실한 모의고사를",
@@ -230,7 +230,7 @@ const Summit = () => {
                     <h3 className="text-sm sm:text-base md:text-xl font-medium mb-3 sm:mb-4 md:mb-6">
                       {feature.title}
                     </h3>
-                    <p className="text-xs sm:text-xs md:text-base text-muted-foreground leading-relaxed">
+                    <p className="text-xs sm:text-xs md:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
                       {feature.description}
                     </p>
                   </div>

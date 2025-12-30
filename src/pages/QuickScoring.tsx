@@ -61,6 +61,7 @@ const QuickScoring = () => {
   
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedExam, setSelectedExam] = useState<string>("");
+  const [selectedUniversity, setSelectedUniversity] = useState<string>("");
   const [isScoring, setIsScoring] = useState(false);
   const [results, setResults] = useState<ScoringResult[] | null>(null);
   const [resultSaved, setResultSaved] = useState(false);
@@ -294,6 +295,7 @@ const QuickScoring = () => {
   const isFormValid =
     selectedSubject &&
     selectedExam &&
+    selectedUniversity &&
     answers.every((group) => {
       const expectedLength = group.endNum - group.startNum + 1;
       return group.value.length === expectedLength;
@@ -394,9 +396,9 @@ const QuickScoring = () => {
               {/* 권한 있음 - 채점 UI */}
               {!accessLoading && user && hasAccess && (
                 <>
-                  <div className="grid grid-cols-2 gap-6 mb-12">
+                  <div className="grid grid-cols-3 gap-4 mb-12">
                     <div className="space-y-2">
-                      <Label>과목 선택</Label>
+                      <Label>과목 선택 <span className="text-destructive">*</span></Label>
                       <Select
                         value={selectedSubject}
                         onValueChange={(v) => {
@@ -405,7 +407,7 @@ const QuickScoring = () => {
                         }}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="과목을 선택하세요" />
+                          <SelectValue placeholder="과목" />
                         </SelectTrigger>
                         <SelectContent>
                           {subjects.map((subject) => (
@@ -418,7 +420,7 @@ const QuickScoring = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>회차 선택</Label>
+                      <Label>회차 선택 <span className="text-destructive">*</span></Label>
                       <Select
                         value={selectedExam}
                         onValueChange={(v) => {
@@ -427,7 +429,7 @@ const QuickScoring = () => {
                         }}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="회차를 선택하세요" />
+                          <SelectValue placeholder="회차" />
                         </SelectTrigger>
                         <SelectContent>
                           {exams.map((exam) => (
@@ -435,6 +437,23 @@ const QuickScoring = () => {
                               {exam.name}
                             </SelectItem>
                           ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>출신대학 <span className="text-destructive">*</span></Label>
+                      <Select
+                        value={selectedUniversity}
+                        onValueChange={setSelectedUniversity}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="대학 선택" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="snu">서울대학교</SelectItem>
+                          <SelectItem value="yonsei">연세대학교</SelectItem>
+                          <SelectItem value="other">기타</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

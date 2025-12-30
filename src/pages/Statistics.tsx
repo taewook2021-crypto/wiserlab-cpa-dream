@@ -74,15 +74,15 @@ const Statistics = () => {
   // 실제 데이터 상태
   const [myExamNumber, setMyExamNumber] = useState<string | null>(null);
   const [myRank, setMyRank] = useState<number | null>(null);
-  const [totalParticipants, setTotalParticipants] = useState<number>(0);
+  const [snuYsuParticipants, setSnuYsuParticipants] = useState<number>(0);
   const [billboard, setBillboard] = useState<BillboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   // 실제 점수
   const userScore = scoreFromUrl ? parseInt(scoreFromUrl, 10) : null;
   const userZone = userScore !== null ? getZoneInfo(userScore) : null;
-  const percentile = myRank !== null && totalParticipants > 0 
-    ? Math.round((myRank / totalParticipants) * 100) 
+  const percentile = myRank !== null && snuYsuParticipants > 0 
+    ? Math.round((myRank / snuYsuParticipants) * 100) 
     : null;
 
   // exam 파라미터에서 회차 추출 (예: "summit-1" -> 1)
@@ -112,32 +112,57 @@ const Statistics = () => {
         }
       }
 
-      // 2. 해당 과목/회차의 모든 채점 결과 조회 (익명 제외, 점수순 정렬)
+      // 2. 서울대/연세대 수험번호(WLP-S, WLP-Y)를 가진 사용자의 채점 결과만 조회
+      // 먼저 exam_numbers에서 서울대/연세대 코드를 조회
+      const { data: snuYsuExamNumbers } = await supabase
+        .from("exam_numbers")
+        .select("id, exam_number, user_id")
+        .or("exam_number.like.WLP-S%,exam_number.like.WLP-Y%")
+        .not("user_id", "is", null);
+
+      const snuYsuUserIds = (snuYsuExamNumbers || []).map(en => en.user_id).filter(Boolean);
+
+      if (snuYsuUserIds.length === 0) {
+        setSnuYsuParticipants(0);
+        setMyRank(null);
+        setBillboard([]);
+        setLoading(false);
+        return;
+      }
+
+      // 3. 해당 과목/회차의 서울대/연세대 채점 결과만 조회
       const { data: allResults } = await supabase
         .from("scoring_results")
         .select("user_id, correct_count")
         .eq("subject", subjectDbValue)
         .eq("exam_round", examRound)
-        .neq("user_id", "00000000-0000-0000-0000-000000000000")
+        .in("user_id", snuYsuUserIds)
         .order("correct_count", { ascending: false });
 
       if (allResults && allResults.length > 0) {
-        setTotalParticipants(allResults.length);
+        setSnuYsuParticipants(allResults.length);
 
-        // 내 등수 찾기
+        // 내 등수 찾기 (서울대/연세대 기준)
         if (user && userScore !== null) {
           const myIndex = allResults.findIndex(r => r.user_id === user.id);
           if (myIndex !== -1) {
             setMyRank(myIndex + 1);
           } else {
-            // 내 결과가 없으면 점수 기준으로 예상 등수 계산
-            const higherCount = allResults.filter(r => r.correct_count > userScore).length;
-            setMyRank(higherCount + 1);
+            // 내가 서울대/연세대가 아니면 등수 표시 안 함
+            // 또는 점수 기준으로 예상 등수 계산 (서울대/연세대 응시자 내에서)
+            const isSnuYsu = snuYsuUserIds.includes(user.id);
+            if (isSnuYsu) {
+              const higherCount = allResults.filter(r => r.correct_count > userScore).length;
+              setMyRank(higherCount + 1);
+            } else {
+              setMyRank(null);
+            }
           }
         }
 
-        // 3. 빌보드 데이터 생성 (상위 15명 또는 안정권 진입자)
-        const topResults = allResults.slice(0, 15);
+        // 4. 빌보드 데이터 생성 (안정권 진입자만 - 28점 이상)
+        const safeZoneResults = allResults.filter(r => r.correct_count >= SAFE_ZONE_CUTOFF);
+        const topResults = safeZoneResults.slice(0, 15);
         const userIds = topResults.map(r => r.user_id);
 
         // profiles에서 exam_number 조회
@@ -155,7 +180,7 @@ const Statistics = () => {
 
         setBillboard(billboardData);
       } else {
-        setTotalParticipants(0);
+        setSnuYsuParticipants(0);
         setMyRank(null);
         setBillboard([]);
       }
@@ -241,9 +266,7 @@ const Statistics = () => {
               <div className="text-center mb-12">
                 <h1 className="text-3xl font-light mb-2">나의 통계</h1>
                 <p className="text-muted-foreground text-sm">
-                  {totalParticipants > 0 
-                    ? `전체 응시자 ${totalParticipants}명 기준`
-                    : "채점 결과를 불러오는 중..."}
+                  서울대 · 연세대 응시자 기준
                 </p>
               </div>
 
@@ -301,10 +324,14 @@ const Statistics = () => {
                         {userZone.zone}
                       </span>
                     </div>
-                    {/* 실제 등수 표시 */}
-                    {totalParticipants > 0 && myRank !== null ? (
+                    {/* 실제 등수 표시 - 서울대/연세대 기준 */}
+                    {snuYsuParticipants > 0 && myRank !== null ? (
                       <p className="text-sm text-muted-foreground">
-                        {totalParticipants}명 중 <span className="font-medium text-foreground">{myRank}등</span> · 상위 {percentile}%
+                        서울대·연세대 {snuYsuParticipants}명 중 <span className="font-medium text-foreground">{myRank}등</span> · 상위 {percentile}%
+                      </p>
+                    ) : myRank === null && snuYsuParticipants > 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        서울대·연세대 응시자 {snuYsuParticipants}명
                       </p>
                     ) : (
                       <p className="text-sm text-muted-foreground animate-pulse">
@@ -356,15 +383,15 @@ const Statistics = () => {
                 </div>
               </Link>
 
-              {/* 빌보드 차트 - 안정권 진입자 */}
+              {/* 빌보드 차트 - 안정권 진입자만 */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h2 className="text-xl font-light">전국 빌보드</h2>
-                    <p className="text-sm text-muted-foreground">상위 응시자 랭킹</p>
+                    <p className="text-sm text-muted-foreground">안정권 진입자 ({SAFE_ZONE_CUTOFF}점 이상)</p>
                   </div>
                   <span className="text-xs text-muted-foreground border border-border px-3 py-1">
-                    TOP {billboard.length}
+                    {billboard.length}명
                   </span>
                 </div>
 

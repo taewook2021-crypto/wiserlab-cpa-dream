@@ -245,36 +245,35 @@ const Summit = () => {
         </section>
 
         {/* Product Detail Sections */}
-        {PRODUCT_SECTIONS.map((section, sectionIndex) => (
+        {PRODUCT_SECTIONS.map((section) => (
           <section 
             key={section.subject}
-            className={`py-16 sm:py-20 md:py-28 border-b border-border ${sectionIndex % 2 === 1 ? 'bg-muted/30' : ''}`}
+            className="py-20 sm:py-28 md:py-36 bg-muted/20"
           >
-            <div className="container mx-auto px-6">
-              <div className={`grid sm:grid-cols-2 gap-8 md:gap-16 items-start ${sectionIndex % 2 === 1 ? 'sm:grid-flow-dense' : ''}`}>
-                {/* Image Placeholder */}
-                <div className={`flex justify-center ${sectionIndex % 2 === 1 ? 'sm:col-start-2' : ''}`}>
-                  <div className="bg-muted w-full max-w-[500px] aspect-[4/3] rounded-lg flex items-center justify-center text-muted-foreground border border-border sticky top-24">
-                    <span className="text-sm">이미지 추가 예정</span>
-                  </div>
-                </div>
-                
-                {/* Text Content */}
-                <div className={`space-y-8 md:space-y-10 ${sectionIndex % 2 === 1 ? 'sm:col-start-1 sm:row-start-1' : ''}`}>
-                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold">
+            <div className="container mx-auto px-6 md:px-12 lg:px-20">
+              <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
+                {/* Left: Text Content */}
+                <div className="space-y-6 md:space-y-8 max-w-xl">
+                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight">
                     {section.subject}
                   </h2>
                   
-                  
-                  <div className="space-y-8 md:space-y-10">
+                  <div className="space-y-6 md:space-y-8">
                     {section.paragraphs.map((paragraph, index) => (
                       <p 
                         key={index}
-                        className="text-sm md:text-base text-muted-foreground leading-relaxed whitespace-pre-line"
+                        className="text-sm md:text-base text-muted-foreground leading-[1.8] whitespace-pre-line"
                       >
                         {paragraph}
                       </p>
                     ))}
+                  </div>
+                </div>
+
+                {/* Right: Image */}
+                <div className="flex justify-center lg:justify-end">
+                  <div className="bg-muted/50 w-full max-w-[600px] aspect-[4/3] rounded-sm flex items-center justify-center text-muted-foreground">
+                    <span className="text-sm">이미지 추가 예정</span>
                   </div>
                 </div>
               </div>

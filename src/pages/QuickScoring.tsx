@@ -137,11 +137,16 @@ const QuickScoring = () => {
     checkAccess();
   }, [user, accessMode]);
 
-  // 수험번호 검증
+  // 수험번호 검증 및 계정 연결
   const verifyExamNumber = async () => {
     const trimmed = examNumberInput.trim().toUpperCase();
     if (!trimmed) {
       setExamNumberError("수험번호를 입력해주세요");
+      return;
+    }
+
+    if (!user) {
+      setExamNumberError("로그인이 필요합니다");
       return;
     }
 
@@ -150,19 +155,41 @@ const QuickScoring = () => {
 
     const { data, error } = await supabase
       .from("exam_numbers")
-      .select("id, exam_number, is_used")
+      .select("id, exam_number, is_used, user_id")
       .eq("exam_number", trimmed)
       .maybeSingle();
 
     if (error || !data) {
       setExamNumberError("유효하지 않은 수험번호입니다");
       setExamNumberRecord(null);
-    } else if (data.is_used) {
-      setExamNumberError("이미 사용된 수험번호입니다. 재채점이 불가능합니다.");
+    } else if (data.is_used && data.user_id !== user.id) {
+      setExamNumberError("이미 다른 계정에서 사용된 수험번호입니다.");
       setExamNumberRecord(null);
-    } else {
+    } else if (data.user_id === user.id) {
+      // 이미 내 계정에 연결된 코드
       setExamNumberRecord(data);
+      setHasPurchaseHistory(true); // 코드 연결 = 접근 권한
       toast.success("수험번호가 확인되었습니다");
+    } else {
+      // 미사용 코드 - 내 계정에 영구 연결
+      const { error: updateError } = await supabase
+        .from("exam_numbers")
+        .update({ 
+          is_used: true, 
+          used_at: new Date().toISOString(),
+          user_id: user.id 
+        })
+        .eq("id", data.id);
+
+      if (updateError) {
+        console.error("Error linking exam number:", updateError);
+        setExamNumberError("수험번호 연결에 실패했습니다. 다시 시도해주세요.");
+        setExamNumberRecord(null);
+      } else {
+        setExamNumberRecord({ ...data, is_used: true, user_id: user.id });
+        setHasPurchaseHistory(true); // 코드 연결 = 접근 권한
+        toast.success("수험번호가 계정에 연결되었습니다");
+      }
     }
 
     setVerifyingExamNumber(false);
@@ -446,8 +473,19 @@ const QuickScoring = () => {
                 </RadioGroup>
               </div>
 
-              {/* 수험번호 입력 (수험번호 모드) */}
-              {accessMode === "exam-number" && (
+              {/* 수험번호 입력 (수험번호 모드) - 로그인 필수 */}
+              {accessMode === "exam-number" && !user && (
+                <div className="bg-muted border border-border rounded-lg p-6 mb-8 text-center">
+                  <p className="text-muted-foreground mb-4">
+                    수험번호 인증을 위해 로그인이 필요합니다
+                  </p>
+                  <Button onClick={() => navigate("/auth?redirect=/quick-scoring")} className="h-12 px-8">
+                    로그인하기
+                  </Button>
+                </div>
+              )}
+
+              {accessMode === "exam-number" && user && (
                 <div className="bg-muted/30 border border-border rounded-lg p-6 mb-8">
                   <Label className="mb-2 block">수험번호 입력</Label>
                   <div className="flex gap-3">
@@ -474,10 +512,10 @@ const QuickScoring = () => {
                     <p className="text-destructive text-sm mt-2">{examNumberError}</p>
                   )}
                   {examNumberRecord && (
-                    <p className="text-primary text-sm mt-2">✓ 수험번호가 확인되었습니다</p>
+                    <p className="text-primary text-sm mt-2">✓ 수험번호가 계정에 연결되었습니다</p>
                   )}
                   <p className="text-xs text-muted-foreground mt-3">
-                    * 수험번호는 1회만 사용 가능하며, 재채점이 불가능합니다.
+                    * 수험번호는 계정에 영구 연결됩니다. 이후 로그인만으로 서비스를 이용할 수 있습니다.
                   </p>
                 </div>
               )}

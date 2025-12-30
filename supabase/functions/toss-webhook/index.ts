@@ -74,14 +74,7 @@ serve(async (req) => {
       );
     }
 
-    // 수험번호 생성
-    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-    let examNumber = 'WLS-';
-    for (let i = 0; i < 4; i++) {
-      examNumber += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    // 주문 저장
+    // 주문 저장 (exam_number 없이)
     const { error: orderError } = await supabase.from('orders').insert({
       user_id: pendingOrder.user_id,
       order_id: orderId,
@@ -96,7 +89,6 @@ serve(async (req) => {
       shipping_detail_address: pendingOrder.shipping_detail_address,
       shipping_postal_code: pendingOrder.shipping_postal_code,
       paid_at: new Date().toISOString(),
-      exam_number: examNumber,
     });
 
     if (orderError) {
@@ -107,13 +99,13 @@ serve(async (req) => {
       );
     }
 
-    console.log('Order saved successfully from webhook:', orderId, 'examNumber:', examNumber);
+    console.log('Order saved successfully from webhook:', orderId);
 
     // pending_order 삭제
     await supabase.from('pending_orders').delete().eq('order_id', orderId);
 
     return new Response(
-      JSON.stringify({ success: true, orderId, examNumber }),
+      JSON.stringify({ success: true, orderId }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

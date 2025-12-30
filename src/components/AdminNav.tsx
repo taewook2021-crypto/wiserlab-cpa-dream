@@ -1,10 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Hash, FileText, ShoppingCart } from "lucide-react";
+import { BarChart3, Hash, FileText, ShoppingCart, Ticket } from "lucide-react";
 
 const adminRoutes = [
   { path: "/statistics-admin", label: "채점 통계", icon: BarChart3 },
   { path: "/exam-numbers-admin", label: "수험번호", icon: Hash },
+  { path: "/free-codes-admin", label: "무료 코드", icon: Ticket },
   { path: "/noticeadmin", label: "공지사항", icon: FileText },
   { path: "/orderadmin", label: "주문 관리", icon: ShoppingCart },
 ];
@@ -17,7 +18,7 @@ const AdminNav = () => {
   return (
     <div className="mb-8">
       <Tabs value={currentPath} onValueChange={(value) => navigate(value)}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           {adminRoutes.map((route) => (
             <TabsTrigger 
               key={route.path} 

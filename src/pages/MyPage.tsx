@@ -56,7 +56,6 @@ interface Order {
   amount: number;
   status: string;
   created_at: string;
-  exam_number: string | null;
   payment_key: string | null;
 }
 
@@ -227,7 +226,7 @@ const MyPage = () => {
 
       const { data, error } = await supabase
         .from("orders")
-        .select("id, order_id, product_name, amount, status, created_at, exam_number, payment_key")
+        .select("id, order_id, product_name, amount, status, created_at, payment_key")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 

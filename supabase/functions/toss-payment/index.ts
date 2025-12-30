@@ -67,7 +67,7 @@ serve(async (req) => {
       // 이미 저장된 주문인지 확인
       const { data: existingOrder } = await supabase
         .from('orders')
-        .select('id, exam_number')
+        .select('id')
         .eq('order_id', data.orderId)
         .maybeSingle();
 
@@ -80,7 +80,6 @@ serve(async (req) => {
             method: data.method,
             totalAmount: data.totalAmount,
             status: data.status,
-            examNumber: existingOrder.exam_number,
             orderSaved: true,
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -99,14 +98,7 @@ serve(async (req) => {
       }
 
       if (pendingOrder) {
-        // 수험번호 생성
-        const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-        let examNumber = 'WLS-';
-        for (let i = 0; i < 4; i++) {
-          examNumber += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-
-        // 주문 저장
+        // 주문 저장 (exam_number 없이)
         const { error: orderError } = await supabase.from('orders').insert({
           user_id: pendingOrder.user_id,
           order_id: data.orderId,
@@ -121,13 +113,12 @@ serve(async (req) => {
           shipping_detail_address: pendingOrder.shipping_detail_address,
           shipping_postal_code: pendingOrder.shipping_postal_code,
           paid_at: new Date().toISOString(),
-          exam_number: examNumber,
         });
 
         if (orderError) {
           console.error('Failed to save order:', orderError);
         } else {
-          console.log('Order saved successfully from toss-payment:', data.orderId, 'examNumber:', examNumber);
+          console.log('Order saved successfully from toss-payment:', data.orderId);
           
           // pending_order 삭제
           await supabase.from('pending_orders').delete().eq('order_id', orderId);
@@ -139,7 +130,6 @@ serve(async (req) => {
               method: data.method,
               totalAmount: data.totalAmount,
               status: data.status,
-              examNumber: examNumber,
               orderSaved: true,
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

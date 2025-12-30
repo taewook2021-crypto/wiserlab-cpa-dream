@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle, Loader2, Copy, Check } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,9 @@ const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [isConfirming, setIsConfirming] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [orderInfo, setOrderInfo] = useState<{
     orderId: string;
     totalAmount: number;
-    examNumber: string;
   } | null>(null);
   
   // 중복 실행 방지를 위한 ref
@@ -58,29 +56,10 @@ const PaymentSuccess = () => {
         }
 
         if (data.success) {
-          let examNumber = data.examNumber || '';
-
-          // 서버에서 주문이 저장되지 않은 경우, DB에서 조회 시도
-          if (!data.orderSaved || !examNumber) {
-            // 잠시 대기 후 주문 조회 (서버 처리 시간 확보)
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const { data: savedOrder } = await supabase
-              .from('orders')
-              .select('exam_number')
-              .eq('order_id', data.orderId)
-              .maybeSingle();
-
-            if (savedOrder?.exam_number) {
-              examNumber = savedOrder.exam_number;
-            }
-          }
-
           setIsSuccess(true);
           setOrderInfo({
             orderId: data.orderId,
             totalAmount: data.totalAmount,
-            examNumber: examNumber,
           });
 
           // 로컬스토리지의 주문 정보 삭제 (이전 버전 호환)
@@ -145,25 +124,6 @@ const PaymentSuccess = () => {
                 <span className="text-muted-foreground">결제금액</span>
                 <span className="font-medium">{formatPrice(orderInfo.totalAmount)}원</span>
               </div>
-              {orderInfo.examNumber && (
-                <div className="flex justify-between items-center pt-3 border-t border-border">
-                  <span className="text-muted-foreground">수험번호</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-primary">{orderInfo.examNumber}</span>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(orderInfo.examNumber);
-                        setCopied(true);
-                        toast.success("수험번호가 복사되었습니다");
-                        setTimeout(() => setCopied(false), 2000);
-                      }}
-                      className="p-1 hover:bg-muted rounded"
-                    >
-                      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 

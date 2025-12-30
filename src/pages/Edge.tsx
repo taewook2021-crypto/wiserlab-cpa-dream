@@ -16,8 +16,11 @@ import {
   Download, 
   X, 
   ChevronLeft, 
-  ChevronRight
+  ChevronRight,
+  Lock
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useServiceAccess } from "@/hooks/useServiceAccess";
 
 const subjects: Record<string, string> = {
   financial: "재무회계",
@@ -68,6 +71,8 @@ const Edge = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const { hasAccess, isLoading: accessLoading } = useServiceAccess();
   
   // 상태
   const [selectedQuestions, setSelectedQuestions] = useState<number[]>([1, 2, 3]);
@@ -147,6 +152,67 @@ const Edge = () => {
   const selectedPastQuestions = initialPastQuestions.filter((q) =>
     selectedQuestions.includes(q.id)
   );
+
+  // 접근 권한 체크
+  if (accessLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-16">
+          <div className="container mx-auto px-6 py-20 text-center">
+            <p className="text-muted-foreground animate-pulse">접근 권한 확인 중...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-16">
+          <section className="py-20 md:py-28">
+            <div className="container mx-auto px-6">
+              <div className="max-w-md mx-auto text-center">
+                <Lock className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
+                <h1 className="text-2xl font-light mb-4">접근 권한이 필요합니다</h1>
+                <p className="text-muted-foreground mb-8">
+                  Edge 서비스는 상품 구입자 또는 무료 배포본 수험번호 인증자만 이용할 수 있습니다.
+                </p>
+                <div className="space-y-3">
+                  {!user && (
+                    <Button 
+                      onClick={() => navigate("/auth?redirect=/edge")} 
+                      className="w-full"
+                    >
+                      로그인하기
+                    </Button>
+                  )}
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate("/quick-scoring")}
+                    className="w-full"
+                  >
+                    빠른 채점에서 코드 인증하기
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate("/summit")}
+                    className="w-full"
+                  >
+                    상품 구매하기
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

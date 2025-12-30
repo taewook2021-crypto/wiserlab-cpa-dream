@@ -79,6 +79,7 @@ export type Database = {
           id: string
           is_used: boolean
           used_at: string | null
+          user_id: string | null
         }
         Insert: {
           batch_name: string
@@ -87,6 +88,7 @@ export type Database = {
           id?: string
           is_used?: boolean
           used_at?: string | null
+          user_id?: string | null
         }
         Update: {
           batch_name?: string
@@ -95,6 +97,7 @@ export type Database = {
           id?: string
           is_used?: boolean
           used_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -138,7 +141,6 @@ export type Database = {
           buyer_name: string
           buyer_phone: string
           created_at: string
-          exam_number: string | null
           id: string
           order_id: string
           paid_at: string | null
@@ -159,7 +161,6 @@ export type Database = {
           buyer_name: string
           buyer_phone: string
           created_at?: string
-          exam_number?: string | null
           id?: string
           order_id: string
           paid_at?: string | null
@@ -180,7 +181,6 @@ export type Database = {
           buyer_name?: string
           buyer_phone?: string
           created_at?: string
-          exam_number?: string | null
           id?: string
           order_id?: string
           paid_at?: string | null

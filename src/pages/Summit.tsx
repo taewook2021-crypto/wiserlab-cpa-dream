@@ -39,27 +39,6 @@ const FEATURES = [
   },
 ] as const;
 
-const INSTRUCTORS = {
-  financial: {
-    subject: "재무회계",
-    name: "김용재",
-    title: "스마트 경영 아카데미 재무회계 강사",
-    teamDescription: "서울대학교 출신 공인회계사 7명 출제팀",
-    credentials: [
-      { main: "2024년 2차 재무회계 133점", sub: "(서울대학교 경제학부 출신 공인회계사)" },
-      { main: "2025년 2차 고급회계 42점", sub: "(서울대학교 경영학과 출신 공인회계사)" },
-    ],
-  },
-  tax: {
-    subject: "세법",
-    name: "오정화",
-    title: "바른생각 세법 강사",
-    teamDescription: "서울대학교 출신 공인회계사 5명 출제팀",
-    credentials: [
-      { main: "전원 2025년 세법 2차 75점 이상", sub: "" },
-    ],
-  },
-} as const;
 
 const formatPrice = (price: number) => price.toLocaleString("ko-KR");
 
@@ -244,45 +223,6 @@ const Summit = () => {
           </div>
         </section>
 
-        {/* 출제진 소개 Section */}
-        <section className="py-12 sm:py-16 md:py-32 border-b border-border">
-          <div className="container mx-auto px-6">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-xl sm:text-xl md:text-3xl font-light text-center mb-8 sm:mb-12 md:mb-20">
-                출제진 소개
-              </h2>
-
-              <div className="grid sm:grid-cols-2 gap-8 sm:gap-12 md:gap-24">
-                {Object.values(INSTRUCTORS).map((instructor) => (
-                  <div key={instructor.subject} className="space-y-4 sm:space-y-6 md:space-y-10">
-                    <h3 className="text-sm sm:text-base md:text-xl font-medium border-b border-border pb-3 sm:pb-4 md:pb-6">
-                      {instructor.subject}
-                    </h3>
-                    <div className="space-y-1 sm:space-y-2 md:space-y-3">
-                      <p className="text-sm sm:text-base md:text-lg font-medium">{instructor.name}</p>
-                      <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">
-                        {instructor.title}
-                      </p>
-                    </div>
-                    <div className="space-y-2 sm:space-y-3 md:space-y-4 text-[10px] sm:text-xs md:text-sm text-muted-foreground leading-relaxed">
-                      <p className="font-medium text-foreground">
-                        {instructor.teamDescription}
-                      </p>
-                      {instructor.credentials.map((cred, index) => (
-                        <div key={index} className="space-y-1 pl-3 sm:pl-4 border-l-2 border-border">
-                          <p>{cred.main}</p>
-                          {cred.sub && (
-                            <p className="text-[9px] sm:text-[10px] md:text-xs">{cred.sub}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <Footer />

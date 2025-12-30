@@ -90,7 +90,7 @@ const FreeCodesAdmin = () => {
 
   // CSV 다운로드
   const handleDownloadCSV = () => {
-    const headers = ['코드', '배치명', '사용여부', '사용자 ID', '사용일시', '생성일시'];
+    const headers = ['코드', '배치명', '사용여부', '카카오톡 ID', '사용일시', '생성일시'];
     const rows = filteredCodes.map(code => [
       code.exam_number,
       code.batch_name,
@@ -171,7 +171,7 @@ const FreeCodesAdmin = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="코드, 배치명, 사용자 ID로 검색..."
+              placeholder="코드, 배치명, 카카오톡 ID로 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -202,7 +202,7 @@ const FreeCodesAdmin = () => {
                     <TableHead>코드</TableHead>
                     <TableHead>배치명</TableHead>
                     <TableHead>상태</TableHead>
-                    <TableHead>사용자 ID</TableHead>
+                    <TableHead>카카오톡 ID</TableHead>
                     <TableHead>사용일시</TableHead>
                     <TableHead>생성일시</TableHead>
                   </TableRow>

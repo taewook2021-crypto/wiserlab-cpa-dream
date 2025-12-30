@@ -42,45 +42,21 @@ const FEATURES = [
 const PRODUCT_SECTIONS = [
   {
     subject: "SUMMIT 재무회계",
-    features: [
-      {
-        title: "낯선 어려움이 아닌, 기출의 어려움",
-        description: "최근 기출과 유사한 난이도로 구성했습니다. 단순히 어렵게 만든 문제가 아니라, 기출에서 고난이도를 만드는 요소를 분해하고 그대로 반영했습니다. 그래서 '낯선 어려움'이 아니라 익숙한 시험 난이도로 실력을 드러냅니다.",
-      },
-      {
-        title: "시험지+OMR까지, 실전 그대로",
-        description: "실제 시험지 구성 + OMR 마킹까지 포함한 실전 연습으로 3교시 재무회계에서 흔들리지 않는 속도·정확도 루틴을 완성합니다. 계산 자체보다 더 중요한 풀이 순서·버릴 문제·끝까지 가져갈 문제가 정리됩니다.",
-      },
-      {
-        title: "오답이 곧 단권화로",
-        description: "틀린 문항은 끝나지 않습니다. 유사 기출을 시험지 형태로 재구성해 PDF로 바로 인출할 수 있어 파이널 기간의 공회전을 끊고 단권화로 밀어붙일 수 있습니다.",
-      },
-      {
-        title: "내 점수의 '의미'가 보인다",
-        description: "그리고, 위치가 보입니다. 안정권 / 경합권 / 레드라인. 감상이 아니라 내 점수의 의미가 숫자로 보이면, 파이널 기간의 공부 방향이 보입니다.",
-      },
-      {
-        title: "정답이 아니라 사고 흐름",
-        description: "마지막으로, 해설은 단순한 정답 풀이가 아닙니다. 문항별로 실전에서 점수를 남기는 초고득점자들의 사고 흐름을 남겨, 다음 시험에서 같은 유형을 만나도 같은 방식으로 맞히게 만듭니다.",
-      },
+    paragraphs: [
+      "SUMMIT 재무회계는\n최근 기출과 유사한 난이도로 구성했습니다.\n단순히 어렵게 만든 문제가 아니라,\n기출에서 고난이도를 만드는 요소를 분해하고 그대로 반영했습니다.\n그래서 '낯선 어려움'이 아니라 익숙한 시험 난이도로 실력을 드러냅니다.",
+      "실제 시험지 구성 + OMR 마킹까지 포함한 실전 연습으로\n3교시 재무회계에서 흔들리지 않는 속도·정확도 루틴을 완성합니다.\n계산 자체보다 더 중요한 풀이 순서·버릴 문제·끝까지 가져갈 문제가 정리됩니다.",
+      "틀린 문항은 끝나지 않습니다.\n유사 기출을 시험지 형태로 재구성해 PDF로 바로 인출할 수 있어\n파이널 기간의 공회전을 끊고 단권화로 밀어붙일 수 있습니다.",
+      "그리고, 위치가 보입니다.\n안정권 / 경합권 / 레드라인.\n감상이 아니라 내 점수의 의미가 숫자로 보이면,\n파이널 기간의 공부 방향이 보입니다.",
+      "마지막으로, 해설은 단순한 정답 풀이가 아닙니다.\n문항별로 실전에서 점수를 남기는 초고득점자들의 사고 흐름을 남겨,\n다음 시험에서 같은 유형을 만나도 같은 방식으로 맞히게 만듭니다.",
     ],
   },
   {
     subject: "SUMMIT 세법",
-    intro: "최근 세법은 어렵고, 과락은 늘었고, 그런데 시장엔 내 현재 위치를 정확히 보여주는 콘텐츠가 부족합니다. SUMMIT 세법은 \"많이 푸는 자료\"가 아니라, 방향을 잡는 시험지입니다.",
-    features: [
-      {
-        title: "2026 개정세법",
-        description: "전 문항을 2026년 기준 개정세법으로 구성했습니다. 남은 기간에도 시행령·개정안 등 변동 요소를 반영해 유료 구입자에게 업데이트를 지속 제공합니다.",
-      },
-      {
-        title: "전략이 결과로 정해진다",
-        description: "2회분을 풀면, 전략이 선명해집니다. 남은 기간 말문제를 더 할지 / 계산문제를 더 할지, 그리고 어떤 단원에서 점수를 방어해야 하는지 '감'이 아니라 결과로 결정할 수 있습니다.",
-      },
-      {
-        title: "내 점수의 '의미'가 보인다",
-        description: "그리고, 위치가 보입니다. 안정권 / 경합권 / 레드라인. 전국모고만으로는 알 수 없는 \"내 점수의 의미\"를 해석합니다.",
-      },
+    paragraphs: [
+      "최근 세법은 어렵고, 과락은 늘었고,\n그런데 시장엔 내 현재 위치를 정확히 보여주는 콘텐츠가 부족합니다.\nSUMMIT 세법은 \"많이 푸는 자료\"가 아니라, 방향을 잡는 시험지입니다.",
+      "전 문항을 2026년 기준 개정세법으로 구성했습니다.\n남은 기간에도 시행령·개정안 등 변동 요소를 반영해\n유료 구입자에게 업데이트를 지속 제공합니다.",
+      "2회분을 풀면, 전략이 선명해집니다.\n남은 기간 말문제를 더 할지 / 계산문제를 더 할지,\n그리고 어떤 단원에서 점수를 방어해야 하는지\n'감'이 아니라 결과로 결정할 수 있습니다.",
+      "그리고, 위치가 보입니다.\n안정권 / 경합권 / 레드라인.\n전국모고만으로는 알 수 없는 \"내 점수의 의미\"를 해석합니다.",
     ],
   },
 ];
@@ -289,25 +265,15 @@ const Summit = () => {
                     {section.subject}
                   </h2>
                   
-                  {section.intro && (
-                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed border-l-2 border-primary pl-4">
-                      {section.intro}
-                    </p>
-                  )}
                   
-                  <div className="space-y-6 md:space-y-8">
-                    {section.features.map((feature, index) => (
-                      <div 
+                  <div className="space-y-8 md:space-y-10">
+                    {section.paragraphs.map((paragraph, index) => (
+                      <p 
                         key={index}
-                        className={index < section.features.length - 1 ? "pb-6 md:pb-8 border-b border-border" : ""}
+                        className="text-sm md:text-base text-muted-foreground leading-relaxed whitespace-pre-line"
                       >
-                        <h3 className="text-sm md:text-base lg:text-lg font-semibold mb-3 md:mb-4">
-                          [{feature.title}]
-                        </h3>
-                        <p className="text-xs md:text-sm lg:text-base text-muted-foreground leading-relaxed">
-                          {feature.description}
-                        </p>
-                      </div>
+                        {paragraph}
+                      </p>
                     ))}
                   </div>
                 </div>

@@ -41,6 +41,7 @@ interface ExamNumberRecord {
   id: string;
   exam_number: string;
   is_used: boolean;
+  user_id?: string | null;
 }
 
 const subjects = [

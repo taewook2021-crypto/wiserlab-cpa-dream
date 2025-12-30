@@ -87,7 +87,7 @@ const StatisticsAdmin = () => {
   const [scoringResults, setScoringResults] = useState<ScoringWithExamNumber[]>([]);
   const [examNumbers, setExamNumbers] = useState<ExamNumber[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState("all");
+  const [selectedTab, setSelectedTab] = useState("snu");
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [selectedRound, setSelectedRound] = useState("all");
   const [scoringAnswers, setScoringAnswers] = useState<ScoringAnswer[]>([]);
@@ -178,8 +178,9 @@ const StatisticsAdmin = () => {
     // 대학별 필터
     if (selectedTab === "snu") results = results.filter(r => r.university === "서울대");
     else if (selectedTab === "ysu") results = results.filter(r => r.university === "연세대");
+    else if (selectedTab === "snu-ysu") results = results.filter(r => r.university === "서울대" || r.university === "연세대");
     else if (selectedTab === "paid") results = results.filter(r => r.university === "유료");
-    else if (selectedTab === "free") results = results.filter(r => r.university === "무료" || r.university === "기타");
+    else if (selectedTab === "etc") results = results.filter(r => r.university === "무료" || r.university === "기타");
     
     // 과목별 필터
     if (selectedSubject !== "all") {
@@ -233,14 +234,18 @@ const StatisticsAdmin = () => {
     const groups: Record<string, number[]> = {
       "서울대": [],
       "연세대": [],
+      "서울대+연세대": [],
       "유료": [],
-      "무료": [],
       "기타": [],
     };
     scoringResults.forEach((r) => {
       const univ = r.university || "기타";
       if (groups[univ]) {
         groups[univ].push(r.correct_count);
+      }
+      // 서울대+연세대 합산 통계에도 추가
+      if (univ === "서울대" || univ === "연세대") {
+        groups["서울대+연세대"].push(r.correct_count);
       }
     });
     return Object.entries(groups).map(([name, scores]) => ({
@@ -322,6 +327,18 @@ const StatisticsAdmin = () => {
       .sort((a, b) => a.question - b.question);
   }, [filteredResults, scoringAnswers]);
 
+  // 탭 라벨 매핑
+  const getTabLabel = (tab: string) => {
+    const labels: Record<string, string> = {
+      "snu": "서울대",
+      "ysu": "연세대",
+      "snu-ysu": "서울대연세대합산",
+      "paid": "유료",
+      "etc": "기타",
+    };
+    return labels[tab] || tab;
+  };
+
   // CSV 다운로드
   const handleDownloadCSV = () => {
     const headers = ["수험번호", "대학구분", "과목", "정답수", "총문항", "정답률", "응시일"];
@@ -343,7 +360,7 @@ const StatisticsAdmin = () => {
     const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `채점통계_${selectedTab}_${new Date().toISOString().split("T")[0]}.csv`;
+    link.download = `채점통계_${getTabLabel(selectedTab)}_${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
   };
 
@@ -457,11 +474,11 @@ const StatisticsAdmin = () => {
         {/* 탭 필터 */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="mb-8">
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="all">전체</TabsTrigger>
             <TabsTrigger value="snu">서울대</TabsTrigger>
             <TabsTrigger value="ysu">연세대</TabsTrigger>
+            <TabsTrigger value="snu-ysu">서울대+연세대</TabsTrigger>
             <TabsTrigger value="paid">유료</TabsTrigger>
-            <TabsTrigger value="free">무료/기타</TabsTrigger>
+            <TabsTrigger value="etc">기타</TabsTrigger>
           </TabsList>
 
           <TabsContent value={selectedTab} className="mt-6">

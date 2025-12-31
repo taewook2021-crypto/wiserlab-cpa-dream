@@ -292,7 +292,7 @@ const StatisticsAdmin = () => {
       .sort((a, b) => a.round - b.round);
   }, [filteredResults]);
 
-  // 문항별 정답률 계산
+  // 문항별 정답률 및 선지별 선택률 계산
   const questionStats = useMemo(() => {
     // 필터된 결과의 ID 목록
     const filteredResultIds = new Set(filteredResults.map(r => r.id));
@@ -305,15 +305,29 @@ const StatisticsAdmin = () => {
     if (relevantAnswers.length === 0) return [];
 
     // 문항번호별 통계 계산
-    const questionGroups: Record<number, { correct: number; total: number }> = {};
+    const questionGroups: Record<number, { 
+      correct: number; 
+      total: number; 
+      correctAnswer: number;
+      choiceDistribution: Record<number, number>;
+    }> = {};
     
     relevantAnswers.forEach((answer) => {
       if (!questionGroups[answer.question_number]) {
-        questionGroups[answer.question_number] = { correct: 0, total: 0 };
+        questionGroups[answer.question_number] = { 
+          correct: 0, 
+          total: 0, 
+          correctAnswer: answer.correct_answer,
+          choiceDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+        };
       }
       questionGroups[answer.question_number].total++;
       if (answer.is_correct) {
         questionGroups[answer.question_number].correct++;
+      }
+      // 선지별 선택 카운트
+      if (answer.user_answer >= 1 && answer.user_answer <= 5) {
+        questionGroups[answer.question_number].choiceDistribution[answer.user_answer]++;
       }
     });
 
@@ -323,6 +337,15 @@ const StatisticsAdmin = () => {
         correctRate: Math.round((stats.correct / stats.total) * 100),
         correct: stats.correct,
         total: stats.total,
+        correctAnswer: stats.correctAnswer,
+        choiceDistribution: stats.choiceDistribution,
+        choiceRates: {
+          1: Math.round((stats.choiceDistribution[1] / stats.total) * 100),
+          2: Math.round((stats.choiceDistribution[2] / stats.total) * 100),
+          3: Math.round((stats.choiceDistribution[3] / stats.total) * 100),
+          4: Math.round((stats.choiceDistribution[4] / stats.total) * 100),
+          5: Math.round((stats.choiceDistribution[5] / stats.total) * 100),
+        }
       }))
       .sort((a, b) => a.question - b.question);
   }, [filteredResults, scoringAnswers]);
@@ -766,19 +789,45 @@ const StatisticsAdmin = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="w-20">문항</TableHead>
-                          <TableHead className="text-right">정답자</TableHead>
-                          <TableHead className="text-right">응시자</TableHead>
-                          <TableHead className="text-right">정답률</TableHead>
-                          <TableHead>난이도</TableHead>
+                          <TableHead className="w-16">문항</TableHead>
+                          <TableHead className="w-16 text-center">정답</TableHead>
+                          <TableHead className="text-center">①</TableHead>
+                          <TableHead className="text-center">②</TableHead>
+                          <TableHead className="text-center">③</TableHead>
+                          <TableHead className="text-center">④</TableHead>
+                          <TableHead className="text-center">⑤</TableHead>
+                          <TableHead className="text-right w-20">정답률</TableHead>
+                          <TableHead className="w-20">난이도</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {questionStats.map((q) => (
                           <TableRow key={q.question}>
                             <TableCell className="font-medium">{q.question}번</TableCell>
-                            <TableCell className="text-right">{q.correct}명</TableCell>
-                            <TableCell className="text-right">{q.total}명</TableCell>
+                            <TableCell className="text-center font-bold text-primary">
+                              {q.correctAnswer}
+                            </TableCell>
+                            {[1, 2, 3, 4, 5].map((choice) => (
+                              <TableCell 
+                                key={choice} 
+                                className={`text-center ${
+                                  choice === q.correctAnswer 
+                                    ? "bg-primary/10 font-bold text-primary" 
+                                    : q.choiceRates[choice as keyof typeof q.choiceRates] >= 20 && choice !== q.correctAnswer
+                                    ? "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
+                                    : ""
+                                }`}
+                              >
+                                <div className="flex flex-col items-center">
+                                  <span className="text-sm font-medium">
+                                    {q.choiceRates[choice as keyof typeof q.choiceRates]}%
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    ({q.choiceDistribution[choice as keyof typeof q.choiceDistribution]}명)
+                                  </span>
+                                </div>
+                              </TableCell>
+                            ))}
                             <TableCell className="text-right font-medium">{q.correctRate}%</TableCell>
                             <TableCell>
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${

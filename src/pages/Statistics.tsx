@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useServiceAccess } from "@/hooks/useServiceAccess";
-import { Lock } from "lucide-react";
+import { Lock, Users, TrendingUp, Trophy, BarChart3 } from "lucide-react";
 
 // 상위 40% 컷라인 점수 (35문제 기준)
 const SAFE_ZONE_CUTOFF = 28; // 80점
@@ -26,6 +26,23 @@ interface BillboardEntry {
   examNumber: string;
   score: number;
   isMe: boolean;
+}
+
+interface OverallStats {
+  totalParticipants: number;
+  avgScore: number;
+  maxScore: number;
+  minScore: number;
+  safeZoneCount: number;
+  competitiveZoneCount: number;
+  redLineCount: number;
+}
+
+interface WeekOption {
+  value: string;
+  label: string;
+  startDate: Date;
+  endDate: Date;
 }
 
 const getZoneInfo = (score: number) => {
@@ -57,6 +74,52 @@ const getSubjectDbValue = (subject: string): string => {
   return subject;
 };
 
+// 주차 옵션 생성 (데이터 기반)
+const generateWeekOptions = (dates: Date[]): WeekOption[] => {
+  if (dates.length === 0) return [];
+  
+  const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());
+  const firstDate = sortedDates[0];
+  const lastDate = sortedDates[sortedDates.length - 1];
+  
+  // 첫 번째 날짜가 속한 주의 월요일 찾기
+  const getMonday = (d: Date) => {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    date.setDate(diff);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+  
+  const weeks: WeekOption[] = [];
+  let currentMonday = getMonday(firstDate);
+  let weekNum = 1;
+  
+  while (currentMonday <= lastDate) {
+    const weekEnd = new Date(currentMonday);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+    
+    // 해당 주에 데이터가 있는지 확인
+    const hasData = dates.some(d => d >= currentMonday && d <= weekEnd);
+    
+    if (hasData) {
+      weeks.push({
+        value: `week-${weekNum}`,
+        label: `${weekNum}주차`,
+        startDate: new Date(currentMonday),
+        endDate: new Date(weekEnd),
+      });
+    }
+    
+    currentMonday.setDate(currentMonday.getDate() + 7);
+    weekNum++;
+  }
+  
+  return weeks;
+};
+
 const Statistics = () => {
   const { user } = useAuth();
   const { hasAccess, isLoading: accessLoading } = useServiceAccess();
@@ -70,6 +133,7 @@ const Statistics = () => {
   
   const [selectedSubject, setSelectedSubject] = useState<string>(subjectFromUrl || "financial");
   const [selectedExam, setSelectedExam] = useState<string>(examFromUrl || "summit-1");
+  const [selectedWeek, setSelectedWeek] = useState<string>("all");
   
   // 실제 데이터 상태
   const [myExamNumber, setMyExamNumber] = useState<string | null>(null);
@@ -77,6 +141,18 @@ const Statistics = () => {
   const [snuYsuParticipants, setSnuYsuParticipants] = useState<number>(0);
   const [billboard, setBillboard] = useState<BillboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // 전체 통계 및 주차 옵션
+  const [overallStats, setOverallStats] = useState<OverallStats>({
+    totalParticipants: 0,
+    avgScore: 0,
+    maxScore: 0,
+    minScore: 0,
+    safeZoneCount: 0,
+    competitiveZoneCount: 0,
+    redLineCount: 0,
+  });
+  const [weekOptions, setWeekOptions] = useState<WeekOption[]>([]);
 
   // 실제 점수
   const userScore = scoreFromUrl ? parseInt(scoreFromUrl, 10) : null;
@@ -112,8 +188,64 @@ const Statistics = () => {
         }
       }
 
-      // 2. 서울대/연세대 수험번호(WLP-S, WLP-Y)를 가진 사용자의 채점 결과만 조회
-      // 먼저 exam_numbers에서 서울대/연세대 코드를 조회
+      // 2. 전체 응시자 데이터 조회 (모든 사용자)
+      const { data: allScoringResults } = await supabase
+        .from("scoring_results")
+        .select("user_id, correct_count, created_at")
+        .eq("subject", subjectDbValue)
+        .eq("exam_round", examRound)
+        .order("correct_count", { ascending: false });
+
+      // 주차 옵션 생성
+      if (allScoringResults && allScoringResults.length > 0) {
+        const dates = allScoringResults.map(r => new Date(r.created_at));
+        const weeks = generateWeekOptions(dates);
+        setWeekOptions(weeks);
+      } else {
+        setWeekOptions([]);
+      }
+
+      // 주단위 필터 적용
+      let filteredResults = allScoringResults || [];
+      if (selectedWeek !== "all" && weekOptions.length > 0) {
+        const selectedWeekOption = weekOptions.find(w => w.value === selectedWeek);
+        if (selectedWeekOption) {
+          filteredResults = filteredResults.filter(r => {
+            const resultDate = new Date(r.created_at);
+            return resultDate >= selectedWeekOption.startDate && resultDate <= selectedWeekOption.endDate;
+          });
+        }
+      }
+
+      // 전체 통계 계산
+      if (filteredResults.length > 0) {
+        const scores = filteredResults.map(r => r.correct_count);
+        const safeCount = scores.filter(s => s >= SAFE_ZONE_CUTOFF).length;
+        const competitiveCount = scores.filter(s => s >= COMPETITIVE_ZONE_CUTOFF && s < SAFE_ZONE_CUTOFF).length;
+        const redLineCount = scores.filter(s => s < COMPETITIVE_ZONE_CUTOFF).length;
+        
+        setOverallStats({
+          totalParticipants: filteredResults.length,
+          avgScore: Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10,
+          maxScore: Math.max(...scores),
+          minScore: Math.min(...scores),
+          safeZoneCount: safeCount,
+          competitiveZoneCount: competitiveCount,
+          redLineCount: redLineCount,
+        });
+      } else {
+        setOverallStats({
+          totalParticipants: 0,
+          avgScore: 0,
+          maxScore: 0,
+          minScore: 0,
+          safeZoneCount: 0,
+          competitiveZoneCount: 0,
+          redLineCount: 0,
+        });
+      }
+
+      // 3. 서울대/연세대 수험번호(WLP-S, WLP-Y)를 가진 사용자 조회
       const { data: snuYsuExamNumbers } = await supabase
         .from("exam_numbers")
         .select("id, exam_number, user_id")
@@ -130,29 +262,22 @@ const Statistics = () => {
         return;
       }
 
-      // 3. 해당 과목/회차의 서울대/연세대 채점 결과만 조회
-      const { data: allResults } = await supabase
-        .from("scoring_results")
-        .select("user_id, correct_count")
-        .eq("subject", subjectDbValue)
-        .eq("exam_round", examRound)
-        .in("user_id", snuYsuUserIds)
-        .order("correct_count", { ascending: false });
+      // 4. 서울대/연세대 채점 결과 (주차 필터 적용)
+      let snuYsuResults = filteredResults.filter(r => snuYsuUserIds.includes(r.user_id));
+      snuYsuResults = snuYsuResults.sort((a, b) => b.correct_count - a.correct_count);
 
-      if (allResults && allResults.length > 0) {
-        setSnuYsuParticipants(allResults.length);
+      if (snuYsuResults.length > 0) {
+        setSnuYsuParticipants(snuYsuResults.length);
 
         // 내 등수 찾기 (서울대/연세대 기준)
         if (user && userScore !== null) {
-          const myIndex = allResults.findIndex(r => r.user_id === user.id);
+          const myIndex = snuYsuResults.findIndex(r => r.user_id === user.id);
           if (myIndex !== -1) {
             setMyRank(myIndex + 1);
           } else {
-            // 내가 서울대/연세대가 아니면 등수 표시 안 함
-            // 또는 점수 기준으로 예상 등수 계산 (서울대/연세대 응시자 내에서)
             const isSnuYsu = snuYsuUserIds.includes(user.id);
             if (isSnuYsu) {
-              const higherCount = allResults.filter(r => r.correct_count > userScore).length;
+              const higherCount = snuYsuResults.filter(r => r.correct_count > userScore).length;
               setMyRank(higherCount + 1);
             } else {
               setMyRank(null);
@@ -160,8 +285,8 @@ const Statistics = () => {
           }
         }
 
-        // 4. 빌보드 데이터 생성 (안정권 진입자만 - 28점 이상)
-        const safeZoneResults = allResults.filter(r => r.correct_count >= SAFE_ZONE_CUTOFF);
+        // 5. 빌보드 데이터 생성 (안정권 진입자만 - 28점 이상)
+        const safeZoneResults = snuYsuResults.filter(r => r.correct_count >= SAFE_ZONE_CUTOFF);
         const topResults = safeZoneResults.slice(0, 15);
         const userIds = topResults.map(r => r.user_id);
 
@@ -191,7 +316,7 @@ const Statistics = () => {
     if (!accessLoading) {
       fetchData();
     }
-  }, [user, selectedSubject, selectedExam, userScore, hasAccess, accessLoading]);
+  }, [user, selectedSubject, selectedExam, selectedWeek, userScore, hasAccess, accessLoading]);
 
   // 접근 권한 체크
   if (accessLoading) {
@@ -270,8 +395,8 @@ const Statistics = () => {
                 </p>
               </div>
 
-              {/* 과목/회차 선택 */}
-              <div className="grid grid-cols-2 gap-4 mb-10 max-w-md mx-auto">
+              {/* 과목/회차/기간 선택 */}
+              <div className="grid grid-cols-3 gap-4 mb-10 max-w-xl mx-auto">
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">과목</Label>
                   <Select value={selectedSubject} onValueChange={setSelectedSubject}>
@@ -293,6 +418,22 @@ const Statistics = () => {
                     <SelectContent>
                       <SelectItem value="summit-1">SUMMIT 1회</SelectItem>
                       <SelectItem value="summit-2">SUMMIT 2회</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">기간</Label>
+                  <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">전체 기간</SelectItem>
+                      {weekOptions.map(week => (
+                        <SelectItem key={week.value} value={week.value}>
+                          {week.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -346,6 +487,67 @@ const Statistics = () => {
                     <p className="text-muted-foreground">
                       채점 후 통계를 확인할 수 있습니다.
                     </p>
+                  </div>
+                </div>
+              )}
+
+              {/* 전체 응시자 통계 */}
+              {overallStats.totalParticipants > 0 && (
+                <div className="border border-border rounded-none p-6 mb-8 bg-card">
+                  <div className="flex items-center gap-2 mb-6">
+                    <BarChart3 className="w-5 h-5 text-muted-foreground" />
+                    <h2 className="text-lg font-light">전체 응시자 통계</h2>
+                    {selectedWeek !== "all" && (
+                      <Badge variant="outline" className="text-xs ml-auto">
+                        {weekOptions.find(w => w.value === selectedWeek)?.label}
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {/* 주요 지표 */}
+                  <div className="grid grid-cols-4 gap-4 mb-6">
+                    <div className="text-center p-4 bg-muted/30">
+                      <Users className="w-4 h-4 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-2xl font-light">{overallStats.totalParticipants}</p>
+                      <p className="text-xs text-muted-foreground">응시자</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/30">
+                      <TrendingUp className="w-4 h-4 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-2xl font-light">{overallStats.avgScore}</p>
+                      <p className="text-xs text-muted-foreground">평균</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/30">
+                      <Trophy className="w-4 h-4 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-2xl font-light">{overallStats.maxScore}</p>
+                      <p className="text-xs text-muted-foreground">최고</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/30">
+                      <p className="text-2xl font-light mt-6">{overallStats.minScore}</p>
+                      <p className="text-xs text-muted-foreground">최저</p>
+                    </div>
+                  </div>
+                  
+                  {/* 존별 분포 바 */}
+                  <div className="space-y-2">
+                    <div className="flex h-3 w-full overflow-hidden bg-muted">
+                      <div 
+                        className="bg-foreground transition-all" 
+                        style={{ width: `${(overallStats.safeZoneCount / overallStats.totalParticipants) * 100}%` }}
+                      />
+                      <div 
+                        className="bg-muted-foreground/50 transition-all" 
+                        style={{ width: `${(overallStats.competitiveZoneCount / overallStats.totalParticipants) * 100}%` }}
+                      />
+                      <div 
+                        className="bg-muted-foreground/20 transition-all" 
+                        style={{ width: `${(overallStats.redLineCount / overallStats.totalParticipants) * 100}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>안정권 {Math.round((overallStats.safeZoneCount / overallStats.totalParticipants) * 100)}%</span>
+                      <span>경합권 {Math.round((overallStats.competitiveZoneCount / overallStats.totalParticipants) * 100)}%</span>
+                      <span>레드라인 {Math.round((overallStats.redLineCount / overallStats.totalParticipants) * 100)}%</span>
+                    </div>
                   </div>
                 </div>
               )}

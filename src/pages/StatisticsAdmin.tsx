@@ -670,12 +670,22 @@ const StatisticsAdmin = () => {
                       variant="outline" 
                       size="sm" 
                       onClick={() => {
-                        const headers = ["문항번호", "정답자수", "응시자수", "정답률", "난이도"];
+                        const headers = ["문항번호", "정답", "①선택률", "①선택수", "②선택률", "②선택수", "③선택률", "③선택수", "④선택률", "④선택수", "⑤선택률", "⑤선택수", "정답률", "응시자수", "난이도"];
                         const rows = questionStats.map((q) => [
                           q.question,
-                          q.correct,
-                          q.total,
+                          q.correctAnswer,
+                          `${q.choiceRates[1]}%`,
+                          q.choiceDistribution[1],
+                          `${q.choiceRates[2]}%`,
+                          q.choiceDistribution[2],
+                          `${q.choiceRates[3]}%`,
+                          q.choiceDistribution[3],
+                          `${q.choiceRates[4]}%`,
+                          q.choiceDistribution[4],
+                          `${q.choiceRates[5]}%`,
+                          q.choiceDistribution[5],
                           `${q.correctRate}%`,
+                          q.total,
                           q.correctRate >= 80 ? "쉬움" : q.correctRate >= 60 ? "보통" : q.correctRate >= 40 ? "어려움" : "킬러"
                         ]);
                         const csvContent = [
@@ -687,7 +697,7 @@ const StatisticsAdmin = () => {
                         link.href = URL.createObjectURL(blob);
                         const subjectLabel = selectedSubject === "all" ? "전체과목" : selectedSubject;
                         const roundLabel = selectedRound === "all" ? "전체회차" : `${selectedRound}회차`;
-                        link.download = `문항별정답률_${subjectLabel}_${roundLabel}_${new Date().toISOString().split("T")[0]}.csv`;
+                        link.download = `문항별선지선택률_${subjectLabel}_${roundLabel}_${new Date().toISOString().split("T")[0]}.csv`;
                         link.click();
                       }}
                     >

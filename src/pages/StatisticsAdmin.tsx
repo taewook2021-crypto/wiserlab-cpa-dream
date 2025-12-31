@@ -707,52 +707,6 @@ const StatisticsAdmin = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* 정답률 차트 */}
-                  <div className="h-80 mb-6">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={questionStats}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis 
-                          dataKey="question" 
-                          fontSize={11} 
-                          tickFormatter={(v) => `${v}번`}
-                          interval={0}
-                          angle={-45}
-                          textAnchor="end"
-                          height={50}
-                        />
-                        <YAxis 
-                          fontSize={12} 
-                          domain={[0, 100]}
-                          tickFormatter={(v) => `${v}%`}
-                        />
-                        <Tooltip 
-                          formatter={(value: number) => [`${value}%`, "정답률"]}
-                          labelFormatter={(v) => `${v}번 문항`}
-                        />
-                        <Bar 
-                          dataKey="correctRate" 
-                          name="정답률"
-                          radius={[4, 4, 0, 0]}
-                        >
-                          {questionStats.map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={
-                                entry.correctRate >= 80 
-                                  ? "hsl(142, 76%, 36%)" 
-                                  : entry.correctRate >= 60 
-                                  ? "hsl(var(--primary))" 
-                                  : entry.correctRate >= 40 
-                                  ? "hsl(45, 93%, 47%)" 
-                                  : "hsl(0, 84%, 60%)"
-                              }
-                            />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
 
                   {/* 난이도별 문항 분류 */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

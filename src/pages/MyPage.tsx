@@ -405,50 +405,58 @@ const MyPage = () => {
                       navigate(`/edge?subject=${subjectId}&exam=${examId}&wrong=${wrongNumbers}`);
                     };
                     
+                      const getScoreZone = (percentage: number) => {
+                        if (percentage >= 80) return { label: "안정권", color: "text-green-500" };
+                        if (percentage >= 60) return { label: "경합권", color: "text-yellow-500" };
+                        return { label: "레드라인", color: "text-red-500" };
+                      };
+
+                      const zone = getScoreZone(result.score_percentage);
+
                       return (
-                      <div
-                        key={result.id}
-                        className="p-4 bg-muted/50 rounded-lg"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <p className="font-medium text-sm">
-                              {result.exam_name} {result.exam_round}회
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {subjectNames[result.subject] || result.subject}
-                            </p>
+                        <div
+                          key={result.id}
+                          className="p-4 bg-muted/50 rounded-lg"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium text-sm">
+                                {result.exam_name} {result.exam_round}회
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {subjectNames[result.subject] || result.subject}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium">
+                                <span className="text-primary">{result.correct_count}</span>
+                                <span className="text-muted-foreground"> / {result.total_questions}</span>
+                              </p>
+                              <p className={`text-xs font-medium ${zone.color}`}>
+                                {zone.label}
+                              </p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-medium">
-                              <span className="text-primary">{result.correct_count}</span>
-                              <span className="text-muted-foreground"> / {result.total_questions}</span>
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {result.score_percentage}%
-                            </p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 h-8 text-xs"
+                              onClick={() => navigate(`/statistics?subject=${subjectId}&exam=${examId}&score=${result.correct_count}&total=${result.total_questions}`)}
+                            >
+                              통계 확인
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 h-8 text-xs"
+                              onClick={handleEdgeClick}
+                            >
+                              Edge
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 h-8 text-xs"
-                            onClick={() => navigate(`/statistics?subject=${subjectId}&exam=${examId}&score=${result.correct_count}&total=${result.total_questions}`)}
-                          >
-                            통계 확인
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 h-8 text-xs"
-                            onClick={handleEdgeClick}
-                          >
-                            Edge
-                          </Button>
-                        </div>
-                      </div>
-                    );
+                      );
                   })}
                 </div>
               )}

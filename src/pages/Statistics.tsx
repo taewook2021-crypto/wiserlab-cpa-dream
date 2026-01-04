@@ -584,66 +584,73 @@ const Statistics = () => {
                 </div>
               </Link>
 
-              {/* 빌보드 차트 - 안정권 진입자만 */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-xl font-light">전국 빌보드</h2>
-                    <p className="text-sm text-muted-foreground">안정권 진입자 ({SAFE_ZONE_CUTOFF}점 이상)</p>
+              {/* 빌보드 차트 - 안정권 진입자만 (공개 시간 이후) */}
+              {isStatsReleased ? (
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-xl font-light">전국 빌보드</h2>
+                      <p className="text-sm text-muted-foreground">안정권 진입자 ({SAFE_ZONE_CUTOFF}점 이상)</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground border border-border px-3 py-1">
+                      {billboard.length}명
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground border border-border px-3 py-1">
-                    {billboard.length}명
-                  </span>
+
+                  {loading ? (
+                    <div className="border border-border p-8 text-center">
+                      <p className="text-muted-foreground animate-pulse">불러오는 중...</p>
+                    </div>
+                  ) : billboard.length > 0 ? (
+                    <div className="border border-border divide-y divide-border">
+                      {billboard.map((entry) => (
+                        <div
+                          key={entry.rank}
+                          className={`flex items-center gap-4 p-4 transition-colors ${
+                            entry.isMe 
+                              ? "bg-primary/10 border-l-2 border-l-primary" 
+                              : "bg-card hover:bg-muted/50"
+                          }`}
+                        >
+                          {/* 순위 */}
+                          <div className="w-10 text-center">
+                            <span className={`font-mono text-sm ${entry.isMe ? "text-primary font-medium" : "text-muted-foreground"}`}>
+                              {entry.rank}
+                            </span>
+                          </div>
+
+                          {/* 수험번호 */}
+                          <div className="flex-1 min-w-0 flex items-center gap-2">
+                            <p className={`font-mono text-sm truncate ${entry.isMe ? "text-primary font-medium" : "text-foreground/80"}`}>
+                              {entry.examNumber}
+                            </p>
+                            {entry.isMe && (
+                              <Badge variant="secondary" className="text-xs">나</Badge>
+                            )}
+                          </div>
+
+                          {/* 점수 */}
+                          <div className="text-right">
+                            <p className={`font-mono ${entry.isMe ? "text-primary" : "text-muted-foreground"}`}>
+                              {entry.score}
+                              <span className="text-xs text-muted-foreground">/35</span>
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border border-border p-8 text-center">
+                      <p className="text-muted-foreground">아직 응시 데이터가 없습니다.</p>
+                    </div>
+                  )}
                 </div>
-
-                {loading ? (
-                  <div className="border border-border p-8 text-center">
-                    <p className="text-muted-foreground animate-pulse">불러오는 중...</p>
-                  </div>
-                ) : billboard.length > 0 ? (
-                  <div className="border border-border divide-y divide-border">
-                    {billboard.map((entry) => (
-                      <div
-                        key={entry.rank}
-                        className={`flex items-center gap-4 p-4 transition-colors ${
-                          entry.isMe 
-                            ? "bg-primary/10 border-l-2 border-l-primary" 
-                            : "bg-card hover:bg-muted/50"
-                        }`}
-                      >
-                        {/* 순위 */}
-                        <div className="w-10 text-center">
-                          <span className={`font-mono text-sm ${entry.isMe ? "text-primary font-medium" : "text-muted-foreground"}`}>
-                            {entry.rank}
-                          </span>
-                        </div>
-
-                        {/* 수험번호 */}
-                        <div className="flex-1 min-w-0 flex items-center gap-2">
-                          <p className={`font-mono text-sm truncate ${entry.isMe ? "text-primary font-medium" : "text-foreground/80"}`}>
-                            {entry.examNumber}
-                          </p>
-                          {entry.isMe && (
-                            <Badge variant="secondary" className="text-xs">나</Badge>
-                          )}
-                        </div>
-
-                        {/* 점수 */}
-                        <div className="text-right">
-                          <p className={`font-mono ${entry.isMe ? "text-primary" : "text-muted-foreground"}`}>
-                            {entry.score}
-                            <span className="text-xs text-muted-foreground">/35</span>
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="border border-border p-8 text-center">
-                    <p className="text-muted-foreground">아직 응시 데이터가 없습니다.</p>
-                  </div>
-                )}
-              </div>
+              ) : (
+                <div className="border border-border p-6 mb-8 text-center">
+                  <h2 className="text-xl font-light mb-2">전국 빌보드</h2>
+                  <p className="text-muted-foreground">{releaseTimeText}</p>
+                </div>
+              )}
 
               {/* 안내 */}
               <div className="border border-border p-6 text-center bg-muted/30">

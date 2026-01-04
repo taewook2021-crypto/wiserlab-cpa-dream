@@ -344,10 +344,10 @@ const MyPage = () => {
                             {formatDate(order.created_at)}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className="text-sm whitespace-nowrap">{formatPrice(order.amount)}원</span>
+                        <div className="flex items-center gap-2 flex-shrink-0 flex-nowrap whitespace-nowrap">
+                          <span className="text-sm whitespace-nowrap shrink-0">{formatPrice(order.amount)}원</span>
                           <Badge
-                            className={`${statusColors[order.status] || "bg-gray-500"} text-white text-xs whitespace-nowrap`}
+                            className={`${statusColors[order.status] || "bg-gray-500"} text-white text-xs whitespace-nowrap shrink-0`}
                           >
                             {statusLabels[order.status] || order.status}
                           </Badge>

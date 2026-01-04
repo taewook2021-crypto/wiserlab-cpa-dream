@@ -337,17 +337,17 @@ const MyPage = () => {
                       key={order.id}
                       className="p-3 bg-muted/50 rounded-lg"
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-sm">{order.product_name}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm truncate">{order.product_name}</p>
                           <p className="text-xs text-muted-foreground">
                             {formatDate(order.created_at)}
                           </p>
                         </div>
-                        <div className="text-right flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <span className="text-sm whitespace-nowrap">{formatPrice(order.amount)}원</span>
                           <Badge
-                            className={`${statusColors[order.status] || "bg-gray-500"} text-white text-xs`}
+                            className={`${statusColors[order.status] || "bg-gray-500"} text-white text-xs whitespace-nowrap`}
                           >
                             {statusLabels[order.status] || order.status}
                           </Badge>

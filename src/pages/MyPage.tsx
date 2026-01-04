@@ -344,8 +344,8 @@ const MyPage = () => {
                             {formatDate(order.created_at)}
                           </p>
                         </div>
-                        <div className="text-right flex items-center gap-2">
-                          <span className="text-sm">{formatPrice(order.amount)}원</span>
+                        <div className="text-right flex items-center gap-2 flex-shrink-0">
+                          <span className="text-sm whitespace-nowrap">{formatPrice(order.amount)}원</span>
                           <Badge
                             className={`${statusColors[order.status] || "bg-gray-500"} text-white text-xs`}
                           >
@@ -482,8 +482,8 @@ const MyPage = () => {
                       key={item.id}
                       className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
                     >
-                      <p className="font-medium text-sm">{item.product_name}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="font-medium text-sm truncate flex-1">{item.product_name}</p>
+                      <p className="text-sm text-muted-foreground whitespace-nowrap flex-shrink-0">
                         {item.price.toLocaleString()}원
                       </p>
                     </div>

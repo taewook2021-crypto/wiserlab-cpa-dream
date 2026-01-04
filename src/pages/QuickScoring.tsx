@@ -47,7 +47,26 @@ const exams = [
   { id: "summit-2", name: "SUMMIT 2회", round: 2 },
 ];
 
-const TOTAL_QUESTIONS = 35;
+// 과목별 문항 수 설정
+const getQuestionCount = (subjectId: string) => {
+  return subjectId === "tax" ? 40 : 35;
+};
+
+// 문항 수에 따른 그룹 생성
+const createAnswerGroups = (totalQuestions: number): AnswerGroup[] => {
+  const groups: AnswerGroup[] = [];
+  const groupCount = Math.ceil(totalQuestions / 5);
+  for (let i = 0; i < groupCount; i++) {
+    const startNum = i * 5 + 1;
+    const endNum = Math.min(i * 5 + 5, totalQuestions);
+    groups.push({
+      startNum,
+      endNum,
+      value: "",
+    });
+  }
+  return groups;
+};
 
 const QuickScoring = () => {
   const navigate = useNavigate();
@@ -66,19 +85,7 @@ const QuickScoring = () => {
   const [resultSaved, setResultSaved] = useState(false);
   const [existingResult, setExistingResult] = useState<ExistingResult | null>(null);
   const [checkingExisting, setCheckingExisting] = useState(false);
-  const [answers, setAnswers] = useState<AnswerGroup[]>(() => {
-    const groups: AnswerGroup[] = [];
-    for (let i = 0; i < 7; i++) {
-      const startNum = i * 5 + 1;
-      const endNum = Math.min(i * 5 + 5, TOTAL_QUESTIONS);
-      groups.push({
-        startNum,
-        endNum,
-        value: "",
-      });
-    }
-    return groups;
-  });
+  const [answers, setAnswers] = useState<AnswerGroup[]>(() => createAnswerGroups(35));
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -402,6 +409,7 @@ const QuickScoring = () => {
                         onValueChange={(v) => {
                           setSelectedSubject(v);
                           setResults(null);
+                          setAnswers(createAnswerGroups(getQuestionCount(v)));
                         }}
                       >
                         <SelectTrigger>

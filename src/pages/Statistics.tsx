@@ -652,12 +652,6 @@ const Statistics = () => {
                 </div>
               )}
 
-              {/* 안내 */}
-              <div className="border border-border p-6 text-center bg-muted/30">
-                <p className="text-sm text-muted-foreground">
-                  통계는 실제 응시자 데이터를 기반으로 합니다.
-                </p>
-              </div>
             </div>
           </div>
         </section>

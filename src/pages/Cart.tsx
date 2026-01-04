@@ -238,36 +238,60 @@ const Cart = () => {
                   ))}
                 </div>
 
-                {/* Total and Purchase */}
-                <div className="border-t border-border pt-6 mt-6 space-y-4">
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>선택 상품</span>
-                    <span>{selectedItems.length}개</span>
+                {/* Order Summary */}
+                <div className="border border-border rounded-lg p-6 mt-6 bg-card/50">
+                  <h3 className="font-medium mb-4">결제 요약</h3>
+                  
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">선택 상품</span>
+                      <span>{selectedItems.length}개</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">상품 금액</span>
+                      <span>{selectedTotal.toLocaleString()}원</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">배송비</span>
+                      <span className={selectedTotal >= 50000 ? "text-primary" : ""}>
+                        {selectedTotal >= 50000 ? "무료" : selectedTotal > 0 ? "3,000원" : "0원"}
+                      </span>
+                    </div>
+                    {selectedTotal > 0 && selectedTotal < 50000 && (
+                      <p className="text-xs text-muted-foreground pt-1">
+                        {(50000 - selectedTotal).toLocaleString()}원 더 구매 시 무료배송
+                      </p>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">총 결제금액</span>
-                    <span className="text-2xl font-medium">
-                      {selectedTotal.toLocaleString()}
-                      <span className="text-base font-normal ml-0.5">원</span>
-                    </span>
+                  
+                  <div className="border-t border-border mt-4 pt-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">총 결제금액</span>
+                      <span className="text-xl font-semibold text-primary">
+                        {(selectedTotal + (selectedTotal > 0 && selectedTotal < 50000 ? 3000 : 0)).toLocaleString()}
+                        <span className="text-sm font-normal ml-0.5">원</span>
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      variant="outline"
-                      className="flex-1 h-14 text-base font-normal hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
-                      disabled={selectedItems.length === 0}
-                      onClick={handleRemoveSelectedItems}
-                    >
-                      선택 삭제
-                    </Button>
-                    <Button
-                      className="flex-1 h-14 text-base font-normal"
-                      disabled={selectedItems.length === 0}
-                      onClick={handlePurchase}
-                    >
-                      구매하기
-                    </Button>
-                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-14 text-base font-normal hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
+                    disabled={selectedItems.length === 0}
+                    onClick={handleRemoveSelectedItems}
+                  >
+                    선택 삭제
+                  </Button>
+                  <Button
+                    className="flex-1 h-14 text-base font-normal"
+                    disabled={selectedItems.length === 0}
+                    onClick={handlePurchase}
+                  >
+                    구매하기
+                  </Button>
                 </div>
               </div>
             )}

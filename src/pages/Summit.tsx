@@ -254,7 +254,7 @@ const Summit = () => {
               <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
                 {/* Left: Text Content */}
                 <div className="space-y-6 md:space-y-8 max-w-xl">
-                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight">
+                  <h2 className="text-xl md:text-2xl lg:text-4xl font-medium tracking-tight">
                     {section.subject}
                   </h2>
                   
@@ -262,7 +262,7 @@ const Summit = () => {
                     {section.paragraphs.map((paragraph, index) => (
                       <p 
                         key={index}
-                        className="text-sm md:text-base text-muted-foreground leading-[1.8] whitespace-pre-line"
+                        className="text-xs md:text-sm text-muted-foreground leading-[1.8] whitespace-pre-line"
                       >
                         {paragraph}
                       </p>

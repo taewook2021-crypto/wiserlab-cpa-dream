@@ -94,13 +94,13 @@ const HeroSection = () => {
         <div className="relative z-10 h-full flex items-center justify-center sm:justify-start">
           <div className="ml-0 sm:ml-12 lg:ml-24 bg-white/95 backdrop-blur-sm p-8 sm:p-10 lg:p-12 w-[300px] sm:w-[400px] lg:w-[560px] min-h-[420px] sm:min-h-[500px] lg:min-h-[620px] flex flex-col justify-between relative">
             <div className="space-y-0 mt-6 sm:mt-8 lg:mt-12">
-              <h1 className="text-[1.35rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-1">
+              <h1 className="text-[1.6rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-1">
                 실전을 넘어
               </h1>
-              <h1 className="text-[1.35rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-2">
+              <h1 className="text-[1.6rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-2">
                 정상으로
               </h1>
-              <h1 className="text-[1.35rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-3 whitespace-nowrap">
+              <h1 className="text-[1.6rem] sm:text-[1.6rem] lg:text-[2.5rem] font-light animate-text-3 whitespace-nowrap">
                 공인회계사 1차 모의고사
               </h1>
             </div>

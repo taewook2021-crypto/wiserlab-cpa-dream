@@ -506,19 +506,6 @@ const Statistics = () => {
                 </div>
               </div>
 
-              {/* 문항별 정답률 링크 */}
-              <Link 
-                to={`/question-analysis?subject=${selectedSubject}&exam=${selectedExam}`}
-                className="block border border-border p-6 mb-10 hover:bg-muted/30 transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-light mb-1">문항별 정답률</h2>
-                    <p className="text-sm text-muted-foreground">전체 응시자 기준 문항별 정답률 확인</p>
-                  </div>
-                  <span className="text-muted-foreground">→</span>
-                </div>
-              </Link>
 
               {/* 빌보드 차트 - 안정권 진입자만 (공개 시간 이후) */}
               {isStatsReleased ? (

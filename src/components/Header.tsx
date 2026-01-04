@@ -77,11 +77,11 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="w-full px-6">
         <nav className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-12">
+          <div className="flex items-center space-x-8">
             <Link to="/" className="flex items-center gap-3">
               <img src={wiserLabLogo} alt="Wiser Lab" className="h-5" style={logoFilter} />
             </Link>
-            <div className="hidden xl:flex items-center space-x-10">
+            <div className="hidden xl:flex items-center space-x-6">
               {navLinks.map(link => (
                 <Link key={link.to} to={link.to} className={`text-sm ${textColorNav} transition-colors`}>
                   {link.label}
@@ -91,7 +91,7 @@ const Header = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden xl:flex items-center gap-6">
+            <div className="hidden xl:flex items-center gap-3">
               <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
                 <Button variant="default" size="sm" className={`${buttonStyle} text-sm`}>
                   빠른 채점하기

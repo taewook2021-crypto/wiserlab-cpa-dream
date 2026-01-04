@@ -83,7 +83,7 @@ const Header = () => {
             </Link>
             <div className="hidden sm:flex items-center space-x-10">
               {navLinks.map(link => (
-                <Link key={link.to} to={link.to} className={`text-sm ${textColorNav} transition-colors`}>
+                <Link key={link.to} to={link.to} className={`text-xs ${textColorNav} transition-colors`}>
                   {link.label}
                 </Link>
               ))}
@@ -93,21 +93,21 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-6">
               <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
-                <Button variant="default" size="sm" className={buttonStyle}>
+                <Button variant="default" size="sm" className={`${buttonStyle} text-xs`}>
                   빠른 채점하기
                 </Button>
               </Link>
-              <Link to="/cart" className={`text-sm ${textColor} transition-colors`}>
+              <Link to="/cart" className={`text-xs ${textColor} transition-colors`}>
                 장바구니
               </Link>
               {user && (
-                <Link to="/mypage" className={`text-sm ${textColor} transition-colors`}>
+                <Link to="/mypage" className={`text-xs ${textColor} transition-colors`}>
                   마이페이지
                 </Link>
               )}
               {isAdmin && (
                 <DropdownMenu>
-                  <DropdownMenuTrigger className={`text-sm ${textColor} transition-colors flex items-center gap-1`}>
+                  <DropdownMenuTrigger className={`text-xs ${textColor} transition-colors flex items-center gap-1`}>
                     관리자
                     <ChevronDown className="w-3 h-3" />
                   </DropdownMenuTrigger>
@@ -141,13 +141,13 @@ const Header = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={signOut}
-                    className={`${textColor} hover:bg-transparent`}
+                    className={`${textColor} hover:bg-transparent text-xs`}
                   >
                     로그아웃
                   </Button>
                 ) : (
                   <Link to="/auth">
-                    <Button variant="ghost" size="sm" className={`${textColor} hover:bg-transparent`}>
+                    <Button variant="ghost" size="sm" className={`${textColor} hover:bg-transparent text-xs`}>
                       로그인
                     </Button>
                   </Link>

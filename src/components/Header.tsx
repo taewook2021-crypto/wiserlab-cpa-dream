@@ -93,21 +93,21 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-6">
               <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
-                <Button variant="default" size="sm" className={`${buttonStyle} text-xs`}>
+                <Button variant="default" size="sm" className={`${buttonStyle} text-[10px]`}>
                   빠른 채점하기
                 </Button>
               </Link>
-              <Link to="/cart" className={`text-xs ${textColor} transition-colors`}>
+              <Link to="/cart" className={`text-[10px] ${textColor} transition-colors`}>
                 장바구니
               </Link>
               {user && (
-                <Link to="/mypage" className={`text-xs ${textColor} transition-colors`}>
+                <Link to="/mypage" className={`text-[10px] ${textColor} transition-colors`}>
                   마이페이지
                 </Link>
               )}
               {isAdmin && (
                 <DropdownMenu>
-                  <DropdownMenuTrigger className={`text-xs ${textColor} transition-colors flex items-center gap-1`}>
+                  <DropdownMenuTrigger className={`text-[10px] ${textColor} transition-colors flex items-center gap-1`}>
                     관리자
                     <ChevronDown className="w-3 h-3" />
                   </DropdownMenuTrigger>
@@ -141,13 +141,13 @@ const Header = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={signOut}
-                    className={`${textColor} hover:bg-transparent text-xs`}
+                    className={`${textColor} hover:bg-transparent text-[10px]`}
                   >
                     로그아웃
                   </Button>
                 ) : (
                   <Link to="/auth">
-                    <Button variant="ghost" size="sm" className={`${textColor} hover:bg-transparent text-xs`}>
+                    <Button variant="ghost" size="sm" className={`${textColor} hover:bg-transparent text-[10px]`}>
                       로그인
                     </Button>
                   </Link>

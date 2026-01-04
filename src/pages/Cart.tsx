@@ -137,24 +137,24 @@ const Cart = () => {
       <Header />
 
       <main className="flex-1 container mx-auto px-6 pt-24 pb-16">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-light mb-1">장바구니</h1>
-              <p className="text-muted-foreground text-sm">
-                {cartItems.length > 0
-                  ? `${cartItems.length}개의 상품이 담겨 있습니다`
-                  : "담긴 상품이 없습니다"}
-              </p>
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-3xl font-light">장바구니</h1>
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span className="text-sm">뒤로가기</span>
+              </button>
             </div>
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
-            >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span className="text-sm">뒤로가기</span>
-            </button>
+            <p className="text-muted-foreground text-sm">
+              {cartItems.length > 0
+                ? `${cartItems.length}개의 상품이 담겨 있습니다`
+                : "담긴 상품이 없습니다"}
+            </p>
           </div>
 
           {/* Cart Content */}

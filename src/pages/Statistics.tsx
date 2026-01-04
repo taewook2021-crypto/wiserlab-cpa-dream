@@ -167,6 +167,17 @@ const Statistics = () => {
     return match ? parseInt(match[1], 10) : 1;
   };
 
+  // 통계 공개 시간 확인
+  const getStatsReleaseDate = (exam: string): Date => {
+    if (exam === "summit-1") {
+      return new Date("2025-01-21T18:00:00+09:00");
+    }
+    return new Date("2025-01-27T18:00:00+09:00");
+  };
+
+  const isStatsReleased = new Date() >= getStatsReleaseDate(selectedExam);
+  const releaseTimeText = selectedExam === "summit-1" ? "1/21 오후 6시에 공개됩니다." : "1/27 오후 6시에 공개됩니다.";
+
   useEffect(() => {
     const fetchData = async () => {
       if (!hasAccess) return;
@@ -460,7 +471,7 @@ const Statistics = () => {
                       </p>
                     ) : (
                       <p className="text-sm text-muted-foreground">
-                        {selectedExam === "summit-1" ? "1/21 오후 6시에 공개됩니다." : "1/27 오후 6시에 공개됩니다."}
+                        {releaseTimeText}
                       </p>
                     )}
                   </div>
@@ -476,7 +487,7 @@ const Statistics = () => {
               )}
 
               {/* 전체 응시자 통계 */}
-              {overallStats.totalParticipants > 0 && (
+              {isStatsReleased && overallStats.totalParticipants > 0 ? (
                 <div className="border border-border rounded-none p-6 mb-8 bg-card">
                   <div className="flex items-center gap-2 mb-6">
                     <BarChart3 className="w-5 h-5 text-muted-foreground" />
@@ -534,7 +545,11 @@ const Statistics = () => {
                     </div>
                   </div>
                 </div>
-              )}
+              ) : !isStatsReleased ? (
+                <div className="border border-border rounded-none p-6 mb-8 bg-card text-center">
+                  <p className="text-muted-foreground">{releaseTimeText}</p>
+                </div>
+              ) : null}
 
               {/* 존 가이드 */}
               <div className="grid grid-cols-3 gap-px bg-border mb-10">

@@ -459,8 +459,8 @@ const Statistics = () => {
                         서울대·연세대 응시자 {snuYsuParticipants}명
                       </p>
                     ) : (
-                      <p className="text-sm text-muted-foreground animate-pulse">
-                        등수 계산 중...
+                      <p className="text-sm text-muted-foreground">
+                        {selectedExam === "summit-1" ? "1/21 오후 6시에 공개됩니다." : "1/27 오후 6시에 공개됩니다."}
                       </p>
                     )}
                   </div>

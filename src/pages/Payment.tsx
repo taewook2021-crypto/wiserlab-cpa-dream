@@ -73,7 +73,7 @@ const Payment = () => {
     return items === "bundle";
   }, [searchParams]);
 
-  const shippingFee = 4500;
+  const shippingFee = 0;
   const totalPrice = BUNDLE_PRICE + shippingFee;
 
   const formatPrice = (price: number) => {
@@ -351,7 +351,7 @@ const Payment = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">배송비</span>
-                    <span>{formatPrice(shippingFee)}원</span>
+                    <span className="text-primary">무료</span>
                   </div>
                 </div>
 

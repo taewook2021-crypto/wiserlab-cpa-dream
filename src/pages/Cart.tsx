@@ -253,22 +253,15 @@ const Cart = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">배송비</span>
-                      <span className={selectedTotal >= 50000 ? "text-primary" : ""}>
-                        {selectedTotal >= 50000 ? "무료" : selectedTotal > 0 ? "3,000원" : "0원"}
-                      </span>
+                      <span className="text-primary">무료</span>
                     </div>
-                    {selectedTotal > 0 && selectedTotal < 50000 && (
-                      <p className="text-xs text-muted-foreground pt-1">
-                        {(50000 - selectedTotal).toLocaleString()}원 더 구매 시 무료배송
-                      </p>
-                    )}
                   </div>
                   
                   <div className="border-t border-border mt-4 pt-4">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">총 결제금액</span>
                       <span className="text-xl font-semibold text-primary">
-                        {(selectedTotal + (selectedTotal > 0 && selectedTotal < 50000 ? 3000 : 0)).toLocaleString()}
+                        {selectedTotal.toLocaleString()}
                         <span className="text-sm font-normal ml-0.5">원</span>
                       </span>
                     </div>

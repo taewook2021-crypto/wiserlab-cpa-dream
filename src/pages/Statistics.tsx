@@ -495,12 +495,27 @@ const Statistics = () => {
                     )}
                   </div>
                 </div>
+              ) : loading ? (
+                <div className="border border-border rounded-none p-8 mb-8 bg-card">
+                  <div className="text-center">
+                    <p className="text-muted-foreground animate-pulse">
+                      점수 조회 중...
+                    </p>
+                  </div>
+                </div>
               ) : (
                 <div className="border border-border rounded-none p-8 mb-8 bg-card">
                   <div className="text-center">
                     <p className="text-muted-foreground">
-                      채점 후 통계를 확인할 수 있습니다.
+                      아직 채점하지 않았습니다.
                     </p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate(`/quick-scoring?subject=${selectedSubject}&exam=${selectedExam}`)}
+                      className="mt-4"
+                    >
+                      채점하러 가기
+                    </Button>
                   </div>
                 </div>
               )}

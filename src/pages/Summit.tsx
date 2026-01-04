@@ -245,7 +245,7 @@ const Summit = () => {
         </section>
 
         {/* Product Detail Sections */}
-        {PRODUCT_SECTIONS.map((section) => (
+        {PRODUCT_SECTIONS.map((section, sectionIndex) => (
           <section 
             key={section.subject}
             className="py-20 sm:py-28 md:py-36 bg-muted/20"
@@ -253,7 +253,7 @@ const Summit = () => {
             <div className="container mx-auto px-6 md:px-12 lg:px-20">
               <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
                 {/* Left: Text Content */}
-                <div className="space-y-6 md:space-y-8 max-w-xl">
+                <div className={`space-y-6 md:space-y-8 max-w-xl ${sectionIndex === 1 ? 'md:text-right md:ml-auto' : ''}`}>
                   <h2 className="text-xl md:text-2xl lg:text-4xl font-medium tracking-tight">
                     {section.subject}
                   </h2>

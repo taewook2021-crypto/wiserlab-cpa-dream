@@ -137,11 +137,11 @@ const Cart = () => {
       <Header />
 
       <main className="flex-1 container mx-auto px-6 pt-24 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 min-h-[60vh]">
-          {/* Left Column - Title and Back */}
-          <div className="flex flex-col justify-between">
+        <div className="max-w-2xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-light mb-2">장바구니</h1>
+              <h1 className="text-3xl font-light mb-1">장바구니</h1>
               <p className="text-muted-foreground text-sm">
                 {cartItems.length > 0
                   ? `${cartItems.length}개의 상품이 담겨 있습니다`
@@ -150,14 +150,14 @@ const Cart = () => {
             </div>
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit group"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span className="text-sm">Back</span>
+              <span className="text-sm">뒤로가기</span>
             </button>
           </div>
 
-          {/* Right Column - Cart Items */}
+          {/* Cart Content */}
           <div className="flex flex-col">
             {loadingCart ? (
               <div className="flex-1 flex items-center justify-center">

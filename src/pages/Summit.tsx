@@ -231,10 +231,10 @@ const Summit = () => {
                     key={index}
                     className={index < FEATURES.length - 1 ? "pb-8 sm:pb-10 md:pb-16 border-b border-border" : ""}
                   >
-                    <h3 className="text-sm sm:text-base md:text-xl font-medium mb-3 sm:mb-4 md:mb-6">
+                    <h3 className="text-sm sm:text-sm md:text-lg font-medium mb-3 sm:mb-4 md:mb-6">
                       {feature.title}
                     </h3>
-                    <p className="text-xs sm:text-xs md:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
+                    <p className="text-xs sm:text-xs md:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                       {feature.description}
                     </p>
                   </div>

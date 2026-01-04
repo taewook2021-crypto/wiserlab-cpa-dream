@@ -406,12 +406,10 @@ const MyPage = () => {
                     };
                     
                       const getScoreZone = (percentage: number) => {
-                        if (percentage >= 80) return { label: "안정권", color: "text-green-500" };
-                        if (percentage >= 60) return { label: "경합권", color: "text-yellow-500" };
-                        return { label: "레드라인", color: "text-red-500" };
+                        if (percentage >= 80) return "안정권";
+                        if (percentage >= 60) return "경합권";
+                        return "레드라인";
                       };
-
-                      const zone = getScoreZone(result.score_percentage);
 
                       return (
                         <div
@@ -432,8 +430,8 @@ const MyPage = () => {
                                 <span className="text-primary">{result.correct_count}</span>
                                 <span className="text-muted-foreground"> / {result.total_questions}</span>
                               </p>
-                              <p className={`text-xs font-medium ${zone.color}`}>
-                                {zone.label}
+                              <p className="text-xs text-muted-foreground">
+                                {getScoreZone(result.score_percentage)}
                               </p>
                             </div>
                           </div>

@@ -121,6 +121,10 @@ const PaymentSuccess = () => {
                 <span className="font-mono text-sm">{orderInfo.orderId}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-muted-foreground">배송비</span>
+                <span className="text-primary">무료</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-muted-foreground">결제금액</span>
                 <span className="font-medium">{formatPrice(orderInfo.totalAmount)}원</span>
               </div>

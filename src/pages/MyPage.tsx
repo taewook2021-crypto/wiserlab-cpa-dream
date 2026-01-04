@@ -430,7 +430,7 @@ const MyPage = () => {
                                 <span className="text-primary">{result.correct_count}</span>
                                 <span className="text-muted-foreground"> / {result.total_questions}</span>
                               </p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-xs">
                                 {getScoreZone(result.score_percentage)}
                               </p>
                             </div>

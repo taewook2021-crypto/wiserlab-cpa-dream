@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, ArrowLeft } from "lucide-react";
+import { Trash2, ArrowLeft, ShoppingBag, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -107,7 +107,6 @@ const Cart = () => {
   const handlePurchase = () => {
     if (selectedItems.length === 0) return;
 
-    // 선택된 상품 중 summit_bundle이 있는지 확인
     const selectedProducts = cartItems.filter((item) =>
       selectedItems.includes(item.id)
     );
@@ -141,12 +140,19 @@ const Cart = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 min-h-[60vh]">
           {/* Left Column - Title and Back */}
           <div className="flex flex-col justify-between">
-            <h1 className="text-3xl font-light">장바구니</h1>
+            <div>
+              <h1 className="text-3xl font-light mb-2">장바구니</h1>
+              <p className="text-muted-foreground text-sm">
+                {cartItems.length > 0
+                  ? `${cartItems.length}개의 상품이 담겨 있습니다`
+                  : "담긴 상품이 없습니다"}
+              </p>
+            </div>
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit group"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm">Back</span>
             </button>
           </div>
@@ -154,42 +160,69 @@ const Cart = () => {
           {/* Right Column - Cart Items */}
           <div className="flex flex-col">
             {loadingCart ? (
-              <p className="text-muted-foreground animate-pulse">불러오는 중...</p>
-            ) : cartItems.length === 0 ? (
               <div className="flex-1 flex items-center justify-center">
-                <p className="text-muted-foreground">장바구니가 비어 있습니다.</p>
+                <div className="text-center">
+                  <div className="w-12 h-12 border-2 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+                  <p className="text-muted-foreground">불러오는 중...</p>
+                </div>
+              </div>
+            ) : cartItems.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center animate-fade-in">
+                <div className="text-center">
+                  <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-6">
+                    <ShoppingBag className="w-10 h-10 text-muted-foreground/50" />
+                  </div>
+                  <p className="text-muted-foreground mb-6">
+                    장바구니가 비어 있습니다
+                  </p>
+                  <Button
+                    onClick={() => navigate("/summit")}
+                    className="h-12 px-8"
+                  >
+                    쇼핑하러 가기
+                  </Button>
+                </div>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-6 animate-fade-in">
                 {/* Select All */}
-                <div className="flex items-center gap-3 pb-4 border-b border-border">
-                  <Checkbox
-                    id="select-all"
-                    checked={selectedItems.length === cartItems.length}
-                    onCheckedChange={handleSelectAll}
-                  />
-                  <label
-                    htmlFor="select-all"
-                    className="text-sm text-muted-foreground cursor-pointer"
-                  >
-                    전체 선택 ({selectedItems.length}/{cartItems.length})
-                  </label>
+                <div className="flex items-center justify-between pb-4 border-b border-border">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      id="select-all"
+                      checked={selectedItems.length === cartItems.length}
+                      onCheckedChange={handleSelectAll}
+                    />
+                    <label
+                      htmlFor="select-all"
+                      className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                    >
+                      전체 선택
+                    </label>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {selectedItems.length}/{cartItems.length}
+                  </span>
                 </div>
 
                 {/* Cart Items List */}
-                <div className="space-y-4">
-                  {cartItems.map((item) => (
+                <div className="space-y-3">
+                  {cartItems.map((item, index) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-4 p-4 border border-border rounded-lg"
+                      className="group flex items-center gap-4 p-5 border border-border bg-card hover:border-primary/30 hover:shadow-sm rounded-lg transition-all duration-200 animate-fade-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <Checkbox
                         checked={selectedItems.includes(item.id)}
                         onCheckedChange={() => handleSelectItem(item.id)}
                       />
-                      <div className="flex-1">
-                        <p className="font-medium">{item.product_name}</p>
-                        <p className="text-sm text-muted-foreground mt-1">
+                      <div className="w-12 h-12 rounded-lg bg-muted/50 flex items-center justify-center flex-shrink-0">
+                        <Package className="w-6 h-6 text-muted-foreground/70" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{item.product_name}</p>
+                        <p className="text-sm text-primary font-medium mt-1">
                           {item.price.toLocaleString()}원
                         </p>
                       </div>
@@ -197,7 +230,7 @@ const Cart = () => {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleRemoveItem(item.id)}
-                        className="text-muted-foreground hover:text-foreground"
+                        className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -206,23 +239,26 @@ const Cart = () => {
                 </div>
 
                 {/* Total and Purchase */}
-                <div className="border-t border-border pt-6 mt-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="text-muted-foreground">
-                      선택 상품 ({selectedItems.length}개)
-                    </span>
-                    <span className="text-xl font-medium">
-                      {selectedTotal.toLocaleString()}원
+                <div className="border-t border-border pt-6 mt-6 space-y-4">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>선택 상품</span>
+                    <span>{selectedItems.length}개</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">총 결제금액</span>
+                    <span className="text-2xl font-medium">
+                      {selectedTotal.toLocaleString()}
+                      <span className="text-base font-normal ml-0.5">원</span>
                     </span>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 pt-2">
                     <Button
                       variant="outline"
-                      className="flex-1 h-14 text-base font-normal"
+                      className="flex-1 h-14 text-base font-normal hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
                       disabled={selectedItems.length === 0}
                       onClick={handleRemoveSelectedItems}
                     >
-                      장바구니에서 제거
+                      선택 삭제
                     </Button>
                     <Button
                       className="flex-1 h-14 text-base font-normal"

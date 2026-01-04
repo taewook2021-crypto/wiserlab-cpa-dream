@@ -81,9 +81,9 @@ const Header = () => {
             <Link to="/" className="flex items-center gap-3">
               <img src={wiserLabLogo} alt="Wiser Lab" className="h-5" style={logoFilter} />
             </Link>
-            <div className="hidden sm:flex items-center space-x-10">
+            <div className="hidden lg:flex items-center space-x-10">
               {navLinks.map(link => (
-                <Link key={link.to} to={link.to} className={`text-[10px] lg:text-sm ${textColorNav} transition-colors`}>
+                <Link key={link.to} to={link.to} className={`text-sm ${textColorNav} transition-colors`}>
                   {link.label}
                 </Link>
               ))}
@@ -91,23 +91,23 @@ const Header = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-3 lg:gap-6">
+            <div className="hidden lg:flex items-center gap-6">
               <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
-                <Button variant="default" size="sm" className={`${buttonStyle} text-[10px] lg:text-sm px-2 lg:px-4`}>
+                <Button variant="default" size="sm" className={`${buttonStyle} text-sm`}>
                   빠른 채점하기
                 </Button>
               </Link>
-              <Link to="/cart" className={`text-[10px] lg:text-sm ${textColor} transition-colors`}>
+              <Link to="/cart" className={`text-sm ${textColor} transition-colors`}>
                 장바구니
               </Link>
               {user && (
-                <Link to="/mypage" className={`text-[10px] lg:text-sm ${textColor} transition-colors`}>
+                <Link to="/mypage" className={`text-sm ${textColor} transition-colors`}>
                   마이페이지
                 </Link>
               )}
               {isAdmin && (
                 <DropdownMenu>
-                  <DropdownMenuTrigger className={`text-[10px] lg:text-sm ${textColor} transition-colors flex items-center gap-1`}>
+                  <DropdownMenuTrigger className={`text-sm ${textColor} transition-colors flex items-center gap-1`}>
                     관리자
                     <ChevronDown className="w-3 h-3" />
                   </DropdownMenuTrigger>
@@ -141,13 +141,13 @@ const Header = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={signOut}
-                    className={`${textColor} hover:bg-transparent text-[10px] lg:text-sm`}
+                    className={`${textColor} hover:bg-transparent text-sm`}
                   >
                     로그아웃
                   </Button>
                 ) : (
                   <Link to="/auth">
-                    <Button variant="ghost" size="sm" className={`${textColor} hover:bg-transparent text-[10px] lg:text-sm`}>
+                    <Button variant="ghost" size="sm" className={`${textColor} hover:bg-transparent text-sm`}>
                       로그인
                     </Button>
                   </Link>
@@ -155,7 +155,7 @@ const Header = () => {
               )}
             </div>
             
-            <div className="sm:hidden">
+            <div className="lg:hidden">
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className={menuButtonStyle}>

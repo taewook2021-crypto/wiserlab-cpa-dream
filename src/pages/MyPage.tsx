@@ -341,7 +341,7 @@ const MyPage = () => {
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-sm truncate">{order.product_name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {formatDate(order.created_at)}
+                            {formatDate(order.created_at)} · 배송비 <span className="text-primary">무료</span>
                           </p>
                         </div>
                         <div className="flex items-center gap-1.5 flex-shrink-0 flex-nowrap">

@@ -432,6 +432,7 @@ const QuickScoring = () => {
                         onValueChange={(v) => {
                           setSelectedExam(v);
                           setResults(null);
+                          setAnswers(createAnswerGroups(getQuestionCount(selectedSubject)));
                         }}
                       >
                         <SelectTrigger>

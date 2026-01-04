@@ -143,10 +143,10 @@ const Summit = () => {
               {/* Right: Product Info */}
               <div className="space-y-3 sm:space-y-3 md:space-y-6 lg:space-y-10">
                 <div>
-                  <h1 className="text-lg sm:text-lg md:text-xl lg:text-3xl font-light mb-2 sm:mb-2 md:mb-4 lg:mb-6">
+                  <h1 className="text-xl sm:text-lg md:text-xl lg:text-3xl font-light mb-2 sm:mb-2 md:mb-4 lg:mb-6">
                     Wiser Lab SUMMIT PACK
                   </h1>
-                  <p className="text-[10px] sm:text-[11px] md:text-xs lg:text-base text-muted-foreground leading-relaxed">
+                  <p className="text-xs sm:text-[11px] md:text-xs lg:text-base text-muted-foreground leading-relaxed">
                     가장 실전적인 모의고사, SUMMIT
                   </p>
                 </div>
@@ -155,8 +155,8 @@ const Summit = () => {
                 <div className="space-y-3 sm:space-y-3 md:space-y-4 lg:space-y-6 py-4 sm:py-4 md:py-5 lg:py-8 border-y border-border">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs sm:text-xs md:text-sm lg:text-base font-medium">전과목 PACK</p>
-                      <p className="text-[10px] sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">
+                      <p className="text-sm sm:text-xs md:text-sm lg:text-base font-medium">전과목 PACK</p>
+                      <p className="text-xs sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">
                         재무회계 + 세법 모의고사 각 2회분
                       </p>
                     </div>
@@ -167,7 +167,7 @@ const Summit = () => {
                 </div>
 
                 {/* Delivery & Notice */}
-                <div className="space-y-1 sm:space-y-1 md:space-y-2 lg:space-y-3 text-[10px] sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">
+                <div className="space-y-1 sm:space-y-1 md:space-y-2 lg:space-y-3 text-xs sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">
                   <p className="text-foreground font-medium">
                     배송 안내: 결제 완료 후 영업일 기준 2~3일 이내 출고
                   </p>
@@ -181,7 +181,7 @@ const Summit = () => {
                 {/* Total & CTA */}
                 <div className="pt-4 sm:pt-4 md:pt-5 lg:pt-8 border-t border-border space-y-3 sm:space-y-3 md:space-y-4 lg:space-y-6">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">총 상품금액</p>
+                    <p className="text-xs sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">총 상품금액</p>
                     <p className="text-lg sm:text-lg md:text-lg lg:text-2xl font-medium">
                       {formatPrice(BUNDLE_PRICE)}원
                     </p>

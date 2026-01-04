@@ -106,7 +106,7 @@ const HeroSection = () => {
             </div>
             
             <div className="flex justify-between items-end">
-              <div className="flex flex-col space-y-1 sm:space-y-2 text-xs sm:text-sm text-muted-foreground">
+              <div className="flex flex-col space-y-1 sm:space-y-2 text-sm sm:text-base text-muted-foreground">
                 <Link to="/summit" className="hover:text-foreground transition-colors">
                   SUMMIT Contents
                 </Link>

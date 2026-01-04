@@ -141,6 +141,7 @@ const Statistics = () => {
   const [snuYsuParticipants, setSnuYsuParticipants] = useState<number>(0);
   const [billboard, setBillboard] = useState<BillboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userScore, setUserScore] = useState<number | null>(scoreFromUrl ? parseInt(scoreFromUrl, 10) : null);
   
   // 전체 통계 및 주차 옵션
   const [overallStats, setOverallStats] = useState<OverallStats>({
@@ -154,8 +155,7 @@ const Statistics = () => {
   });
   const [weekOptions, setWeekOptions] = useState<WeekOption[]>([]);
 
-  // 실제 점수
-  const userScore = scoreFromUrl ? parseInt(scoreFromUrl, 10) : null;
+  // 유저 존 계산
   const userZone = userScore !== null ? getZoneInfo(userScore) : null;
   const percentile = myRank !== null && snuYsuParticipants > 0 
     ? Math.round((myRank / snuYsuParticipants) * 100) 
@@ -187,7 +187,7 @@ const Statistics = () => {
       const subjectDbValue = getSubjectDbValue(selectedSubject);
       const examRound = getExamRound(selectedExam);
 
-      // 1. 내 프로필 조회 (수험번호)
+      // 1. 내 프로필 및 채점 결과 조회
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
@@ -197,6 +197,25 @@ const Statistics = () => {
         if (profile) {
           setMyExamNumber(profile.exam_number);
         }
+
+        // 내 채점 결과 조회 (선택된 과목/회차)
+        const { data: myResult } = await supabase
+          .from("scoring_results")
+          .select("correct_count")
+          .eq("user_id", user.id)
+          .eq("subject", subjectDbValue)
+          .eq("exam_round", examRound)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (myResult) {
+          setUserScore(myResult.correct_count);
+        } else {
+          setUserScore(null);
+        }
+      } else {
+        setUserScore(null);
       }
 
       // 2. 전체 응시자 데이터 조회 (모든 사용자)
@@ -327,7 +346,7 @@ const Statistics = () => {
     if (!accessLoading) {
       fetchData();
     }
-  }, [user, selectedSubject, selectedExam, selectedWeek, userScore, hasAccess, accessLoading]);
+  }, [user, selectedSubject, selectedExam, selectedWeek, hasAccess, accessLoading]);
 
   // 접근 권한 체크
   if (accessLoading) {

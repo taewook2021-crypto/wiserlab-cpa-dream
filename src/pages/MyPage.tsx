@@ -405,22 +405,19 @@ const MyPage = () => {
                       navigate(`/edge?subject=${subjectId}&exam=${examId}&wrong=${wrongNumbers}`);
                     };
                     
-                    return (
+                      return (
                       <div
                         key={result.id}
                         className="p-4 bg-muted/50 rounded-lg"
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <Trophy className="w-5 h-5 text-primary" />
-                            <div>
-                              <p className="font-medium text-sm">
-                                {result.exam_name} {result.exam_round}회
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {subjectNames[result.subject] || result.subject}
-                              </p>
-                            </div>
+                          <div>
+                            <p className="font-medium text-sm">
+                              {result.exam_name} {result.exam_round}회
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {subjectNames[result.subject] || result.subject}
+                            </p>
                           </div>
                           <div className="text-right">
                             <p className="font-medium">
@@ -439,7 +436,6 @@ const MyPage = () => {
                             className="flex-1 h-8 text-xs"
                             onClick={() => navigate(`/statistics?subject=${subjectId}&exam=${examId}&score=${result.correct_count}&total=${result.total_questions}`)}
                           >
-                            <BarChart3 className="w-3 h-3 mr-1" />
                             통계 확인
                           </Button>
                           <Button
@@ -448,7 +444,6 @@ const MyPage = () => {
                             className="flex-1 h-8 text-xs"
                             onClick={handleEdgeClick}
                           >
-                            <Zap className="w-3 h-3 mr-1" />
                             Edge
                           </Button>
                         </div>

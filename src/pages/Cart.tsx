@@ -253,7 +253,7 @@ const Cart = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">배송비</span>
-                      <span className="text-primary">무료</span>
+                      <span>4,500원</span>
                     </div>
                   </div>
                   
@@ -261,7 +261,7 @@ const Cart = () => {
                     <div className="flex items-center justify-between">
                       <span className="font-medium">총 결제금액</span>
                       <span className="text-xl font-semibold text-primary">
-                        {selectedTotal.toLocaleString()}
+                        {(selectedTotal + (selectedItems.length > 0 ? 4500 : 0)).toLocaleString()}
                         <span className="text-sm font-normal ml-0.5">원</span>
                       </span>
                     </div>

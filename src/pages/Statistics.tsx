@@ -74,6 +74,11 @@ const getSubjectDbValue = (subject: string): string => {
   return subject;
 };
 
+// 과목별 총 문제 수
+const getTotalQuestions = (subject: string): number => {
+  return subject === "tax" ? 40 : 35;
+};
+
 // 주차 옵션 생성 (데이터 기반)
 const generateWeekOptions = (dates: Date[]): WeekOption[] => {
   if (dates.length === 0) return [];
@@ -466,7 +471,7 @@ const Statistics = () => {
                     <p className="text-sm text-muted-foreground mb-2">내 점수</p>
                     <p className="text-5xl font-light mb-1">
                       <span className="text-foreground">{userScore}</span>
-                      <span className="text-muted-foreground text-2xl"> / 35</span>
+                      <span className="text-muted-foreground text-2xl"> / {getTotalQuestions(selectedSubject)}</span>
                     </p>
                     <div className="mt-6 mb-6">
                       <span className={`inline-block px-6 py-2 text-sm font-medium border ${
@@ -585,7 +590,7 @@ const Statistics = () => {
                           <div className="text-right">
                             <p className={`font-mono ${entry.isMe ? "text-primary" : "text-muted-foreground"}`}>
                               {entry.score}
-                              <span className="text-xs text-muted-foreground">/35</span>
+                              <span className="text-xs text-muted-foreground">/{getTotalQuestions(selectedSubject)}</span>
                             </p>
                           </div>
                         </div>

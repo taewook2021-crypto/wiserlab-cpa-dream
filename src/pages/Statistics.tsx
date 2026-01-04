@@ -641,7 +641,7 @@ const Statistics = () => {
                     </div>
                   ) : (
                     <div className="border border-border p-8 text-center">
-                      <p className="text-muted-foreground">아직 응시 데이터가 없습니다.</p>
+                      <p className="text-muted-foreground">{releaseTimeText}</p>
                     </div>
                   )}
                 </div>

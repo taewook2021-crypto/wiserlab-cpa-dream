@@ -213,7 +213,7 @@ const Summit = () => {
         <section className="py-16 sm:py-20 md:py-28 border-b border-border">
           <div className="grid sm:grid-cols-2">
             {/* Left: Image */}
-            <div className="aspect-square sm:aspect-auto sm:min-h-[400px] md:min-h-[500px] overflow-hidden">
+            <div className="aspect-square sm:aspect-auto sm:min-h-[320px] md:min-h-[400px] overflow-hidden">
               <img
                 src={summitFeature}
                 alt="SUMMIT 모의고사 특징"

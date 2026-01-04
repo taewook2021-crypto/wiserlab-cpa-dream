@@ -395,8 +395,8 @@ const Statistics = () => {
                 </p>
               </div>
 
-              {/* 과목/회차/기간 선택 */}
-              <div className="grid grid-cols-3 gap-4 mb-10 max-w-xl mx-auto">
+              {/* 과목/회차 선택 */}
+              <div className="grid grid-cols-2 gap-4 mb-10 max-w-md mx-auto">
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">과목</Label>
                   <Select value={selectedSubject} onValueChange={setSelectedSubject}>
@@ -418,22 +418,6 @@ const Statistics = () => {
                     <SelectContent>
                       <SelectItem value="summit-1">SUMMIT 1회</SelectItem>
                       <SelectItem value="summit-2">SUMMIT 2회</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">기간</Label>
-                  <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-                    <SelectTrigger className="h-10">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">전체 기간</SelectItem>
-                      {weekOptions.map(week => (
-                        <SelectItem key={week.value} value={week.value}>
-                          {week.label}
-                        </SelectItem>
-                      ))}
                     </SelectContent>
                   </Select>
                 </div>

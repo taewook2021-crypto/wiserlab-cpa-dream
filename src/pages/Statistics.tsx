@@ -587,14 +587,9 @@ const Statistics = () => {
               {/* 빌보드 차트 - 안정권 진입자만 (공개 시간 이후) */}
               {isStatsReleased ? (
                 <div className="mb-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h2 className="text-xl font-light">전국 빌보드</h2>
-                      <p className="text-sm text-muted-foreground">안정권 진입자 ({SAFE_ZONE_CUTOFF}점 이상)</p>
-                    </div>
-                    <span className="text-xs text-muted-foreground border border-border px-3 py-1">
-                      {billboard.length}명
-                    </span>
+                  <div className="mb-6">
+                    <h2 className="text-xl font-light">전국 빌보드</h2>
+                    <p className="text-sm text-muted-foreground">안정권 진입자 ({SAFE_ZONE_CUTOFF}점 이상)</p>
                   </div>
 
                   {loading ? (

@@ -10,6 +10,7 @@ import { ShoppingCart } from "lucide-react";
 import summitFeature from "@/assets/summit-feature.png";
 import summitCover from "@/assets/summit-cover.png";
 import summitFinancial from "@/assets/summit-financial.png";
+import summitTax from "@/assets/summit-tax.png";
 import { useState } from "react";
 
 const BUNDLE_PRICE = 50000;
@@ -284,8 +285,14 @@ const Summit = () => {
                       />
                     </div>
                   ) : (
-                    <div className="bg-muted/50 w-full max-w-[600px] aspect-[4/3] rounded-sm flex items-center justify-center text-muted-foreground">
-                      <span className="text-sm">이미지 추가 예정</span>
+                    <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
+                      <img
+                        src={summitTax}
+                        alt="SUMMIT 세법 시험지"
+                        className="w-full h-auto object-contain"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
                   )}
                 </div>

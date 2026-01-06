@@ -91,7 +91,7 @@ const Header = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden xl:flex items-center gap-3">
+            <div className="hidden xl:flex items-center gap-6">
               <Link to="/quick-scoring" onClick={handleQuickScoringClick}>
                 <Button variant="default" size="sm" className={`${buttonStyle} text-sm`}>
                   빠른 채점하기

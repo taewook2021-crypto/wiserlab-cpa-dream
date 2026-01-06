@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ShoppingCart } from "lucide-react";
 import summitFeature from "@/assets/summit-feature.png";
 import summitCover from "@/assets/summit-cover.png";
+import summitFinancial from "@/assets/summit-financial.png";
 import { useState } from "react";
 
 const BUNDLE_PRICE = 50000;
@@ -272,9 +273,21 @@ const Summit = () => {
 
                 {/* Right: Image */}
                 <div className="flex justify-center lg:justify-end">
-                  <div className="bg-muted/50 w-full max-w-[600px] aspect-[4/3] rounded-sm flex items-center justify-center text-muted-foreground">
-                    <span className="text-sm">이미지 추가 예정</span>
-                  </div>
+                  {sectionIndex === 0 ? (
+                    <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
+                      <img
+                        src={summitFinancial}
+                        alt="SUMMIT 재무회계 시험지"
+                        className="w-full h-auto object-contain"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-muted/50 w-full max-w-[600px] aspect-[4/3] rounded-sm flex items-center justify-center text-muted-foreground">
+                      <span className="text-sm">이미지 추가 예정</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

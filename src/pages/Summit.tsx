@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useCallback, useEffect } from "react";
+import { useCallback, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import summitFeature from "@/assets/summit-feature.png";
 import summitCover from "@/assets/summit-cover.png";
 import summitFinancial from "@/assets/summit-financial.png";
@@ -41,6 +41,30 @@ const FEATURES = [
   },
 ] as const;
 
+// Gallery items for horizontal scroll section (Apple-style)
+const GALLERY_ITEMS = [
+  {
+    title: "실전과 동일한 시험지",
+    description: "실제 CPA 시험지와 동일한 양식으로 제작하여 실전 감각을 극대화합니다.",
+    image: summitCover,
+  },
+  {
+    title: "최상위권 데이터 기반",
+    description: "서울대학교, 연세대학교 최상위권 수험생 데이터를 기반으로 객관적인 위치 파악이 가능합니다.",
+    image: summitFinancial,
+  },
+  {
+    title: "트렌디한 출제 경향",
+    description: "최근 1차 시험의 난이도와 출제 경향을 정밀하게 분석하여 반영했습니다.",
+    image: summitTax,
+  },
+  {
+    title: "개정세법 완벽 반영",
+    description: "2025년 12월 법률 개정안까지 반영하고, 시험일까지 지속적으로 업데이트합니다.",
+    image: summitFeature,
+  },
+] as const;
+
 const PRODUCT_SECTIONS = [
   {
     subject: "SUMMIT 재무회계",
@@ -69,6 +93,16 @@ const Summit = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  const scrollGallery = useCallback((direction: 'left' | 'right') => {
+    if (!galleryRef.current) return;
+    const scrollAmount = galleryRef.current.clientWidth * 0.8;
+    galleryRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  }, []);
 
 
   const handleAddToCart = useCallback(async () => {
@@ -246,60 +280,140 @@ const Summit = () => {
           </div>
         </section>
 
-        {/* Product Detail Sections */}
-        {PRODUCT_SECTIONS.map((section, sectionIndex) => (
-          <section 
-            key={section.subject}
-            className="py-20 sm:py-28 md:py-36 bg-muted/20"
-          >
-            <div className="container mx-auto px-6 md:px-12 lg:px-20">
-              <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
-                {/* Left: Text Content */}
-                <div className={`space-y-6 md:space-y-8 max-w-xl ${sectionIndex === 1 ? 'md:text-right md:ml-auto' : ''}`}>
-                  <h2 className="text-3xl md:text-2xl lg:text-4xl font-medium tracking-tight">
-                    {section.subject}
-                  </h2>
-                  
-                  <div className="space-y-6 md:space-y-8">
-                    {section.paragraphs.map((paragraph, index) => (
-                      <p 
-                        key={index}
-                        className="text-base md:text-sm text-muted-foreground leading-[1.8] whitespace-pre-line"
-                      >
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
+        {/* 재무회계 Section */}
+        <section className="py-20 sm:py-28 md:py-36 bg-muted/20">
+          <div className="container mx-auto px-6 md:px-12 lg:px-20">
+            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
+              <div className="space-y-6 md:space-y-8 max-w-xl">
+                <h2 className="text-3xl md:text-2xl lg:text-4xl font-medium tracking-tight">
+                  {PRODUCT_SECTIONS[0].subject}
+                </h2>
+                <div className="space-y-6 md:space-y-8">
+                  {PRODUCT_SECTIONS[0].paragraphs.map((paragraph, index) => (
+                    <p 
+                      key={index}
+                      className="text-base md:text-sm text-muted-foreground leading-[1.8] whitespace-pre-line"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
                 </div>
-
-                {/* Right: Image */}
-                <div className="flex justify-center lg:justify-end">
-                  {sectionIndex === 0 ? (
-                    <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
-                      <img
-                        src={summitFinancial}
-                        alt="SUMMIT 재무회계 시험지"
-                        className="w-full h-auto object-contain"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
-                      <img
-                        src={summitTax}
-                        alt="SUMMIT 세법 시험지"
-                        className="w-full h-auto object-contain"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                  )}
+              </div>
+              <div className="flex justify-center lg:justify-end">
+                <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
+                  <img
+                    src={summitFinancial}
+                    alt="SUMMIT 재무회계 시험지"
+                    className="w-full h-auto object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               </div>
             </div>
-          </section>
-        ))}
+          </div>
+        </section>
+
+        {/* Apple-style Horizontal Gallery Section */}
+        <section className="py-20 sm:py-28 md:py-36 bg-background border-y border-border overflow-hidden">
+          <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-center">
+              디테일 하나하나, 프로답게.
+            </h2>
+          </div>
+
+          {/* Gallery Container */}
+          <div className="relative">
+            {/* Navigation Buttons - Hidden on mobile */}
+            <button
+              onClick={() => scrollGallery('left')}
+              className="hidden md:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border hover:bg-muted transition-colors"
+              aria-label="이전 슬라이드"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={() => scrollGallery('right')}
+              className="hidden md:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border hover:bg-muted transition-colors"
+              aria-label="다음 슬라이드"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+
+            {/* Scrollable Gallery */}
+            <div
+              ref={galleryRef}
+              className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6 md:px-12 lg:px-20 pb-4"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+            >
+              {GALLERY_ITEMS.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[40vw] xl:w-[35vw] snap-center"
+                >
+                  <div className="bg-muted/30 rounded-2xl md:rounded-3xl overflow-hidden h-full">
+                    {/* Image */}
+                    <div className="aspect-[4/3] overflow-hidden">
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                    {/* Text Content */}
+                    <div className="p-6 md:p-8 lg:p-10">
+                      <h3 className="text-lg md:text-xl lg:text-2xl font-medium mb-2 md:mb-3">
+                        {item.title}
+                      </h3>
+                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 세법 Section */}
+        <section className="py-20 sm:py-28 md:py-36 bg-muted/20">
+          <div className="container mx-auto px-6 md:px-12 lg:px-20">
+            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
+              <div className="space-y-6 md:space-y-8 max-w-xl md:text-right md:ml-auto">
+                <h2 className="text-3xl md:text-2xl lg:text-4xl font-medium tracking-tight">
+                  {PRODUCT_SECTIONS[1].subject}
+                </h2>
+                <div className="space-y-6 md:space-y-8">
+                  {PRODUCT_SECTIONS[1].paragraphs.map((paragraph, index) => (
+                    <p 
+                      key={index}
+                      className="text-base md:text-sm text-muted-foreground leading-[1.8] whitespace-pre-line"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-center lg:justify-end">
+                <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
+                  <img
+                    src={summitTax}
+                    alt="SUMMIT 세법 시험지"
+                    className="w-full h-auto object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
       </main>
 

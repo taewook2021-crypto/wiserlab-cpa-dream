@@ -265,7 +265,7 @@ const Summit = () => {
                 {FEATURES.map((feature, index) => (
                   <div
                     key={index}
-                    className={index < FEATURES.length - 1 ? "pb-8 sm:pb-10 md:pb-16" : ""}
+                    className={index < FEATURES.length - 1 ? "pb-8 sm:pb-10 md:pb-16 border-b border-border" : ""}
                   >
                     <h3 className="text-lg sm:text-base md:text-lg font-medium mb-3 sm:mb-4 md:mb-6">
                       {feature.title}

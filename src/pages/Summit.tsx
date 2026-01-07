@@ -11,6 +11,7 @@ import summitFeature from "@/assets/summit-front.png";
 import summitCover from "@/assets/summit-cover.png";
 import summitFinancial from "@/assets/summit-financial.png";
 import summitTax from "@/assets/summit-tax.png";
+import summitProductGroup from "@/assets/summit-product-group.png";
 import { useState } from "react";
 import { useScrollAnimation, scrollAnimationClasses } from "@/hooks/useScrollAnimation";
 
@@ -551,6 +552,22 @@ const Summit = () => {
               >
                 지금 구매하기
               </Button>
+            </div>
+            
+            {/* Product Group Image - Apple Style Scale & Fade Animation */}
+            <div className="mt-16 sm:mt-20 md:mt-28 max-w-5xl mx-auto">
+              <img
+                src={summitProductGroup}
+                alt="SUMMIT 모의고사 제품 구성"
+                className={`w-full h-auto transition-all duration-[1500ms] ease-out ${
+                  ctaAnim.isVisible 
+                    ? 'opacity-100 scale-100' 
+                    : 'opacity-0 scale-90'
+                }`}
+                style={{ transitionDelay: '300ms' }}
+                loading="lazy"
+                decoding="async"
+              />
             </div>
           </div>
         </section>

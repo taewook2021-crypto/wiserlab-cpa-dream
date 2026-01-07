@@ -102,6 +102,7 @@ const Summit = () => {
   const financialAnim = useScrollAnimation({ threshold: 0.1 });
   const galleryAnim = useScrollAnimation({ threshold: 0.1 });
   const taxAnim = useScrollAnimation({ threshold: 0.1 });
+  const ctaAnim = useScrollAnimation({ threshold: 0.1 });
 
   const scrollGallery = useCallback((direction: 'left' | 'right') => {
     if (!galleryRef.current) return;
@@ -438,6 +439,39 @@ const Summit = () => {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section - Apple Style */}
+        <section className="py-24 sm:py-32 md:py-40 bg-background">
+          <div 
+            ref={ctaAnim.ref}
+            className={`container mx-auto px-6 md:px-12 lg:px-20 text-center ${scrollAnimationClasses.transition} ${ctaAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto">
+              2026 CPA 1차,
+              <br />
+              SUMMIT으로 승리하세요.
+            </h2>
+            <div className="mt-10 sm:mt-12 md:mt-16 flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                size="lg"
+                className="h-12 sm:h-14 px-8 sm:px-10 text-base sm:text-lg font-medium rounded-full"
+                onClick={handleAddToCart}
+                disabled={isAddingToCart}
+              >
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                장바구니에 담기
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-12 sm:h-14 px-8 sm:px-10 text-base sm:text-lg font-medium rounded-full"
+                onClick={() => navigate('/summit')}
+              >
+                더 알아보기
+              </Button>
             </div>
           </div>
         </section>

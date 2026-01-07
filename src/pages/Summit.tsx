@@ -102,7 +102,6 @@ const Summit = () => {
   const financialAnim = useScrollAnimation({ threshold: 0.1 });
   const galleryAnim = useScrollAnimation({ threshold: 0.1 });
   const taxAnim = useScrollAnimation({ threshold: 0.1 });
-  const gradientAnim = useScrollAnimation({ threshold: 0.3 });
   const ctaAnim = useScrollAnimation({ threshold: 0.1 });
 
   const scrollGallery = useCallback((direction: 'left' | 'right') => {
@@ -444,42 +443,21 @@ const Summit = () => {
           </div>
         </section>
 
-        {/* Gradient Transition Area - Animated */}
-        <div 
-          ref={gradientAnim.ref}
-          className="h-48 sm:h-64 md:h-80 relative overflow-hidden"
-        >
-          {/* Base background */}
-          <div className="absolute inset-0 bg-muted/20" />
-          
-          {/* Animated gradient overlay */}
-          <div 
-            className={`absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black transition-all duration-[2000ms] ease-out ${
-              gradientAnim.isVisible 
-                ? 'opacity-100 translate-y-0' 
-                : 'opacity-0 translate-y-full'
-            }`}
-          />
-          
-          {/* Second wave for smoother effect */}
-          <div 
-            className={`absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black transition-all duration-[1500ms] delay-300 ease-out ${
-              gradientAnim.isVisible 
-                ? 'opacity-100' 
-                : 'opacity-0'
-            }`}
-          />
-        </div>
-
-        {/* CTA Section - Apple Style */}
+        {/* CTA Section - Apple Style with gradient to black */}
         <section 
           ref={ctaAnim.ref}
-          className="py-24 sm:py-32 md:py-40 bg-black"
+          className={`py-24 sm:py-32 md:py-40 transition-all duration-1000 ease-out ${
+            ctaAnim.isVisible 
+              ? 'bg-black' 
+              : 'bg-background'
+          }`}
         >
           <div 
             className={`container mx-auto px-6 md:px-12 lg:px-20 text-center ${scrollAnimationClasses.transition} ${ctaAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto text-white">
+            <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto transition-colors duration-1000 ${
+              ctaAnim.isVisible ? 'text-white' : 'text-foreground'
+            }`}>
               2026 CPA 1차,
               <br />
               SUMMIT으로 승리하세요.
@@ -487,7 +465,11 @@ const Summit = () => {
             <div className="mt-10 sm:mt-12 md:mt-16">
               <Button
                 size="lg"
-                className="h-12 sm:h-14 px-10 sm:px-12 text-base sm:text-lg font-medium rounded-full bg-white text-black hover:bg-gray-200"
+                className={`h-12 sm:h-14 px-10 sm:px-12 text-base sm:text-lg font-medium rounded-full transition-all duration-1000 ${
+                  ctaAnim.isVisible 
+                    ? 'bg-white text-black hover:bg-gray-200' 
+                    : ''
+                }`}
                 onClick={handlePurchase}
               >
                 지금 구매하기

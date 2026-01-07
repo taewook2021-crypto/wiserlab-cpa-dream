@@ -102,6 +102,7 @@ const Summit = () => {
   const financialAnim = useScrollAnimation({ threshold: 0.1 });
   const galleryAnim = useScrollAnimation({ threshold: 0.1 });
   const taxAnim = useScrollAnimation({ threshold: 0.1 });
+  const gradientAnim = useScrollAnimation({ threshold: 0.3 });
   const ctaAnim = useScrollAnimation({ threshold: 0.1 });
 
   const scrollGallery = useCallback((direction: 'left' | 'right') => {
@@ -443,8 +444,32 @@ const Summit = () => {
           </div>
         </section>
 
-        {/* Gradient Transition Area */}
-        <div className="h-32 sm:h-48 md:h-64 bg-gradient-to-b from-muted/20 to-black" />
+        {/* Gradient Transition Area - Animated */}
+        <div 
+          ref={gradientAnim.ref}
+          className="h-48 sm:h-64 md:h-80 relative overflow-hidden"
+        >
+          {/* Base background */}
+          <div className="absolute inset-0 bg-muted/20" />
+          
+          {/* Animated gradient overlay */}
+          <div 
+            className={`absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black transition-all duration-[2000ms] ease-out ${
+              gradientAnim.isVisible 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-full'
+            }`}
+          />
+          
+          {/* Second wave for smoother effect */}
+          <div 
+            className={`absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black transition-all duration-[1500ms] delay-300 ease-out ${
+              gradientAnim.isVisible 
+                ? 'opacity-100' 
+                : 'opacity-0'
+            }`}
+          />
+        </div>
 
         {/* CTA Section - Apple Style */}
         <section 

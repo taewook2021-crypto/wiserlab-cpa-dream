@@ -443,21 +443,18 @@ const Summit = () => {
           </div>
         </section>
 
-        {/* CTA Section - Apple Style with gradient to black */}
+        {/* Gradient Transition Area */}
+        <div className="h-32 sm:h-48 md:h-64 bg-gradient-to-b from-muted/20 to-black" />
+
+        {/* CTA Section - Apple Style */}
         <section 
           ref={ctaAnim.ref}
-          className={`py-24 sm:py-32 md:py-40 transition-all duration-1000 ease-out ${
-            ctaAnim.isVisible 
-              ? 'bg-black' 
-              : 'bg-background'
-          }`}
+          className="py-24 sm:py-32 md:py-40 bg-black"
         >
           <div 
             className={`container mx-auto px-6 md:px-12 lg:px-20 text-center ${scrollAnimationClasses.transition} ${ctaAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
           >
-            <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto transition-colors duration-1000 ${
-              ctaAnim.isVisible ? 'text-white' : 'text-foreground'
-            }`}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto text-white">
               2026 CPA 1차,
               <br />
               SUMMIT으로 승리하세요.
@@ -465,11 +462,7 @@ const Summit = () => {
             <div className="mt-10 sm:mt-12 md:mt-16">
               <Button
                 size="lg"
-                className={`h-12 sm:h-14 px-10 sm:px-12 text-base sm:text-lg font-medium rounded-full transition-all duration-1000 ${
-                  ctaAnim.isVisible 
-                    ? 'bg-white text-black hover:bg-gray-200' 
-                    : ''
-                }`}
+                className="h-12 sm:h-14 px-10 sm:px-12 text-base sm:text-lg font-medium rounded-full bg-white text-black hover:bg-gray-200"
                 onClick={handlePurchase}
               >
                 지금 구매하기

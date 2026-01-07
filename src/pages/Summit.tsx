@@ -464,15 +464,15 @@ const Summit = () => {
               확인할 수 있는 첫 번째<br />
               모의고사입니다.
             </h2>
-            <a 
-              href="#" 
+            <button 
+              onClick={handlePurchase}
               className={`inline-flex items-center gap-1 mt-6 sm:mt-8 text-base sm:text-lg transition-colors duration-[5000ms] hover:underline ${
                 envAnim.isVisible ? 'text-[#0066cc]' : 'text-primary'
               }`}
             >
-              SUMMIT에 대해 더 알아보기
+              지금 SUMMIT 바로 구매하기
               <ChevronRight className="w-4 h-4" />
-            </a>
+            </button>
           </div>
 
           {/* Three White Cards */}

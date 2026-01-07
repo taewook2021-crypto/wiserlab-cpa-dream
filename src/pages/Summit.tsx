@@ -524,7 +524,7 @@ const Summit = () => {
         {/* CTA Section - Apple Style with gradient to black */}
         <section 
           ref={ctaAnim.ref}
-          className={`py-24 sm:py-32 md:py-40 transition-all duration-[5000ms] ease-out ${
+          className={`py-24 sm:py-32 md:py-40 transition-all duration-[3000ms] ease-out ${
             ctaAnim.isVisible 
               ? 'bg-black' 
               : 'bg-background'
@@ -533,7 +533,7 @@ const Summit = () => {
           <div 
             className={`container mx-auto px-6 md:px-12 lg:px-20 text-center ${scrollAnimationClasses.transition} ${ctaAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
           >
-            <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto transition-colors duration-1000 ${
+            <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto transition-colors duration-[2000ms] ${
               ctaAnim.isVisible ? 'text-white' : 'text-foreground'
             }`}>
               2026 CPA 1차,
@@ -543,7 +543,7 @@ const Summit = () => {
             <div className="mt-10 sm:mt-12 md:mt-16">
               <Button
                 size="lg"
-                className={`h-12 sm:h-14 px-10 sm:px-12 text-base sm:text-lg font-medium rounded-full transition-all duration-1000 ${
+                className={`h-12 sm:h-14 px-10 sm:px-12 text-base sm:text-lg font-medium rounded-full transition-all duration-[2000ms] ${
                   ctaAnim.isVisible 
                     ? 'bg-white text-black hover:bg-gray-200' 
                     : ''
@@ -559,12 +559,12 @@ const Summit = () => {
               <img
                 src={summitProductGroup}
                 alt="SUMMIT 모의고사 제품 구성"
-                className={`w-full h-auto transition-all duration-[1500ms] ease-out ${
+                className={`w-full h-auto transition-all duration-[2500ms] ease-out ${
                   ctaAnim.isVisible 
                     ? 'opacity-100 scale-100' 
                     : 'opacity-0 scale-90'
                 }`}
-                style={{ transitionDelay: '300ms' }}
+                style={{ transitionDelay: '500ms' }}
                 loading="lazy"
                 decoding="async"
               />

@@ -159,7 +159,7 @@ const Summit = () => {
 
       <main className="pt-16">
         {/* Product Hero Section */}
-        <section className="border-b border-border">
+        <section>
           <div className="container mx-auto px-6 py-12 sm:py-16 md:py-28">
             <div className="grid sm:grid-cols-2 gap-8 sm:gap-10 md:gap-20 items-start">
               {/* Left: Product Image */}
@@ -246,7 +246,7 @@ const Summit = () => {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 sm:py-20 md:py-28 border-b border-border">
+        <section className="py-16 sm:py-20 md:py-28">
           <div className="grid sm:grid-cols-2">
             {/* Left: Image */}
             <div className="aspect-square sm:aspect-auto sm:min-h-[320px] md:min-h-[400px] overflow-hidden">
@@ -265,7 +265,7 @@ const Summit = () => {
                 {FEATURES.map((feature, index) => (
                   <div
                     key={index}
-                    className={index < FEATURES.length - 1 ? "pb-8 sm:pb-10 md:pb-16 border-b border-border" : ""}
+                    className={index < FEATURES.length - 1 ? "pb-8 sm:pb-10 md:pb-16" : ""}
                   >
                     <h3 className="text-lg sm:text-base md:text-lg font-medium mb-3 sm:mb-4 md:mb-6">
                       {feature.title}
@@ -315,7 +315,7 @@ const Summit = () => {
         </section>
 
         {/* Apple-style Horizontal Gallery Section */}
-        <section className="py-20 sm:py-28 md:py-36 bg-background border-y border-border overflow-hidden">
+        <section className="py-20 sm:py-28 md:py-36 bg-background overflow-hidden">
           <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-center">
               디테일 하나하나, 프로답게.

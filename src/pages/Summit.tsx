@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
-import summitFeature from "@/assets/summit-feature.png";
+import summitFeature from "@/assets/summit-front.png";
 import summitCover from "@/assets/summit-cover.png";
 import summitFinancial from "@/assets/summit-financial.png";
 import summitTax from "@/assets/summit-tax.png";

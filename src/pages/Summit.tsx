@@ -458,7 +458,7 @@ const Summit = () => {
               <Button
                 size="lg"
                 className="h-12 sm:h-14 px-10 sm:px-12 text-base sm:text-lg font-medium rounded-full"
-                onClick={() => navigate('/payment')}
+                onClick={handlePurchase}
               >
                 지금 구매하기
               </Button>

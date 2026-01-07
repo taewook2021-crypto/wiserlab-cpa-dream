@@ -449,7 +449,7 @@ const Summit = () => {
         {/* CTA Section - Apple Style with gradient to black */}
         <section 
           ref={ctaAnim.ref}
-          className={`py-24 sm:py-32 md:py-40 transition-all duration-[2000ms] ease-out ${
+          className={`py-24 sm:py-32 md:py-40 transition-all duration-[3000ms] ease-out ${
             ctaAnim.isVisible 
               ? 'bg-black' 
               : 'bg-background'

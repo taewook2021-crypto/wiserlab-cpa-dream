@@ -443,10 +443,13 @@ const Summit = () => {
           </div>
         </section>
 
+        {/* Spacer between sections */}
+        <div className="h-24 sm:h-32 md:h-40 bg-muted/20" />
+
         {/* CTA Section - Apple Style with gradient to black */}
         <section 
           ref={ctaAnim.ref}
-          className={`mt-24 sm:mt-32 md:mt-40 py-24 sm:py-32 md:py-40 transition-all duration-[2000ms] ease-out ${
+          className={`py-24 sm:py-32 md:py-40 transition-all duration-[2000ms] ease-out ${
             ctaAnim.isVisible 
               ? 'bg-black' 
               : 'bg-background'

@@ -269,7 +269,7 @@ const Summit = () => {
               <img
                 src={summitFeature}
                 alt="SUMMIT 모의고사 특징"
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover transition-transform duration-1000 ease-out ${featuresAnim.isVisible ? 'scale-100' : 'scale-90'}`}
                 loading="eager"
                 decoding="async"
               />

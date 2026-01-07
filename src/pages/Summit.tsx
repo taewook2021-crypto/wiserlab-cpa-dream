@@ -12,6 +12,7 @@ import summitCover from "@/assets/summit-cover.png";
 import summitFinancial from "@/assets/summit-financial.png";
 import summitTax from "@/assets/summit-tax.png";
 import { useState } from "react";
+import { useScrollAnimation, scrollAnimationClasses } from "@/hooks/useScrollAnimation";
 
 const BUNDLE_PRICE = 50000;
 
@@ -95,6 +96,13 @@ const Summit = () => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const galleryRef = useRef<HTMLDivElement>(null);
 
+  // Scroll animations for each section
+  const heroAnim = useScrollAnimation({ threshold: 0.1 });
+  const featuresAnim = useScrollAnimation({ threshold: 0.1 });
+  const financialAnim = useScrollAnimation({ threshold: 0.1 });
+  const galleryAnim = useScrollAnimation({ threshold: 0.1 });
+  const taxAnim = useScrollAnimation({ threshold: 0.1 });
+
   const scrollGallery = useCallback((direction: 'left' | 'right') => {
     if (!galleryRef.current) return;
     const scrollAmount = galleryRef.current.clientWidth * 0.8;
@@ -160,7 +168,10 @@ const Summit = () => {
       <main className="pt-16">
         {/* Product Hero Section */}
         <section>
-          <div className="container mx-auto px-6 py-12 sm:py-16 md:py-28">
+          <div 
+            ref={heroAnim.ref}
+            className={`container mx-auto px-6 py-12 sm:py-16 md:py-28 ${scrollAnimationClasses.transition} ${heroAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
             <div className="grid sm:grid-cols-2 gap-8 sm:gap-10 md:gap-20 items-start">
               {/* Left: Product Image */}
               <div className="flex items-center justify-center">
@@ -247,7 +258,10 @@ const Summit = () => {
 
         {/* Features Section */}
         <section className="py-16 sm:py-20 md:py-28">
-          <div className="grid sm:grid-cols-2">
+          <div 
+            ref={featuresAnim.ref}
+            className={`grid sm:grid-cols-2 ${scrollAnimationClasses.transition} ${featuresAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
             {/* Left: Image */}
             <div className="aspect-square sm:aspect-auto sm:min-h-[320px] md:min-h-[400px] overflow-hidden">
               <img
@@ -282,7 +296,10 @@ const Summit = () => {
 
         {/* 재무회계 Section */}
         <section className="py-20 sm:py-28 md:py-36 bg-muted/20">
-          <div className="container mx-auto px-6 md:px-12 lg:px-20">
+          <div 
+            ref={financialAnim.ref}
+            className={`container mx-auto px-6 md:px-12 lg:px-20 ${scrollAnimationClasses.transition} ${financialAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
             <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
               <div className="space-y-6 md:space-y-8 max-w-xl">
                 <h2 className="text-3xl md:text-2xl lg:text-4xl font-medium tracking-tight">
@@ -316,74 +333,84 @@ const Summit = () => {
 
         {/* Apple-style Horizontal Gallery Section */}
         <section className="py-20 sm:py-28 md:py-36 bg-background overflow-hidden">
-          <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-center">
-              디테일까지 섬세하게, 모두 준비했습니다.
-            </h2>
-          </div>
+          <div 
+            ref={galleryAnim.ref}
+            className={`${scrollAnimationClasses.transition} ${galleryAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
+            <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-center">
+                디테일까지 섬세하게, 전부 준비했습니다.
+              </h2>
+            </div>
 
-          {/* Gallery Container */}
-          <div className="relative">
-            {/* Navigation Buttons - Hidden on mobile */}
-            <button
-              onClick={() => scrollGallery('left')}
-              className="hidden md:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border hover:bg-muted transition-colors"
-              aria-label="이전 슬라이드"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
-              onClick={() => scrollGallery('right')}
-              className="hidden md:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border hover:bg-muted transition-colors"
-              aria-label="다음 슬라이드"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            {/* Scrollable Gallery */}
-            <div
-              ref={galleryRef}
-              className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6 md:px-12 lg:px-20 pb-4"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
-            >
-              {GALLERY_ITEMS.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[40vw] xl:w-[35vw] snap-center"
-                >
-                  <div className="bg-muted/30 rounded-2xl md:rounded-3xl overflow-hidden h-full">
-                    {/* Image */}
-                    <div className="aspect-[4/3] overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                    {/* Text Content */}
-                    <div className="p-6 md:p-8 lg:p-10">
-                      <h3 className="text-lg md:text-xl lg:text-2xl font-medium mb-2 md:mb-3">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                        {item.description}
-                      </p>
+            {/* Gallery Container */}
+            <div className="relative">
+              {/* Scrollable Gallery */}
+              <div
+                ref={galleryRef}
+                className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6 md:px-12 lg:px-20 pb-4"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                }}
+              >
+                {GALLERY_ITEMS.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[40vw] xl:w-[35vw] snap-center"
+                  >
+                    <div className="bg-muted/30 rounded-2xl md:rounded-3xl overflow-hidden h-full">
+                      {/* Image */}
+                      <div className="aspect-[4/3] overflow-hidden">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      {/* Text Content */}
+                      <div className="p-6 md:p-8 lg:p-10">
+                        <h3 className="text-lg md:text-xl lg:text-2xl font-medium mb-2 md:mb-3">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              {/* Navigation Buttons - Bottom right like Apple */}
+              <div className="hidden md:flex justify-end gap-3 mt-6 px-6 md:px-12 lg:px-20">
+                <button
+                  onClick={() => scrollGallery('left')}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
+                  aria-label="이전 슬라이드"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scrollGallery('right')}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
+                  aria-label="다음 슬라이드"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
         {/* 세법 Section */}
         <section className="py-20 sm:py-28 md:py-36 bg-muted/20">
-          <div className="container mx-auto px-6 md:px-12 lg:px-20">
+          <div 
+            ref={taxAnim.ref}
+            className={`container mx-auto px-6 md:px-12 lg:px-20 ${scrollAnimationClasses.transition} ${taxAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
             <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
               <div className="space-y-6 md:space-y-8 max-w-xl md:text-right md:ml-auto">
                 <h2 className="text-3xl md:text-2xl lg:text-4xl font-medium tracking-tight">

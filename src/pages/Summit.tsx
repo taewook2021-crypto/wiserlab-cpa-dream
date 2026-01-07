@@ -455,26 +455,22 @@ const Summit = () => {
         >
           {/* Header */}
           <div 
-            className={`py-24 sm:py-32 md:py-40 container mx-auto px-6 md:px-12 lg:px-20 text-center ${scrollAnimationClasses.transition} ${envAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+            className={`py-24 sm:py-32 md:py-40 container mx-auto px-6 md:px-12 lg:px-20 ${scrollAnimationClasses.transition} ${envAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
           >
-            <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto transition-colors duration-[5000ms] ${
+            <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl transition-colors duration-[5000ms] ${
               envAnim.isVisible ? 'text-[#1d1d1f]' : 'text-foreground'
             }`}>
-              SUMMIT 그리고 환경.
+              SUMMIT은 '현재 내 위치'를<br />
+              확인할 수 있는 첫 번째<br />
+              모의고사입니다.
             </h2>
-            <p className={`mt-6 sm:mt-8 text-base sm:text-lg md:text-xl max-w-2xl mx-auto transition-colors duration-[5000ms] ${
-              envAnim.isVisible ? 'text-[#86868b]' : 'text-muted-foreground'
-            }`}>
-              SUMMIT 모의고사는 친환경 용지와 콩기름 인쇄를 사용하여<br className="hidden sm:block" />
-              환경에 대한 책임을 다하고 있습니다.
-            </p>
             <a 
               href="#" 
               className={`inline-flex items-center gap-1 mt-6 sm:mt-8 text-base sm:text-lg transition-colors duration-[5000ms] hover:underline ${
                 envAnim.isVisible ? 'text-[#0066cc]' : 'text-primary'
               }`}
             >
-              환경에 대한 노력 더 알아보기
+              SUMMIT에 대해 더 알아보기
               <ChevronRight className="w-4 h-4" />
             </a>
           </div>

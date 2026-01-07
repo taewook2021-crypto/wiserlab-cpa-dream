@@ -102,6 +102,7 @@ const Summit = () => {
   const financialAnim = useScrollAnimation({ threshold: 0.1 });
   const galleryAnim = useScrollAnimation({ threshold: 0.1 });
   const taxAnim = useScrollAnimation({ threshold: 0.1 });
+  const envAnim = useScrollAnimation({ threshold: 0.1 });
   const ctaAnim = useScrollAnimation({ threshold: 0.1 });
 
   const scrollGallery = useCallback((direction: 'left' | 'right') => {
@@ -443,8 +444,43 @@ const Summit = () => {
           </div>
         </section>
 
+        {/* Environment Section - Apple Style with gradient to green */}
+        <section 
+          ref={envAnim.ref}
+          className={`py-24 sm:py-32 md:py-40 transition-all duration-[5000ms] ease-out ${
+            envAnim.isVisible 
+              ? 'bg-[#1d1d1f]' 
+              : 'bg-muted/20'
+          }`}
+        >
+          <div 
+            className={`container mx-auto px-6 md:px-12 lg:px-20 text-center ${scrollAnimationClasses.transition} ${envAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
+            <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight max-w-4xl mx-auto transition-colors duration-[5000ms] ${
+              envAnim.isVisible ? 'text-white' : 'text-foreground'
+            }`}>
+              SUMMIT 그리고 환경.
+            </h2>
+            <p className={`mt-6 sm:mt-8 text-base sm:text-lg md:text-xl max-w-2xl mx-auto transition-colors duration-[5000ms] ${
+              envAnim.isVisible ? 'text-[#86868b]' : 'text-muted-foreground'
+            }`}>
+              SUMMIT 모의고사는 친환경 용지와 콩기름 인쇄를 사용하여<br className="hidden sm:block" />
+              환경에 대한 책임을 다하고 있습니다.
+            </p>
+            <a 
+              href="#" 
+              className={`inline-flex items-center gap-1 mt-6 sm:mt-8 text-base sm:text-lg transition-colors duration-[5000ms] hover:underline ${
+                envAnim.isVisible ? 'text-[#2997ff]' : 'text-primary'
+              }`}
+            >
+              환경에 대한 노력 더 알아보기
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </div>
+        </section>
+
         {/* Spacer between sections */}
-        <div className="h-24 sm:h-32 md:h-40 bg-muted/20" />
+        <div className={`h-24 sm:h-32 md:h-40 transition-colors duration-[5000ms] ${envAnim.isVisible ? 'bg-[#1d1d1f]' : 'bg-muted/20'}`} />
 
         {/* CTA Section - Apple Style with gradient to black */}
         <section 

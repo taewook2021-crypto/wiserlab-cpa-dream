@@ -318,7 +318,7 @@ const Summit = () => {
         <section className="py-20 sm:py-28 md:py-36 bg-background overflow-hidden">
           <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-center">
-              디테일 하나하나, 프로답게.
+              디테일까지 섬세하게, 모두 준비했습니다.
             </h2>
           </div>
 

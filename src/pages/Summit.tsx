@@ -333,7 +333,7 @@ const Summit = () => {
         </section>
 
         {/* Apple-style Horizontal Gallery Section */}
-        <section className="py-20 sm:py-28 md:py-36 bg-background overflow-hidden">
+        <section className="py-20 sm:py-28 md:py-36 bg-muted/20 overflow-hidden">
           <div 
             ref={galleryAnim.ref}
             className={`${scrollAnimationClasses.transition} ${galleryAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}

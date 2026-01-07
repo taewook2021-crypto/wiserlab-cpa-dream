@@ -555,7 +555,7 @@ const Summit = () => {
             </div>
             
             {/* Product Group Image - Apple Style Scale & Fade Animation */}
-            <div className="mt-10 sm:mt-12 md:mt-16 max-w-5xl mx-auto">
+            <div className="mt-16 sm:mt-20 md:mt-28 max-w-5xl mx-auto">
               <img
                 src={summitProductGroup}
                 alt="SUMMIT 모의고사 제품 구성"

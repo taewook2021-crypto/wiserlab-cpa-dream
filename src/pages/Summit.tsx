@@ -455,7 +455,7 @@ const Summit = () => {
         >
           {/* Header */}
           <div 
-            className={`py-24 sm:py-32 md:py-40 container mx-auto px-6 md:px-12 lg:px-20 ${scrollAnimationClasses.transition} ${envAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+            className={`pt-24 sm:pt-32 md:pt-40 pb-12 sm:pb-16 md:pb-20 container mx-auto px-6 md:px-12 lg:px-20 ${scrollAnimationClasses.transition} ${envAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
           >
             <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight leading-snug transition-colors duration-[5000ms] ${
               envAnim.isVisible ? 'text-[#1d1d1f]' : 'text-foreground'

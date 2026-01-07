@@ -454,23 +454,13 @@ const Summit = () => {
               <br />
               SUMMIT으로 승리하세요.
             </h2>
-            <div className="mt-10 sm:mt-12 md:mt-16 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="mt-10 sm:mt-12 md:mt-16">
               <Button
                 size="lg"
-                className="h-12 sm:h-14 px-8 sm:px-10 text-base sm:text-lg font-medium rounded-full"
-                onClick={handleAddToCart}
-                disabled={isAddingToCart}
+                className="h-12 sm:h-14 px-10 sm:px-12 text-base sm:text-lg font-medium rounded-full"
+                onClick={() => navigate('/payment')}
               >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                장바구니에 담기
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-12 sm:h-14 px-8 sm:px-10 text-base sm:text-lg font-medium rounded-full"
-                onClick={() => navigate('/summit')}
-              >
-                더 알아보기
+                지금 구매하기
               </Button>
             </div>
           </div>

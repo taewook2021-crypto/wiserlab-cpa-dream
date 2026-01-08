@@ -502,7 +502,7 @@ const Summit = () => {
               <div className={`bg-white rounded-3xl p-8 sm:p-10 transition-all duration-500 ${envAnim.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '200ms' }}>
                 <p className="text-[#86868b] text-sm font-medium mb-4">우리의 접근 방식.</p>
                 <p className="text-[#1d1d1f] text-base sm:text-lg leading-[1.8] tracking-tight">
-                  전국모고만으로는 알 수 없는 <span className="font-medium">"내 점수의 의미"</span>, 어떤 부분을 보완해야 할지를 웹사이트 <span className="font-medium">"빠른 채점하기"</span>를 통해 부족한 개념과 관련된 문제만 모아 나만을 위한 커스텀 시험지를 자동으로 만들 수 있습니다.
+                  어떤 부분을 보완해야 할지를 웹사이트 <span className="font-medium">"빠른 채점하기"</span>를 통해 부족한 개념과 관련된 문제만 모아 나만을 위한 커스텀 시험지를 자동으로 만들 수 있습니다.
                 </p>
               </div>
 

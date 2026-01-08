@@ -368,7 +368,7 @@ const Summit = () => {
                         <img
                           src={item.image}
                           alt={item.title}
-                          className="w-full h-full object-cover"
+                          className={`w-full h-full object-cover ${index === 0 ? 'scale-110' : ''}`}
                           loading="lazy"
                           decoding="async"
                         />

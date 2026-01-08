@@ -362,8 +362,8 @@ const Summit = () => {
                     key={index}
                     className="flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[40vw] xl:w-[35vw] snap-center"
                   >
-                    <div className="bg-muted/30 rounded-2xl md:rounded-3xl overflow-hidden h-full">
-                      {/* Image */}
+                    {/* Image Container with Border - Apple Style */}
+                    <div className="rounded-2xl md:rounded-3xl overflow-hidden border border-border/50 bg-white shadow-sm">
                       <div className="aspect-[4/3] overflow-hidden">
                         <img
                           src={item.image}
@@ -373,15 +373,15 @@ const Summit = () => {
                           decoding="async"
                         />
                       </div>
-                      {/* Text Content */}
-                      <div className="p-6 md:p-8 lg:p-10">
-                        <h3 className="text-lg md:text-xl lg:text-2xl font-medium mb-2 md:mb-3">
-                          {item.title}
-                        </h3>
-                        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                          {item.description}
-                        </p>
-                      </div>
+                    </div>
+                    {/* Text Content - Separated Below Image */}
+                    <div className="pt-5 md:pt-6 lg:pt-8 px-1">
+                      <h3 className="text-lg md:text-xl lg:text-2xl font-semibold mb-2 md:mb-3 text-foreground">
+                        {item.title}
+                      </h3>
+                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
                 ))}

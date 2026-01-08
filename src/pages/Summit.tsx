@@ -13,6 +13,7 @@ import summitFinancial from "@/assets/summit-financial.png";
 import summitTax from "@/assets/summit-tax.png";
 import summitProductGroup from "@/assets/summit-product-group.png";
 import summitHeroProduct from "@/assets/summit-hero-product.png";
+import summitGallery1 from "@/assets/summit-gallery-1.png";
 import { useState } from "react";
 import { useScrollAnimation, scrollAnimationClasses } from "@/hooks/useScrollAnimation";
 
@@ -50,8 +51,7 @@ const GALLERY_ITEMS = [
   {
     title: "실전과 동일한 시험지",
     description: "실제 CPA 시험지와 동일한 양식으로 제작하여 실전 감각을 극대화합니다.",
-    imagePath: "/summit-gallery-1.png",
-    fallbackImage: summitCover,
+    fallbackImage: summitGallery1,
   },
   {
     title: "최상위권 데이터 기반",

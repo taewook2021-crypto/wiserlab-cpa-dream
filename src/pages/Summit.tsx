@@ -16,6 +16,7 @@ import summitProductGroup from "@/assets/summit-product-group.png";
 import summitHeroProduct from "@/assets/summit-hero-product.png";
 import summitGallery1 from "@/assets/summit-gallery-1.png";
 import summitGallery3 from "@/assets/summit-gallery-3.png";
+import summitGallery4 from "@/assets/summit-gallery-4.jpg";
 import { useState } from "react";
 import { useScrollAnimation, scrollAnimationClasses } from "@/hooks/useScrollAnimation";
 
@@ -69,8 +70,7 @@ const GALLERY_ITEMS = [
   {
     title: "실제 시험은 이런 느낌입니다",
     description: "과도하게 지엽적인 문제는 배제하고, 실제 시험에서 변별되는 포인트 중심으로 문제를 구성했습니다.",
-    imagePath: "/summit-gallery-4.png",
-    fallbackImage: summitFeature,
+    fallbackImage: summitGallery4,
   },
 ] as const;
 

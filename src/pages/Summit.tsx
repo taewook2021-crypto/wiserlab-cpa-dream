@@ -285,7 +285,7 @@ const Summit = () => {
 
             {/* Right: Features */}
             <div className="bg-muted/30 p-8 sm:p-10 md:p-16 lg:p-24 flex flex-col justify-center">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              <div className="flex flex-col gap-4 sm:gap-5 md:gap-6">
                 {FEATURES.map((feature, index) => (
                   <div
                     key={index}

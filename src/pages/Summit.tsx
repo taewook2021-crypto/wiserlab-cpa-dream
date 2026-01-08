@@ -341,7 +341,7 @@ const Summit = () => {
             className={`${scrollAnimationClasses.transition} ${galleryAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
           >
             <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-center">
               <span className="font-bold">디테일까지</span> 섬세하게, 전부 준비했습니다.
             </h2>
             </div>

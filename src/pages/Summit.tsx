@@ -284,17 +284,17 @@ const Summit = () => {
             </div>
 
             {/* Right: Features */}
-            <div className="bg-background p-8 sm:p-10 md:p-24 flex flex-col justify-center">
-              <div className="space-y-8 sm:space-y-10 md:space-y-16">
+            <div className="bg-muted/30 p-8 sm:p-10 md:p-16 lg:p-24 flex flex-col justify-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                 {FEATURES.map((feature, index) => (
                   <div
                     key={index}
-                    className={index < FEATURES.length - 1 ? "pb-8 sm:pb-10 md:pb-16 border-b border-border" : ""}
+                    className="bg-background rounded-2xl p-6 sm:p-7 md:p-8 shadow-sm border border-border/50"
                   >
-                    <h3 className="text-lg sm:text-base md:text-lg font-medium mb-3 sm:mb-4 md:mb-6">
+                    <h3 className="text-base sm:text-sm md:text-base lg:text-lg font-medium mb-2 sm:mb-3 md:mb-4">
                       {feature.title}
                     </h3>
-                    <p className="text-base sm:text-sm md:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                    <p className="text-sm sm:text-xs md:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                       {feature.description}
                     </p>
                   </div>

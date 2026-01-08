@@ -49,8 +49,8 @@ const FEATURES = [
 // Using image paths directly to avoid sharing references with other sections
 const GALLERY_ITEMS = [
   {
-    title: "실전과 동일한 시험지",
-    description: "실제 CPA 시험지와 동일한 양식으로 제작하여 실전 감각을 극대화합니다.",
+    title: "탄탄한 해설과 함께",
+    description: "단순 답지는 이제 그만. 다양한 풀이법과 코멘트, 관련 개념까지 연결지어 복습할 수 있는 새로운 해설지를 만나보세요.",
     fallbackImage: summitGallery1,
   },
   {

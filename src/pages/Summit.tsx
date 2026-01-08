@@ -12,6 +12,7 @@ import summitCover from "@/assets/summit-cover-mockup.png";
 import summitFinancial from "@/assets/summit-financial.png";
 import summitTax from "@/assets/summit-tax.png";
 import summitProductGroup from "@/assets/summit-product-group.png";
+import summitHeroProduct from "@/assets/summit-hero-product.png";
 import { useState } from "react";
 import { useScrollAnimation, scrollAnimationClasses } from "@/hooks/useScrollAnimation";
 
@@ -185,7 +186,7 @@ const Summit = () => {
               <div className="flex items-center justify-center">
                 <div className="shadow-xl rounded-sm overflow-hidden w-[180px] sm:w-[180px] md:w-[280px] lg:w-[400px]">
                   <img
-                    src={summitCover}
+                    src={summitHeroProduct}
                     alt="Wiser Lab SUMMIT 모의고사 패키지"
                     className="w-full h-auto object-contain"
                     loading="eager"

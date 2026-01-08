@@ -489,37 +489,25 @@ const Summit = () => {
               {/* Card 1 - 친환경 용지 */}
               <div className={`bg-white rounded-3xl p-8 sm:p-10 transition-all duration-500 ${envAnim.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '200ms' }}>
                 <p className="text-[#86868b] text-sm font-medium mb-4">우리의 접근 방식.</p>
-                <p className="text-[#1d1d1f] text-lg sm:text-xl leading-relaxed mb-6">
+                <p className="text-[#1d1d1f] text-lg sm:text-xl leading-relaxed">
                   FSC 인증 친환경 용지를 사용하여 산림 자원을 보호하고, 지속 가능한 인쇄 환경을 만들어갑니다.
                 </p>
-                <a href="#" className="inline-flex items-center gap-1 text-[#0066cc] text-base hover:underline">
-                  친환경 인쇄에 대해 더 알아보기
-                  <ChevronRight className="w-4 h-4" />
-                </a>
               </div>
 
               {/* Card 2 - 콩기름 인쇄 */}
               <div className={`bg-white rounded-3xl p-8 sm:p-10 transition-all duration-500 ${envAnim.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '400ms' }}>
                 <p className="text-[#86868b] text-sm font-medium mb-4">당신이 도울 수 있는 방법.</p>
-                <p className="text-[#1d1d1f] text-lg sm:text-xl leading-relaxed mb-6">
+                <p className="text-[#1d1d1f] text-lg sm:text-xl leading-relaxed">
                   석유 기반 잉크 대신 콩기름 잉크를 사용하여 유해 물질 배출을 줄이고, 재활용 시에도 환경 부담을 최소화합니다.
                 </p>
-                <a href="#" className="inline-flex items-center gap-1 text-[#0066cc] text-base hover:underline">
-                  콩기름 잉크에 대해 더 알아보기
-                  <ChevronRight className="w-4 h-4" />
-                </a>
               </div>
 
               {/* Card 3 - 최소 포장 */}
               <div className={`bg-white rounded-3xl p-8 sm:p-10 transition-all duration-500 ${envAnim.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
                 <p className="text-[#86868b] text-sm font-medium mb-4">우리의 접근 방식.</p>
-                <p className="text-[#1d1d1f] text-lg sm:text-xl leading-relaxed mb-6">
+                <p className="text-[#1d1d1f] text-lg sm:text-xl leading-relaxed">
                   불필요한 포장재를 최소화하고 재활용 가능한 소재만 사용하여, 한 번에 더 많은 제품을 운송할 수 있도록 설계했습니다.
                 </p>
-                <a href="#" className="inline-flex items-center gap-1 text-[#0066cc] text-base hover:underline">
-                  포장 및 운송에 대해 더 알아보기
-                  <ChevronRight className="w-4 h-4" />
-                </a>
               </div>
             </div>
           </div>

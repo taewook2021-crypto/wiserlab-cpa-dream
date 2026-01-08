@@ -27,6 +27,11 @@ const preloadedCover = new Image();
 preloadedCover.src = summitCover;
 const preloadedFeature = new Image();
 preloadedFeature.src = summitFeature;
+const preloadedFinancial = new Image();
+preloadedFinancial.src = summitFinancialSection;
+const preloadedTax = new Image();
+preloadedTax.src = summitTax;
+preloadedFeature.src = summitFeature;
 
 // Static data moved outside component to prevent recreation
 const FEATURES = [
@@ -337,8 +342,9 @@ const Summit = () => {
                     src={summitFinancialSection}
                     alt="SUMMIT 재무회계 시험지"
                     className="w-full h-auto object-contain"
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
+                    fetchPriority="high"
                   />
                 </div>
               </div>
@@ -448,8 +454,9 @@ const Summit = () => {
                     src={summitTax}
                     alt="SUMMIT 세법 시험지"
                     className="w-full h-auto object-contain"
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
+                    fetchPriority="high"
                   />
                 </div>
               </div>

@@ -518,7 +518,7 @@ const Summit = () => {
               <div className={`bg-white rounded-3xl p-8 sm:p-10 transition-all duration-500 ${envAnim.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
                 <p className="text-[#86868b] text-sm font-medium mb-4">우리의 세법.</p>
                 <p className="text-[#1d1d1f] text-base sm:text-lg leading-[1.8] tracking-tight">
-                  이제는 감이 아닌 데이터입니다. 말문제 / 계산문제 중 당신의 취약 영역을 점수로 구분해 드리겠습니다.
+                  이제는 감이 아닌 데이터입니다. 말문제와 계산문제 중 당신의 취약 영역을 점수로 구분해 드리겠습니다.
                 </p>
               </div>
             </div>

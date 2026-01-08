@@ -61,8 +61,8 @@ const GALLERY_ITEMS = [
     fallbackImage: summitFinancial,
   },
   {
-    title: "트렌디한 출제 경향",
-    description: "최근 1차 시험의 난이도와 출제 경향을 정밀하게 분석하여 반영했습니다.",
+    title: "보증된 문제 퀄리티",
+    description: "현직 재무회계, 세무회계 메이저 강사들이 직접 선별 및 검수한 문제들을 만나보세요.",
     imagePath: "/summit-gallery-3.png",
     fallbackImage: summitTax,
   },

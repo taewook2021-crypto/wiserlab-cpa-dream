@@ -15,6 +15,7 @@ import summitTax from "@/assets/summit-tax.png";
 import summitProductGroup from "@/assets/summit-product-group.png";
 import summitHeroProduct from "@/assets/summit-hero-product.png";
 import summitGallery1 from "@/assets/summit-gallery-1.png";
+import summitGallery3 from "@/assets/summit-gallery-3.png";
 import { useState } from "react";
 import { useScrollAnimation, scrollAnimationClasses } from "@/hooks/useScrollAnimation";
 
@@ -63,8 +64,7 @@ const GALLERY_ITEMS = [
   {
     title: "보증된 문제 퀄리티",
     description: "현직 재무회계, 세무회계 메이저 강사들이 직접 선별 및 검수한 문제들을 만나보세요.",
-    imagePath: "/summit-gallery-3.png",
-    fallbackImage: summitTax,
+    fallbackImage: summitGallery3,
   },
   {
     title: "개정세법 완벽 반영",

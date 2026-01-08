@@ -44,26 +44,31 @@ const FEATURES = [
 ] as const;
 
 // Gallery items for horizontal scroll section (Apple-style)
+// Using image paths directly to avoid sharing references with other sections
 const GALLERY_ITEMS = [
   {
     title: "실전과 동일한 시험지",
     description: "실제 CPA 시험지와 동일한 양식으로 제작하여 실전 감각을 극대화합니다.",
-    image: summitCover,
+    imagePath: "/summit-gallery-1.png",
+    fallbackImage: summitCover,
   },
   {
     title: "최상위권 데이터 기반",
     description: "서울대학교, 연세대학교 최상위권 수험생 데이터를 기반으로 객관적인 위치 파악이 가능합니다.",
-    image: summitFinancial,
+    imagePath: "/summit-gallery-2.png",
+    fallbackImage: summitFinancial,
   },
   {
     title: "트렌디한 출제 경향",
     description: "최근 1차 시험의 난이도와 출제 경향을 정밀하게 분석하여 반영했습니다.",
-    image: summitTax,
+    imagePath: "/summit-gallery-3.png",
+    fallbackImage: summitTax,
   },
   {
     title: "개정세법 완벽 반영",
     description: "2025년 12월 법률 개정안까지 반영하고, 시험일까지 지속적으로 업데이트합니다.",
-    image: summitFeature,
+    imagePath: "/summit-gallery-4.png",
+    fallbackImage: summitFeature,
   },
 ] as const;
 
@@ -366,7 +371,7 @@ const Summit = () => {
                     <div className="rounded-2xl md:rounded-3xl overflow-hidden border border-border/50 bg-white shadow-sm">
                       <div className="aspect-[4/3] overflow-hidden">
                         <img
-                          src={item.image}
+                          src={item.fallbackImage}
                           alt={item.title}
                           className="w-full h-full object-cover"
                           loading="lazy"

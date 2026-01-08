@@ -67,8 +67,8 @@ const GALLERY_ITEMS = [
     fallbackImage: summitGallery3,
   },
   {
-    title: "개정세법 완벽 반영",
-    description: "2025년 12월 법률 개정안까지 반영하고, 시험일까지 지속적으로 업데이트합니다.",
+    title: "실제 시험은 이런 느낌입니다",
+    description: "과도하게 지엽적인 문제는 배제하고, 실제 시험에서 변별되는 포인트 중심으로 문제를 구성했습니다.",
     imagePath: "/summit-gallery-4.png",
     fallbackImage: summitFeature,
   },

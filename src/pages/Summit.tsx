@@ -10,6 +10,7 @@ import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import summitFeature from "@/assets/summit-front.png";
 import summitCover from "@/assets/summit-cover-mockup.png";
 import summitFinancial from "@/assets/summit-financial.png";
+import summitFinancialSection from "@/assets/summit-financial-section.png";
 import summitTax from "@/assets/summit-tax.png";
 import summitProductGroup from "@/assets/summit-product-group.png";
 import summitHeroProduct from "@/assets/summit-hero-product.png";
@@ -328,7 +329,7 @@ const Summit = () => {
               <div className="flex justify-center lg:justify-end">
                 <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
                   <img
-                    src={summitFinancial}
+                    src={summitFinancialSection}
                     alt="SUMMIT 재무회계 시험지"
                     className="w-full h-auto object-contain"
                     loading="lazy"

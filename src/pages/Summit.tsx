@@ -183,7 +183,7 @@ const Summit = () => {
           >
             <div className="grid sm:grid-cols-2 gap-8 sm:gap-10 md:gap-20 items-start">
               {/* Left: Product Image */}
-              <div className="flex items-center justify-center">
+              <div className="flex items-start justify-center">
                 <div className="shadow-xl rounded-sm overflow-hidden w-[180px] sm:w-[180px] md:w-[280px] lg:w-[400px]">
                   <img
                     src={summitHeroProduct}

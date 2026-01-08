@@ -54,7 +54,7 @@ const GALLERY_ITEMS = [
     fallbackImage: summitGallery1,
   },
   {
-    title: "시험 전에 당신의 현 상황을 진단해드립니다",
+    title: "시험 전에 당신의 현 상황을",
     description: "서울대, 연세대 최상위권 수험생 데이터를 기반으로 당신의 안정권 / 경합권 / 레드라인 위치를 제공해드립니다. 남은 기간 당신의 확실한 필승 전략을 세우기 위함이죠.",
     imagePath: "/summit-gallery-2.png",
     fallbackImage: summitFinancial,

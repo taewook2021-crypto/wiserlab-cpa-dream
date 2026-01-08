@@ -289,7 +289,12 @@ const Summit = () => {
                 {FEATURES.map((feature, index) => (
                   <div
                     key={index}
-                    className="bg-background rounded-2xl p-6 sm:p-7 md:p-8 shadow-sm border border-border/50"
+                    className={`bg-background rounded-2xl p-6 sm:p-7 md:p-8 shadow-sm border border-border/50 transition-all duration-500 ${
+                      featuresAnim.isVisible 
+                        ? 'opacity-100 translate-y-0' 
+                        : 'opacity-0 translate-y-8'
+                    }`}
+                    style={{ transitionDelay: `${(index + 1) * 150}ms` }}
                   >
                     <h3 className="text-base sm:text-sm md:text-base lg:text-lg font-medium mb-2 sm:mb-3 md:mb-4">
                       {feature.title}

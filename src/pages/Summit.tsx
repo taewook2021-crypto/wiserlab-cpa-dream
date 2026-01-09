@@ -58,7 +58,7 @@ const FEATURES = [
 const GALLERY_ITEMS = [
   {
     title: "탄탄한 해설과 함께",
-    description: "단순 답지는 이제 그만. 다양한 풀이법과 코멘트, 관련 개념까지 연결지어 복습할 수 있는 새로운 해설지를 만나보세요.",
+    description: "출제의도와 다양한 풀이법, 초고득점자들의 풀이 과정을 담았습니다.",
     fallbackImage: summitGallery1,
   },
   {

@@ -15,6 +15,7 @@ import summitTax from "@/assets/summit-tax.png";
 import summitProductGroup from "@/assets/summit-product-group.png";
 import summitHeroProduct from "@/assets/summit-hero-product.png";
 import summitGallery1 from "@/assets/summit-gallery-1.png";
+import summitGallery2 from "@/assets/summit-gallery-2.png";
 import summitGallery3 from "@/assets/summit-gallery-3.png";
 import summitGallery4 from "@/assets/summit-gallery-4.jpg";
 import { useState } from "react";
@@ -64,8 +65,7 @@ const GALLERY_ITEMS = [
   {
     title: "시험 전에 당신의 현 상황을",
     description: "서울대, 연세대 최상위권 수험생 데이터를 기반으로 당신의 안정권 / 경합권 / 레드라인 위치를 제공해드립니다. 남은 기간 당신의 확실한 필승 전략을 세우기 위함이죠.",
-    imagePath: "/summit-gallery-2.png",
-    fallbackImage: summitFinancial,
+    fallbackImage: summitGallery2,
   },
   {
     title: "보증된 문제 퀄리티",

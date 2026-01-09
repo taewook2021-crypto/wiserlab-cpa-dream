@@ -69,7 +69,7 @@ const GALLERY_ITEMS = [
   },
   {
     title: "보증된 문제 퀄리티",
-    description: "현직 재무회계, 세무회계 메이저 강사들이 직접 선별 및 검수한 문제들을 만나보세요.",
+    description: "현직 재무회계, 세무회계 메이저 강사들이 직접 선별 및 검수한 가장 실전적인 문제들로 구성했습니다.",
     fallbackImage: summitGallery3,
   },
   {

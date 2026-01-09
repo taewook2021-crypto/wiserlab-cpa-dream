@@ -340,7 +340,7 @@ const Summit = () => {
                 {GALLERY_ITEMS.map((item, index) => (
                   <div
                     key={index}
-                    className="flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[40vw] xl:w-[35vw] snap-center"
+                    className="flex-shrink-0 w-[90vw] sm:w-[85vw] md:w-[70vw] lg:w-[55vw] xl:w-[45vw] snap-center"
                   >
                     {/* Image Container with Border - Apple Style */}
                     <div className="rounded-2xl md:rounded-3xl overflow-hidden border border-border/50 bg-white shadow-sm">
@@ -355,11 +355,11 @@ const Summit = () => {
                       </div>
                     </div>
                     {/* Text Content - Separated Below Image */}
-                    <div className="pt-5 md:pt-6 lg:pt-8 px-1">
-                      <h3 className="text-lg md:text-xl lg:text-2xl font-semibold mb-2 md:mb-3 text-foreground">
+                    <div className="pt-6 md:pt-8 lg:pt-10 px-2">
+                      <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-3 md:mb-4 text-foreground">
                         {item.title}
                       </h3>
-                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                      <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
                         {item.description}
                       </p>
                     </div>

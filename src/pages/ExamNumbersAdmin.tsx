@@ -19,7 +19,7 @@ interface UserProfile {
   id: string;
   exam_number: string;
   created_at: string;
-  email?: string;
+  email: string | null;
 }
 
 const ExamNumbersAdmin = () => {
@@ -57,7 +57,7 @@ const ExamNumbersAdmin = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, exam_number, created_at")
+        .select("id, exam_number, created_at, email")
         .order("created_at", { ascending: false });
 
       if (!error && data) {
@@ -111,7 +111,7 @@ const ExamNumbersAdmin = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>수험번호</TableHead>
-                      <TableHead>가입자 ID</TableHead>
+                      <TableHead>카카오 이메일</TableHead>
                       <TableHead>가입일</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -128,8 +128,8 @@ const ExamNumbersAdmin = () => {
                           <TableCell className="font-mono font-medium">
                             {profile.exam_number}
                           </TableCell>
-                          <TableCell className="font-mono text-xs text-muted-foreground">
-                            {profile.id}
+                          <TableCell className="text-sm text-muted-foreground">
+                            {profile.email || "-"}
                           </TableCell>
                           <TableCell>
                             {new Date(profile.created_at).toLocaleDateString("ko-KR")}

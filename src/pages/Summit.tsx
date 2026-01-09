@@ -17,7 +17,7 @@ import summitHeroProduct from "@/assets/summit-hero-product.png";
 import summitGallery1 from "@/assets/summit-gallery-1.png";
 import summitGallery2 from "@/assets/summit-gallery-2.png";
 import summitGallery3 from "@/assets/summit-gallery-3.png";
-import summitGallery4 from "@/assets/summit-gallery-4.jpg";
+import summitGallery4 from "@/assets/summit-gallery-4.png";
 import { useState } from "react";
 import { useScrollAnimation, scrollAnimationClasses } from "@/hooks/useScrollAnimation";
 

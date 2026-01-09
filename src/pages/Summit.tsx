@@ -432,16 +432,16 @@ const Summit = () => {
             ref={taxAnim.ref}
             className={`container mx-auto px-6 md:px-12 lg:px-20 ${scrollAnimationClasses.transition} ${taxAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
           >
-            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
-              <div className="space-y-6 md:space-y-8 max-w-xl md:text-right md:ml-auto">
-                <h2 className="text-3xl md:text-2xl lg:text-4xl font-medium tracking-tight">
+            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-20 items-center">
+              <div className="space-y-6 md:space-y-8 lg:space-y-10 max-w-2xl md:text-right md:ml-auto">
+                <h2 className="text-3xl md:text-3xl lg:text-5xl font-medium tracking-tight">
                   {PRODUCT_SECTIONS[1].subject}
                 </h2>
-                <div className="space-y-6 md:space-y-8">
+                <div className="space-y-6 md:space-y-8 lg:space-y-10">
                   {PRODUCT_SECTIONS[1].paragraphs.map((paragraph, index) => (
                     <p 
                       key={index}
-                      className="text-base md:text-sm text-muted-foreground leading-[1.8] whitespace-pre-line"
+                      className="text-base md:text-base lg:text-lg text-muted-foreground leading-[1.8] whitespace-pre-line"
                     >
                       {paragraph}
                     </p>
@@ -449,7 +449,7 @@ const Summit = () => {
                 </div>
               </div>
               <div className="flex justify-center lg:justify-end">
-                <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
+                <div className="w-full max-w-[700px] lg:max-w-[800px] rounded-sm overflow-hidden">
                   <img
                     src={summitTax}
                     alt="SUMMIT 세법 시험지"

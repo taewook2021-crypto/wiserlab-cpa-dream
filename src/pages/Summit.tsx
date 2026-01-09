@@ -314,44 +314,6 @@ const Summit = () => {
           </div>
         </section>
 
-        {/* 재무회계 Section */}
-        <section className="py-20 sm:py-28 md:py-36 bg-muted/20">
-          <div 
-            ref={financialAnim.ref}
-            className={`container mx-auto px-6 md:px-12 lg:px-20 ${scrollAnimationClasses.transition} ${financialAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
-          >
-            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
-              <div className="space-y-6 md:space-y-8 max-w-xl">
-                <h2 className="text-3xl md:text-2xl lg:text-4xl font-medium tracking-tight">
-                  {PRODUCT_SECTIONS[0].subject}
-                </h2>
-                <div className="space-y-6 md:space-y-8">
-                  {PRODUCT_SECTIONS[0].paragraphs.map((paragraph, index) => (
-                    <p 
-                      key={index}
-                      className="text-base md:text-sm text-muted-foreground leading-[1.8] whitespace-pre-line"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </div>
-              <div className="flex justify-center lg:justify-end">
-                <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
-                  <img
-                    src={summitFinancialSection}
-                    alt="SUMMIT 재무회계 시험지"
-                    className="w-full h-auto object-contain"
-                    loading="eager"
-                    decoding="async"
-                    fetchPriority="high"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Apple-style Horizontal Gallery Section */}
         <section className="py-20 sm:py-28 md:py-36 bg-muted/20 overflow-hidden">
           <div 
@@ -421,6 +383,44 @@ const Summit = () => {
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 재무회계 Section */}
+        <section className="py-20 sm:py-28 md:py-36 bg-muted/20">
+          <div 
+            ref={financialAnim.ref}
+            className={`container mx-auto px-6 md:px-12 lg:px-20 ${scrollAnimationClasses.transition} ${financialAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
+            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
+              <div className="space-y-6 md:space-y-8 max-w-xl">
+                <h2 className="text-3xl md:text-2xl lg:text-4xl font-medium tracking-tight">
+                  {PRODUCT_SECTIONS[0].subject}
+                </h2>
+                <div className="space-y-6 md:space-y-8">
+                  {PRODUCT_SECTIONS[0].paragraphs.map((paragraph, index) => (
+                    <p 
+                      key={index}
+                      className="text-base md:text-sm text-muted-foreground leading-[1.8] whitespace-pre-line"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-center lg:justify-end">
+                <div className="w-full max-w-[600px] rounded-sm overflow-hidden">
+                  <img
+                    src={summitFinancialSection}
+                    alt="SUMMIT 재무회계 시험지"
+                    className="w-full h-auto object-contain"
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -43,6 +43,7 @@ export type Database = {
       }
       discount_codes: {
         Row: {
+          assigned_email: string | null
           batch_name: string
           code: string
           created_at: string
@@ -54,6 +55,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          assigned_email?: string | null
           batch_name: string
           code: string
           created_at?: string
@@ -65,6 +67,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          assigned_email?: string | null
           batch_name?: string
           code?: string
           created_at?: string

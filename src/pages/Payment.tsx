@@ -73,8 +73,10 @@ const Payment = () => {
     code: string;
     amount: number;
     codeId: string;
+    isAutoApplied?: boolean;
   } | null>(null);
   const [isCheckingCode, setIsCheckingCode] = useState(false);
+  const [isLoadingAutoDiscount, setIsLoadingAutoDiscount] = useState(true);
 
   // URL params에서 상품 확인
   const isValidOrder = useMemo(() => {
@@ -138,6 +140,44 @@ const Payment = () => {
       navigate("/summit");
     }
   }, [isValidOrder, navigate]);
+
+  // 자동 할인 코드 적용 (이메일로 지정된 코드 조회)
+  useEffect(() => {
+    const checkAutoDiscount = async () => {
+      if (!user?.email) {
+        setIsLoadingAutoDiscount(false);
+        return;
+      }
+
+      try {
+        // 사용자 이메일로 지정된 미사용 할인 코드 조회
+        const { data, error } = await supabase
+          .from("discount_codes")
+          .select("*")
+          .eq("assigned_email", user.email)
+          .eq("is_used", false)
+          .maybeSingle();
+
+        if (!error && data) {
+          setAppliedDiscount({
+            code: data.code,
+            amount: data.discount_amount,
+            codeId: data.id,
+            isAutoApplied: true,
+          });
+          toast.success(`${data.discount_amount.toLocaleString("ko-KR")}원 할인이 자동 적용되었습니다.`);
+        }
+      } catch (error) {
+        console.error("Auto discount check error:", error);
+      } finally {
+        setIsLoadingAutoDiscount(false);
+      }
+    };
+
+    if (user && !loading) {
+      checkAutoDiscount();
+    }
+  }, [user, loading]);
 
   // 할인 코드 적용
   const handleApplyDiscountCode = async () => {
@@ -346,13 +386,22 @@ const Payment = () => {
                   <Tag className="w-5 h-5" />
                   할인 코드
                 </h2>
-                {appliedDiscount ? (
+                {isLoadingAutoDiscount ? (
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground animate-pulse">할인 코드 확인 중...</p>
+                  </div>
+                ) : appliedDiscount ? (
                   <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-600" />
                       <div>
                         <p className="font-medium text-green-700 dark:text-green-300">
                           {appliedDiscount.code}
+                          {appliedDiscount.isAutoApplied && (
+                            <span className="ml-2 text-xs bg-green-200 dark:bg-green-800 px-2 py-0.5 rounded">
+                              자동 적용
+                            </span>
+                          )}
                         </p>
                         <p className="text-sm text-green-600 dark:text-green-400">
                           {formatPrice(appliedDiscount.amount)}원 할인 적용됨

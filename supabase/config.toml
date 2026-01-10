@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.toss-webhook]
 verify_jwt = false
+
+[functions.generate-discount-code]
+verify_jwt = false

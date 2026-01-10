@@ -38,6 +38,7 @@ interface DiscountCode {
   used_at: string | null;
   created_at: string;
   expires_at: string | null;
+  assigned_email: string | null;
 }
 
 const DiscountCodesAdmin = () => {
@@ -54,6 +55,12 @@ const DiscountCodesAdmin = () => {
   const [codeCount, setCodeCount] = useState(10);
   const [discountAmount, setDiscountAmount] = useState(20000);
   const [isCreating, setIsCreating] = useState(false);
+
+  // 이메일 기반 생성 다이얼로그
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [emailBatchName, setEmailBatchName] = useState("");
+  const [emailList, setEmailList] = useState("");
+  const [isCreatingEmailCodes, setIsCreatingEmailCodes] = useState(false);
 
   useEffect(() => {
     const checkAdminRole = async () => {
@@ -154,7 +161,8 @@ const DiscountCodesAdmin = () => {
   const filteredCodes = codes.filter(
     (code) =>
       code.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      code.batch_name.toLowerCase().includes(searchTerm.toLowerCase())
+      code.batch_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (code.assigned_email && code.assigned_email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const totalCodes = codes.length;
@@ -162,11 +170,12 @@ const DiscountCodesAdmin = () => {
   const unusedCodes = totalCodes - usedCodes;
 
   const handleDownloadCSV = () => {
-    const headers = ["코드", "할인금액", "배치명", "사용여부", "사용일시", "생성일시"];
+    const headers = ["코드", "할인금액", "배치명", "지정이메일", "사용여부", "사용일시", "생성일시"];
     const rows = filteredCodes.map((code) => [
       code.code,
       code.discount_amount,
       code.batch_name,
+      code.assigned_email || "",
       code.is_used ? "사용됨" : "미사용",
       code.used_at ? new Date(code.used_at).toLocaleString("ko-KR") : "",
       new Date(code.created_at).toLocaleString("ko-KR"),
@@ -181,6 +190,63 @@ const DiscountCodesAdmin = () => {
     link.href = URL.createObjectURL(blob);
     link.download = `discount_codes_${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
+  };
+
+  // 이메일 기반 코드 생성
+  const handleCreateEmailCodes = async () => {
+    if (!emailBatchName.trim()) {
+      toast.error("배치명을 입력해주세요.");
+      return;
+    }
+    if (!emailList.trim()) {
+      toast.error("이메일 목록을 입력해주세요.");
+      return;
+    }
+
+    const emails = emailList
+      .split("\n")
+      .map((email) => email.trim())
+      .filter((email) => email.length > 0);
+
+    if (emails.length === 0) {
+      toast.error("유효한 이메일이 없습니다.");
+      return;
+    }
+
+    if (emails.length > 100) {
+      toast.error("한 번에 최대 100개까지 생성 가능합니다.");
+      return;
+    }
+
+    setIsCreatingEmailCodes(true);
+
+    try {
+      const newCodes = emails.map((email) => ({
+        code: generateCode(),
+        discount_amount: 20000,
+        batch_name: emailBatchName.trim(),
+        assigned_email: email,
+      }));
+
+      const { error } = await supabase.from("discount_codes").insert(newCodes);
+
+      if (error) {
+        console.error("Create email codes error:", error);
+        toast.error("할인 코드 생성 중 오류가 발생했습니다.");
+        return;
+      }
+
+      toast.success(`${emails.length}개의 이메일 기반 할인 코드가 생성되었습니다.`);
+      setShowEmailDialog(false);
+      setEmailBatchName("");
+      setEmailList("");
+      fetchCodes();
+    } catch (error) {
+      console.error("Create email codes error:", error);
+      toast.error("할인 코드 생성 중 오류가 발생했습니다.");
+    } finally {
+      setIsCreatingEmailCodes(false);
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -255,9 +321,13 @@ const DiscountCodesAdmin = () => {
               <RefreshCw className="w-4 h-4 mr-2" />
               새로고침
             </Button>
+            <Button size="sm" variant="outline" onClick={() => setShowEmailDialog(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              이메일 기반 생성
+            </Button>
             <Button size="sm" onClick={() => setShowCreateDialog(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              코드 생성
+              일괄 생성
             </Button>
           </div>
         </div>
@@ -330,6 +400,7 @@ const DiscountCodesAdmin = () => {
                       <TableHead>코드</TableHead>
                       <TableHead>할인금액</TableHead>
                       <TableHead>배치명</TableHead>
+                      <TableHead>지정 이메일</TableHead>
                       <TableHead>상태</TableHead>
                       <TableHead>사용일시</TableHead>
                       <TableHead>생성일시</TableHead>
@@ -343,6 +414,9 @@ const DiscountCodesAdmin = () => {
                         </TableCell>
                         <TableCell>{formatPrice(code.discount_amount)}원</TableCell>
                         <TableCell>{code.batch_name}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {code.assigned_email || "-"}
+                        </TableCell>
                         <TableCell>
                           <Badge
                             className={
@@ -428,6 +502,60 @@ const DiscountCodesAdmin = () => {
             </Button>
             <Button onClick={handleCreateCodes} disabled={isCreating}>
               {isCreating ? "생성 중..." : `${codeCount}개 생성`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 이메일 기반 코드 생성 다이얼로그 */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>이메일 기반 할인 코드 생성</DialogTitle>
+            <DialogDescription>
+              카카오 이메일 목록을 입력하면 각 이메일에 고유한 할인 코드가 지정됩니다.
+              해당 이메일로 로그인한 사용자에게 할인이 자동 적용됩니다.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="emailBatchName">배치명 (학교명)</Label>
+              <Input
+                id="emailBatchName"
+                placeholder="예: 고려대 2025"
+                value={emailBatchName}
+                onChange={(e) => setEmailBatchName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="emailList">카카오 이메일 목록 (줄바꿈으로 구분)</Label>
+              <textarea
+                id="emailList"
+                className="w-full min-h-[200px] p-3 border rounded-md text-sm font-mono resize-y bg-background"
+                placeholder="example1@kakao.com&#10;example2@naver.com&#10;example3@gmail.com"
+                value={emailList}
+                onChange={(e) => setEmailList(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                {emailList.split("\n").filter((e) => e.trim()).length}개 이메일 입력됨 (최대 100개)
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowEmailDialog(false);
+                setEmailBatchName("");
+                setEmailList("");
+              }}
+            >
+              취소
+            </Button>
+            <Button onClick={handleCreateEmailCodes} disabled={isCreatingEmailCodes}>
+              {isCreatingEmailCodes ? "생성 중..." : "코드 생성"}
             </Button>
           </DialogFooter>
         </DialogContent>

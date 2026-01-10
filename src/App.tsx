@@ -26,6 +26,7 @@ import OrderAdmin from "./pages/OrderAdmin";
 import ExamNumbersAdmin from "./pages/ExamNumbersAdmin";
 import StatisticsAdmin from "./pages/StatisticsAdmin";
 import FreeCodesAdmin from "./pages/FreeCodesAdmin";
+import DiscountCodesAdmin from "./pages/DiscountCodesAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/exam-numbers-admin" element={<ExamNumbersAdmin />} />
             <Route path="/statistics-admin" element={<StatisticsAdmin />} />
             <Route path="/free-codes-admin" element={<FreeCodesAdmin />} />
+            <Route path="/discount-codes-admin" element={<DiscountCodesAdmin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

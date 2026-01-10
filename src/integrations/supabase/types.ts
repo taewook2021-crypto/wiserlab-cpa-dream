@@ -41,6 +41,42 @@ export type Database = {
         }
         Relationships: []
       }
+      discount_codes: {
+        Row: {
+          batch_name: string
+          code: string
+          created_at: string
+          discount_amount: number
+          expires_at: string | null
+          id: string
+          is_used: boolean
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          batch_name: string
+          code: string
+          created_at?: string
+          discount_amount?: number
+          expires_at?: string | null
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          batch_name?: string
+          code?: string
+          created_at?: string
+          discount_amount?: number
+          expires_at?: string | null
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       exam_answer_keys: {
         Row: {
           correct_answer: number

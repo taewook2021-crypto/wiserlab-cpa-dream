@@ -115,7 +115,7 @@ const handler = async (req: Request): Promise<Response> => {
     const resend = new Resend(resendApiKey);
 
     const emailResponse = await resend.emails.send({
-      from: "WISER LAB <onboarding@resend.dev>",
+      from: "WISER LAB <support@wiserlab.co.kr>",
       to: [recipient_email],
       subject: "[WISER LAB] SUMMIT 할인 코드가 발급되었습니다",
       html: `
@@ -175,6 +175,21 @@ const handler = async (req: Request): Promise<Response> => {
         </html>
       `,
     });
+
+    // Resend 응답 확인 및 에러 처리
+    if (emailResponse.error) {
+      console.error("Resend email error:", emailResponse.error);
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          code: discountCode,
+          email_sent: false,
+          email_error: emailResponse.error.message,
+          recipient: recipient_email
+        }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     console.log("Email sent successfully:", emailResponse);
 

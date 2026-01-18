@@ -572,6 +572,7 @@ const Edge = () => {
                     width: '210mm',
                     height: '297mm',
                     margin: '0 auto 16px',
+                    padding: '15mm 10mm',
                     boxSizing: 'border-box',
                     border: '1px solid #ccc',
                     overflow: 'hidden'
@@ -583,39 +584,48 @@ const Edge = () => {
                     style={{ borderBottom: '2px solid black', height: '36px' }}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold">{pageNum}/{totalPages}</span>
+                      <span 
+                        className="text-sm font-bold"
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                      >{pageNum}/{totalPages}</span>
                       <span 
                         className="inline-flex items-center justify-center w-5 h-5 border border-black rounded-full text-sm font-bold"
-                        style={{ borderWidth: '1.5px' }}
+                        style={{ borderWidth: '1.5px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
                       >
                         ①
                       </span>
-                      <span className="text-xs">형</span>
+                      <span 
+                        className="text-xs"
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                      >형</span>
                     </div>
                     
                     <div className="text-center flex-1">
                       <h1 
                         className="text-2xl font-bold tracking-widest"
-                        style={{ fontFamily: 'Georgia, serif' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
                       >
                         {subject === 'financial' ? '회계학' : '세법학'}
                       </h1>
                     </div>
                     
                     <div className="text-right">
-                      <span className="text-sm font-bold">제3교시</span>
+                      <span 
+                        className="text-sm font-bold"
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                      >제3교시</span>
                     </div>
                   </div>
 
-                  {/* T자형 본문 영역 - 2x2 그리드 */}
+                  {/* T자형 본문 영역 - 2x2 그리드 (가로선 없음) */}
                   <div 
                     className="grid grid-cols-2"
-                    style={{ height: 'calc(297mm - 36px)' }}
+                    style={{ height: 'calc(100% - 36px)' }}
                   >
                     {/* 왼쪽 상단 */}
                     <div 
                       className="p-2 overflow-hidden"
-                      style={{ borderRight: '1px solid black', borderBottom: '1px solid black', height: 'calc((297mm - 36px) / 2)' }}
+                      style={{ borderRight: '1px solid black', height: '50%' }}
                     >
                       {topLeftQ && (
                         <img 
@@ -629,7 +639,7 @@ const Edge = () => {
                     {/* 오른쪽 상단 */}
                     <div 
                       className="p-2 overflow-hidden"
-                      style={{ borderBottom: '1px solid black', height: 'calc((297mm - 36px) / 2)' }}
+                      style={{ height: '50%' }}
                     >
                       {topRightQ && (
                         <img 
@@ -643,7 +653,7 @@ const Edge = () => {
                     {/* 왼쪽 하단 */}
                     <div 
                       className="p-2 overflow-hidden"
-                      style={{ borderRight: '1px solid black', height: 'calc((297mm - 36px) / 2)' }}
+                      style={{ borderRight: '1px solid black', height: '50%' }}
                     >
                       {bottomLeftQ && (
                         <img 
@@ -657,7 +667,7 @@ const Edge = () => {
                     {/* 오른쪽 하단 */}
                     <div 
                       className="p-2 overflow-hidden"
-                      style={{ height: 'calc((297mm - 36px) / 2)' }}
+                      style={{ height: '50%' }}
                     >
                       {bottomRightQ && (
                         <img 
@@ -820,7 +830,7 @@ const Edge = () => {
             width: 210mm !important;
             height: 297mm !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 15mm 10mm !important;
             border: none !important;
             page-break-after: always;
             page-break-inside: avoid;

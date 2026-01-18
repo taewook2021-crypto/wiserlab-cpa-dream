@@ -308,6 +308,45 @@ export type Database = {
         }
         Relationships: []
       }
+      related_questions: {
+        Row: {
+          created_at: string
+          exam_name: string
+          exam_round: number
+          id: string
+          image_path: string
+          question_number: number
+          related_question_number: number
+          related_year: number
+          subject: Database["public"]["Enums"]["exam_subject"]
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          exam_name: string
+          exam_round: number
+          id?: string
+          image_path: string
+          question_number: number
+          related_question_number: number
+          related_year: number
+          subject: Database["public"]["Enums"]["exam_subject"]
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          exam_name?: string
+          exam_round?: number
+          id?: string
+          image_path?: string
+          question_number?: number
+          related_question_number?: number
+          related_year?: number
+          subject?: Database["public"]["Enums"]["exam_subject"]
+          topic?: string
+        }
+        Relationships: []
+      }
       scoring_answers: {
         Row: {
           correct_answer: number

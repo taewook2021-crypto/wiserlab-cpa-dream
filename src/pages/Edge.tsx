@@ -603,7 +603,7 @@ const Edge = () => {
                     <div className="text-center flex-1">
                       <h1 
                         className="font-bold tracking-widest"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '28px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '40px' }}
                       >
                         {subject === 'financial' ? '회계학' : '세법학'}
                       </h1>
@@ -612,7 +612,7 @@ const Edge = () => {
                     <div className="text-right">
                       <span 
                         className="font-bold"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '18px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '25px' }}
                       >제3교시</span>
                     </div>
                   </div>
@@ -637,56 +637,56 @@ const Edge = () => {
                     <div className="grid grid-cols-2 h-full">
                       {/* 왼쪽 상단 */}
                       <div 
-                        className="p-2 overflow-hidden"
+                        className="p-1 overflow-hidden"
                         style={{ height: '50%' }}
                       >
                         {topLeftQ && (
                           <img 
                             src={topLeftQ.image_path} 
                             alt={`${topLeftQ.related_year}년 ${topLeftQ.related_question_number}번`}
-                            className="w-full h-full object-contain object-top"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
                           />
                         )}
                       </div>
 
                       {/* 오른쪽 상단 */}
                       <div 
-                        className="p-2 overflow-hidden"
+                        className="p-1 overflow-hidden"
                         style={{ height: '50%' }}
                       >
                         {topRightQ && (
                           <img 
                             src={topRightQ.image_path} 
                             alt={`${topRightQ.related_year}년 ${topRightQ.related_question_number}번`}
-                            className="w-full h-full object-contain object-top"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
                           />
                         )}
                       </div>
 
                       {/* 왼쪽 하단 */}
                       <div 
-                        className="p-2 overflow-hidden"
+                        className="p-1 overflow-hidden"
                         style={{ height: '50%' }}
                       >
                         {bottomLeftQ && (
                           <img 
                             src={bottomLeftQ.image_path} 
                             alt={`${bottomLeftQ.related_year}년 ${bottomLeftQ.related_question_number}번`}
-                            className="w-full h-full object-contain object-top"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
                           />
                         )}
                       </div>
 
                       {/* 오른쪽 하단 */}
                       <div 
-                        className="p-2 overflow-hidden"
+                        className="p-1 overflow-hidden"
                         style={{ height: '50%' }}
                       >
                         {bottomRightQ && (
                           <img 
                             src={bottomRightQ.image_path} 
                             alt={`${bottomRightQ.related_year}년 ${bottomRightQ.related_question_number}번`}
-                            className="w-full h-full object-contain object-top"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
                           />
                         )}
                       </div>
@@ -828,7 +828,7 @@ const Edge = () => {
           
           #print-content, 
           #print-content * {
-            visibility: visible;
+            visibility: visible !important;
           }
           
           #print-content {
@@ -849,6 +849,17 @@ const Edge = () => {
             page-break-after: always;
             page-break-inside: avoid;
             box-sizing: border-box;
+            position: relative !important;
+          }
+          
+          /* 세로선 인쇄시 표시 */
+          .exam-page [style*="backgroundColor: black"],
+          .exam-page [style*="background-color: black"],
+          .exam-page div[style*="width: 1px"] {
+            visibility: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            background-color: black !important;
           }
           
           .exam-page:last-child {

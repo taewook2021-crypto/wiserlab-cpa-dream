@@ -553,60 +553,97 @@ const Edge = () => {
             </DialogTitle>
           </DialogHeader>
 
-          {/* 시험지 미리보기 컨텐츠 - CPA 시험지 양식 */}
+          {/* 시험지 미리보기 컨텐츠 - CPA 시험지 양식 (T자형 2단 레이아웃) */}
           <div className="bg-white text-black print:p-0 print:border-0 print:rounded-none" id="print-content">
-            {/* 각 페이지별로 문제 배치 */}
-            {selectedPastQuestions.map((q, idx) => {
-              const pageNum = idx + 1;
-              const totalPages = selectedPastQuestions.length;
+            {/* 2문제씩 페어로 묶어서 페이지 생성 */}
+            {Array.from({ length: Math.ceil(selectedPastQuestions.length / 2) }).map((_, pageIdx) => {
+              const leftQuestion = selectedPastQuestions[pageIdx * 2];
+              const rightQuestion = selectedPastQuestions[pageIdx * 2 + 1];
+              const pageNum = pageIdx + 1;
+              const totalPages = Math.ceil(selectedPastQuestions.length / 2);
               
               return (
                 <div 
-                  key={q.id} 
+                  key={pageIdx} 
                   className="exam-page bg-white border border-gray-300 mx-6 mb-6 print:mx-0 print:mb-0 print:border-0"
-                  style={{ pageBreakAfter: idx < totalPages - 1 ? 'always' : 'auto' }}
+                  style={{ 
+                    pageBreakAfter: pageIdx < totalPages - 1 ? 'always' : 'auto',
+                    width: '210mm',
+                    minHeight: '297mm',
+                    margin: '0 auto',
+                    boxSizing: 'border-box'
+                  }}
                 >
-                  {/* 시험지 상단 헤더 */}
-                  <div className="flex items-center justify-between border-b-2 border-black px-4 py-3">
+                  {/* 시험지 상단 헤더 - T자형 상단 가로선 */}
+                  <div 
+                    className="flex items-center justify-between px-4 py-2"
+                    style={{ borderBottom: '2px solid black' }}
+                  >
                     {/* 좌측: 페이지 번호 / 전체 페이지, 형 */}
-                    <div className="flex items-center gap-4">
-                      <span className="text-lg font-bold">{pageNum}/{totalPages}</span>
-                      <span className="inline-flex items-center justify-center w-8 h-8 border-2 border-black rounded-full text-lg font-bold">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-bold">{pageNum}/{totalPages}</span>
+                      <span 
+                        className="inline-flex items-center justify-center w-6 h-6 border border-black rounded-full text-base font-bold"
+                        style={{ borderWidth: '1.5px' }}
+                      >
                         ①
                       </span>
                       <span className="text-sm">형</span>
                     </div>
                     
                     {/* 중앙: 과목명 */}
-                    <div className="text-center">
-                      <h1 className="text-4xl font-bold tracking-wider" style={{ fontFamily: 'serif' }}>
+                    <div className="text-center flex-1">
+                      <h1 
+                        className="text-3xl font-bold tracking-widest"
+                        style={{ fontFamily: 'Georgia, serif' }}
+                      >
                         {subject === 'financial' ? '회계학' : '세법학'}
                       </h1>
                     </div>
                     
                     {/* 우측: 교시 */}
                     <div className="text-right">
-                      <span className="text-lg font-bold">제3교시</span>
+                      <span className="text-base font-bold">제3교시</span>
                     </div>
                   </div>
 
-                  {/* 문제 영역 */}
-                  <div className="p-6">
-                    {/* 문제 이미지 */}
-                    <div className="exam-question">
-                      <img 
-                        src={q.image_path} 
-                        alt={`${q.related_year}년 ${q.related_question_number}번 문제`}
-                        className="w-full h-auto"
-                        loading="lazy"
-                      />
+                  {/* T자형 본문 영역 - 세로선으로 좌우 분할 */}
+                  <div 
+                    className="flex"
+                    style={{ minHeight: 'calc(297mm - 60px)' }}
+                  >
+                    {/* 왼쪽 문제 영역 */}
+                    <div 
+                      className="flex-1 p-3"
+                      style={{ borderRight: '1px solid black' }}
+                    >
+                      {leftQuestion && (
+                        <div className="exam-question">
+                          <img 
+                            src={leftQuestion.image_path} 
+                            alt={`${leftQuestion.related_year}년 ${leftQuestion.related_question_number}번 문제`}
+                            className="w-full h-auto"
+                            style={{ maxHeight: '270mm', objectFit: 'contain' }}
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
                     </div>
-                  </div>
 
-                  {/* 페이지 하단 정보 */}
-                  <div className="border-t border-gray-300 px-4 py-2 text-xs text-gray-500 flex justify-between">
-                    <span>출처: {q.related_year}년 CPA 1차 {q.related_question_number}번</span>
-                    <span>Wiser Lab Edge</span>
+                    {/* 오른쪽 문제 영역 */}
+                    <div className="flex-1 p-3">
+                      {rightQuestion && (
+                        <div className="exam-question">
+                          <img 
+                            src={rightQuestion.image_path} 
+                            alt={`${rightQuestion.related_year}년 ${rightQuestion.related_question_number}번 문제`}
+                            className="w-full h-auto"
+                            style={{ maxHeight: '270mm', objectFit: 'contain' }}
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -615,49 +652,63 @@ const Edge = () => {
             {/* 답안지 페이지 */}
             <div 
               className="exam-page bg-white border border-gray-300 mx-6 mb-6 print:mx-0 print:mb-0 print:border-0"
-              style={{ pageBreakBefore: 'always' }}
+              style={{ 
+                pageBreakBefore: 'always',
+                width: '210mm',
+                minHeight: '297mm',
+                margin: '0 auto'
+              }}
             >
               {/* 답안지 헤더 */}
-              <div className="flex items-center justify-between border-b-2 border-black px-4 py-3">
-                <div className="flex items-center gap-4">
-                  <span className="inline-flex items-center justify-center w-8 h-8 border-2 border-black rounded-full text-lg font-bold">
+              <div 
+                className="flex items-center justify-between px-4 py-2"
+                style={{ borderBottom: '2px solid black' }}
+              >
+                <div className="flex items-center gap-2">
+                  <span 
+                    className="inline-flex items-center justify-center w-6 h-6 border border-black rounded-full text-base font-bold"
+                    style={{ borderWidth: '1.5px' }}
+                  >
                     ①
                   </span>
                   <span className="text-sm">형</span>
                 </div>
-                <div className="text-center">
-                  <h1 className="text-3xl font-bold tracking-wider" style={{ fontFamily: 'serif' }}>
+                <div className="text-center flex-1">
+                  <h1 
+                    className="text-2xl font-bold tracking-widest"
+                    style={{ fontFamily: 'Georgia, serif' }}
+                  >
                     답안지
                   </h1>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-bold">{subject === 'financial' ? '회계학' : '세법학'}</span>
+                  <span className="text-base font-bold">{subject === 'financial' ? '회계학' : '세법학'}</span>
                 </div>
               </div>
 
               {/* 수험 정보 입력란 */}
-              <div className="p-6 border-b border-gray-300">
-                <div className="flex gap-8">
+              <div className="p-4 border-b border-gray-400">
+                <div className="flex gap-6">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-1">
                       <span className="text-sm font-bold">성명</span>
                     </div>
-                    <div className="border-2 border-black h-12 flex items-center justify-center">
+                    <div className="border-2 border-black h-10 flex items-center justify-center">
                       <div className="grid grid-cols-5 gap-2 px-4">
                         {[1, 2, 3, 4, 5].map((n) => (
-                          <div key={n} className="w-8 h-8 border-b border-gray-400"></div>
+                          <div key={n} className="w-6 h-6 border-b border-gray-400"></div>
                         ))}
                       </div>
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-1">
                       <span className="text-sm font-bold">수험번호</span>
                     </div>
-                    <div className="border-2 border-black h-12 flex items-center justify-center">
+                    <div className="border-2 border-black h-10 flex items-center justify-center">
                       <div className="grid grid-cols-8 gap-1 px-4">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                          <div key={n} className="w-6 h-8 border-b border-gray-400"></div>
+                          <div key={n} className="w-5 h-6 border-b border-gray-400"></div>
                         ))}
                       </div>
                     </div>
@@ -666,17 +717,18 @@ const Edge = () => {
               </div>
 
               {/* 답안 표기란 */}
-              <div className="p-6">
-                <h3 className="font-bold mb-6 text-center text-lg border-b pb-2">답안 표기란</h3>
-                <div className="grid grid-cols-5 gap-x-6 gap-y-4">
+              <div className="p-4">
+                <h3 className="font-bold mb-4 text-center text-base border-b pb-2">답안 표기란</h3>
+                <div className="grid grid-cols-5 gap-x-4 gap-y-2">
                   {selectedPastQuestions.map((_, idx) => (
-                    <div key={idx} className="flex items-center gap-3 py-2 border-b border-gray-200">
-                      <span className="text-base font-bold w-6 text-right">{idx + 1}.</span>
-                      <div className="flex gap-2">
+                    <div key={idx} className="flex items-center gap-2 py-1 border-b border-gray-200">
+                      <span className="text-sm font-bold w-5 text-right">{idx + 1}.</span>
+                      <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((n) => (
                           <span
                             key={n}
-                            className="w-7 h-7 border-2 border-black rounded-full flex items-center justify-center text-sm font-medium"
+                            className="w-5 h-5 border border-black rounded-full flex items-center justify-center text-xs font-medium"
+                            style={{ borderWidth: '1.5px' }}
                           >
                             {n === 1 ? '①' : n === 2 ? '②' : n === 3 ? '③' : n === 4 ? '④' : '⑤'}
                           </span>
@@ -688,7 +740,7 @@ const Edge = () => {
               </div>
 
               {/* 하단 정보 */}
-              <div className="border-t border-gray-300 px-4 py-2 text-xs text-gray-500 text-center">
+              <div className="border-t border-gray-300 px-4 py-2 text-xs text-gray-500 text-center mt-auto">
                 <span>Wiser Lab Edge | {examInfo?.name} {examInfo?.round}회 기반 맞춤형 복습 시험지</span>
               </div>
             </div>

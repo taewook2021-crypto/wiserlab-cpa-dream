@@ -553,95 +553,118 @@ const Edge = () => {
             </DialogTitle>
           </DialogHeader>
 
-          {/* 시험지 미리보기 컨텐츠 - CPA 시험지 양식 (T자형 2단 레이아웃) */}
-          <div className="bg-white text-black print:p-0 print:border-0 print:rounded-none" id="print-content">
-            {/* 2문제씩 페어로 묶어서 페이지 생성 */}
-            {Array.from({ length: Math.ceil(selectedPastQuestions.length / 2) }).map((_, pageIdx) => {
-              const leftQuestion = selectedPastQuestions[pageIdx * 2];
-              const rightQuestion = selectedPastQuestions[pageIdx * 2 + 1];
+          {/* 시험지 미리보기 컨텐츠 - CPA 시험지 양식 (T자형 2단 레이아웃, 4문제/페이지) */}
+          <div className="bg-white text-black" id="print-content">
+            {/* 4문제씩 페어로 묶어서 페이지 생성 */}
+            {Array.from({ length: Math.ceil(selectedPastQuestions.length / 4) }).map((_, pageIdx) => {
+              const topLeftQ = selectedPastQuestions[pageIdx * 4];
+              const topRightQ = selectedPastQuestions[pageIdx * 4 + 1];
+              const bottomLeftQ = selectedPastQuestions[pageIdx * 4 + 2];
+              const bottomRightQ = selectedPastQuestions[pageIdx * 4 + 3];
               const pageNum = pageIdx + 1;
-              const totalPages = Math.ceil(selectedPastQuestions.length / 2);
+              const totalPages = Math.ceil(selectedPastQuestions.length / 4);
               
               return (
                 <div 
                   key={pageIdx} 
-                  className="exam-page bg-white border border-gray-300 mx-6 mb-6 print:mx-0 print:mb-0 print:border-0"
+                  className="exam-page bg-white mx-4 mb-4"
                   style={{ 
-                    pageBreakAfter: pageIdx < totalPages - 1 ? 'always' : 'auto',
                     width: '210mm',
-                    minHeight: '297mm',
-                    margin: '0 auto',
-                    boxSizing: 'border-box'
+                    height: '297mm',
+                    margin: '0 auto 16px',
+                    boxSizing: 'border-box',
+                    border: '1px solid #ccc',
+                    overflow: 'hidden'
                   }}
                 >
-                  {/* 시험지 상단 헤더 - T자형 상단 가로선 */}
+                  {/* 시험지 상단 헤더 */}
                   <div 
-                    className="flex items-center justify-between px-4 py-2"
-                    style={{ borderBottom: '2px solid black' }}
+                    className="flex items-center justify-between px-3 py-1"
+                    style={{ borderBottom: '2px solid black', height: '36px' }}
                   >
-                    {/* 좌측: 페이지 번호 / 전체 페이지, 형 */}
                     <div className="flex items-center gap-2">
-                      <span className="text-base font-bold">{pageNum}/{totalPages}</span>
+                      <span className="text-sm font-bold">{pageNum}/{totalPages}</span>
                       <span 
-                        className="inline-flex items-center justify-center w-6 h-6 border border-black rounded-full text-base font-bold"
+                        className="inline-flex items-center justify-center w-5 h-5 border border-black rounded-full text-sm font-bold"
                         style={{ borderWidth: '1.5px' }}
                       >
                         ①
                       </span>
-                      <span className="text-sm">형</span>
+                      <span className="text-xs">형</span>
                     </div>
                     
-                    {/* 중앙: 과목명 */}
                     <div className="text-center flex-1">
                       <h1 
-                        className="text-3xl font-bold tracking-widest"
+                        className="text-2xl font-bold tracking-widest"
                         style={{ fontFamily: 'Georgia, serif' }}
                       >
                         {subject === 'financial' ? '회계학' : '세법학'}
                       </h1>
                     </div>
                     
-                    {/* 우측: 교시 */}
                     <div className="text-right">
-                      <span className="text-base font-bold">제3교시</span>
+                      <span className="text-sm font-bold">제3교시</span>
                     </div>
                   </div>
 
-                  {/* T자형 본문 영역 - 세로선으로 좌우 분할 */}
+                  {/* T자형 본문 영역 - 2x2 그리드 */}
                   <div 
-                    className="flex"
-                    style={{ minHeight: 'calc(297mm - 60px)' }}
+                    className="grid grid-cols-2"
+                    style={{ height: 'calc(297mm - 36px)' }}
                   >
-                    {/* 왼쪽 문제 영역 */}
+                    {/* 왼쪽 상단 */}
                     <div 
-                      className="flex-1 p-3"
-                      style={{ borderRight: '1px solid black' }}
+                      className="p-2 overflow-hidden"
+                      style={{ borderRight: '1px solid black', borderBottom: '1px solid black', height: 'calc((297mm - 36px) / 2)' }}
                     >
-                      {leftQuestion && (
-                        <div className="exam-question">
-                          <img 
-                            src={leftQuestion.image_path} 
-                            alt={`${leftQuestion.related_year}년 ${leftQuestion.related_question_number}번 문제`}
-                            className="w-full h-auto"
-                            style={{ maxHeight: '270mm', objectFit: 'contain' }}
-                            loading="lazy"
-                          />
-                        </div>
+                      {topLeftQ && (
+                        <img 
+                          src={topLeftQ.image_path} 
+                          alt={`${topLeftQ.related_year}년 ${topLeftQ.related_question_number}번`}
+                          className="w-full h-full object-contain object-top"
+                        />
                       )}
                     </div>
 
-                    {/* 오른쪽 문제 영역 */}
-                    <div className="flex-1 p-3">
-                      {rightQuestion && (
-                        <div className="exam-question">
-                          <img 
-                            src={rightQuestion.image_path} 
-                            alt={`${rightQuestion.related_year}년 ${rightQuestion.related_question_number}번 문제`}
-                            className="w-full h-auto"
-                            style={{ maxHeight: '270mm', objectFit: 'contain' }}
-                            loading="lazy"
-                          />
-                        </div>
+                    {/* 오른쪽 상단 */}
+                    <div 
+                      className="p-2 overflow-hidden"
+                      style={{ borderBottom: '1px solid black', height: 'calc((297mm - 36px) / 2)' }}
+                    >
+                      {topRightQ && (
+                        <img 
+                          src={topRightQ.image_path} 
+                          alt={`${topRightQ.related_year}년 ${topRightQ.related_question_number}번`}
+                          className="w-full h-full object-contain object-top"
+                        />
+                      )}
+                    </div>
+
+                    {/* 왼쪽 하단 */}
+                    <div 
+                      className="p-2 overflow-hidden"
+                      style={{ borderRight: '1px solid black', height: 'calc((297mm - 36px) / 2)' }}
+                    >
+                      {bottomLeftQ && (
+                        <img 
+                          src={bottomLeftQ.image_path} 
+                          alt={`${bottomLeftQ.related_year}년 ${bottomLeftQ.related_question_number}번`}
+                          className="w-full h-full object-contain object-top"
+                        />
+                      )}
+                    </div>
+
+                    {/* 오른쪽 하단 */}
+                    <div 
+                      className="p-2 overflow-hidden"
+                      style={{ height: 'calc((297mm - 36px) / 2)' }}
+                    >
+                      {bottomRightQ && (
+                        <img 
+                          src={bottomRightQ.image_path} 
+                          alt={`${bottomRightQ.related_year}년 ${bottomRightQ.related_question_number}번`}
+                          className="w-full h-full object-contain object-top"
+                        />
                       )}
                     </div>
                   </div>
@@ -651,64 +674,61 @@ const Edge = () => {
 
             {/* 답안지 페이지 */}
             <div 
-              className="exam-page bg-white border border-gray-300 mx-6 mb-6 print:mx-0 print:mb-0 print:border-0"
+              className="exam-page bg-white mx-4 mb-4"
               style={{ 
-                pageBreakBefore: 'always',
                 width: '210mm',
-                minHeight: '297mm',
-                margin: '0 auto'
+                height: '297mm',
+                margin: '0 auto',
+                boxSizing: 'border-box',
+                border: '1px solid #ccc'
               }}
             >
               {/* 답안지 헤더 */}
               <div 
-                className="flex items-center justify-between px-4 py-2"
-                style={{ borderBottom: '2px solid black' }}
+                className="flex items-center justify-between px-3 py-1"
+                style={{ borderBottom: '2px solid black', height: '36px' }}
               >
                 <div className="flex items-center gap-2">
                   <span 
-                    className="inline-flex items-center justify-center w-6 h-6 border border-black rounded-full text-base font-bold"
+                    className="inline-flex items-center justify-center w-5 h-5 border border-black rounded-full text-sm font-bold"
                     style={{ borderWidth: '1.5px' }}
                   >
                     ①
                   </span>
-                  <span className="text-sm">형</span>
+                  <span className="text-xs">형</span>
                 </div>
                 <div className="text-center flex-1">
                   <h1 
-                    className="text-2xl font-bold tracking-widest"
+                    className="text-xl font-bold tracking-widest"
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
                     답안지
                   </h1>
                 </div>
                 <div className="text-right">
-                  <span className="text-base font-bold">{subject === 'financial' ? '회계학' : '세법학'}</span>
+                  <span className="text-sm font-bold">{subject === 'financial' ? '회계학' : '세법학'}</span>
                 </div>
               </div>
 
               {/* 수험 정보 입력란 */}
-              <div className="p-4 border-b border-gray-400">
-                <div className="flex gap-6">
+              <div className="p-3 border-b border-gray-400">
+                <div className="flex gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-bold">성명</span>
-                    </div>
-                    <div className="border-2 border-black h-10 flex items-center justify-center">
-                      <div className="grid grid-cols-5 gap-2 px-4">
+                    <span className="text-xs font-bold block mb-1">성명</span>
+                    <div className="border-2 border-black h-8 flex items-center px-2">
+                      <div className="flex gap-3">
                         {[1, 2, 3, 4, 5].map((n) => (
-                          <div key={n} className="w-6 h-6 border-b border-gray-400"></div>
+                          <div key={n} className="w-5 h-5 border-b border-gray-400"></div>
                         ))}
                       </div>
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-bold">수험번호</span>
-                    </div>
-                    <div className="border-2 border-black h-10 flex items-center justify-center">
-                      <div className="grid grid-cols-8 gap-1 px-4">
+                    <span className="text-xs font-bold block mb-1">수험번호</span>
+                    <div className="border-2 border-black h-8 flex items-center px-2">
+                      <div className="flex gap-1">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                          <div key={n} className="w-5 h-6 border-b border-gray-400"></div>
+                          <div key={n} className="w-4 h-5 border-b border-gray-400"></div>
                         ))}
                       </div>
                     </div>
@@ -717,18 +737,17 @@ const Edge = () => {
               </div>
 
               {/* 답안 표기란 */}
-              <div className="p-4">
-                <h3 className="font-bold mb-4 text-center text-base border-b pb-2">답안 표기란</h3>
-                <div className="grid grid-cols-5 gap-x-4 gap-y-2">
+              <div className="p-3">
+                <h3 className="font-bold mb-3 text-center text-sm border-b pb-1">답안 표기란</h3>
+                <div className="grid grid-cols-5 gap-x-2 gap-y-1">
                   {selectedPastQuestions.map((_, idx) => (
-                    <div key={idx} className="flex items-center gap-2 py-1 border-b border-gray-200">
-                      <span className="text-sm font-bold w-5 text-right">{idx + 1}.</span>
-                      <div className="flex gap-1">
+                    <div key={idx} className="flex items-center gap-1 py-0.5 border-b border-gray-200">
+                      <span className="text-xs font-bold w-4 text-right">{idx + 1}.</span>
+                      <div className="flex gap-0.5">
                         {[1, 2, 3, 4, 5].map((n) => (
                           <span
                             key={n}
-                            className="w-5 h-5 border border-black rounded-full flex items-center justify-center text-xs font-medium"
-                            style={{ borderWidth: '1.5px' }}
+                            className="w-4 h-4 border border-black rounded-full flex items-center justify-center text-[10px] font-medium"
                           >
                             {n === 1 ? '①' : n === 2 ? '②' : n === 3 ? '③' : n === 4 ? '④' : '⑤'}
                           </span>
@@ -740,14 +759,14 @@ const Edge = () => {
               </div>
 
               {/* 하단 정보 */}
-              <div className="border-t border-gray-300 px-4 py-2 text-xs text-gray-500 text-center mt-auto">
+              <div className="absolute bottom-0 left-0 right-0 border-t border-gray-300 px-3 py-1 text-xs text-gray-500 text-center">
                 <span>Wiser Lab Edge | {examInfo?.name} {examInfo?.round}회 기반 맞춤형 복습 시험지</span>
               </div>
             </div>
           </div>
 
           {/* 액션 버튼 */}
-          <div className="flex gap-4 p-6 pt-0 print:hidden">
+          <div className="flex gap-4 p-6 pt-4 print:hidden">
             <Button
               variant="outline"
               className="flex-1"
@@ -764,32 +783,63 @@ const Edge = () => {
         </DialogContent>
       </Dialog>
 
-      {/* 인쇄 전용 스타일 */}
+      {/* 인쇄 전용 스타일 - 개선됨 */}
       <style>{`
         @media print {
           @page {
             size: A4 portrait;
-            margin: 10mm;
+            margin: 0;
           }
+          
+          html, body {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          
           body * {
             visibility: hidden;
           }
-          #print-content, #print-content * {
+          
+          #print-content, 
+          #print-content * {
             visibility: visible;
           }
+          
           #print-content {
             position: absolute;
             left: 0;
             top: 0;
-            width: 100%;
+            width: 210mm;
+            margin: 0;
+            padding: 0;
           }
+          
           .exam-page {
-            page-break-after: always;
+            width: 210mm !important;
+            height: 297mm !important;
             margin: 0 !important;
+            padding: 0 !important;
             border: none !important;
+            page-break-after: always;
+            page-break-inside: avoid;
+            box-sizing: border-box;
           }
+          
           .exam-page:last-child {
             page-break-after: auto;
+          }
+          
+          /* Dialog 숨기기 */
+          [role="dialog"] {
+            position: static !important;
+            transform: none !important;
+            max-width: none !important;
+            max-height: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: white !important;
           }
         }
       `}</style>

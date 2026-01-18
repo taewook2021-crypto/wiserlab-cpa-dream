@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -13,59 +13,52 @@ import {
 import { 
   FileText, 
   ArrowLeft, 
-  Download, 
+  Printer, 
   X, 
   ChevronLeft, 
   ChevronRight,
-  Lock
+  Lock,
+  Loader2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useServiceAccess } from "@/hooks/useServiceAccess";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const subjects: Record<string, string> = {
   financial: "재무회계",
   tax: "세법",
 };
 
-const exams: Record<string, string> = {
-  "summit-1": "SUMMIT 1회",
-  "summit-2": "SUMMIT 2회",
+const subjectToDbValue: Record<string, string> = {
+  financial: "financial_accounting",
+  tax: "tax_law",
 };
 
-// 목업 취약 영역 데이터
-const mockWeakAreas = [
-  { id: 1, name: "재고자산", wrongCount: 3, relatedCount: 12 },
-  { id: 2, name: "유형자산", wrongCount: 2, relatedCount: 8 },
-  { id: 3, name: "금융상품", wrongCount: 2, relatedCount: 15 },
-  { id: 4, name: "수익인식", wrongCount: 1, relatedCount: 6 },
-  { id: 5, name: "리스회계", wrongCount: 2, relatedCount: 9 },
-  { id: 6, name: "충당부채", wrongCount: 1, relatedCount: 7 },
-  { id: 7, name: "법인세회계", wrongCount: 3, relatedCount: 11 },
-  { id: 8, name: "연결재무제표", wrongCount: 2, relatedCount: 14 },
-];
+const exams: Record<string, { name: string; round: number }> = {
+  "summit-1": { name: "SUMMIT", round: 1 },
+  "summit-2": { name: "SUMMIT", round: 2 },
+};
 
-interface PastQuestion {
-  id: number;
-  year: number;
-  round: number;
-  number: number;
+interface RelatedQuestion {
+  id: string;
+  exam_name: string;
+  exam_round: number;
+  subject: string;
+  question_number: number;
+  related_year: number;
+  related_question_number: number;
+  image_path: string;
   topic: string;
-  areaId: number;
 }
 
-// 목업 추천 기출문제 데이터
-const initialPastQuestions: PastQuestion[] = [
-  { id: 1, year: 2024, round: 1, number: 12, topic: "재고자산 - 저가법 적용", areaId: 1 },
-  { id: 2, year: 2024, round: 2, number: 8, topic: "재고자산 - 매출원가 계산", areaId: 1 },
-  { id: 3, year: 2023, round: 1, number: 15, topic: "유형자산 - 감가상각", areaId: 2 },
-  { id: 4, year: 2023, round: 2, number: 22, topic: "금융상품 - 공정가치 측정", areaId: 3 },
-  { id: 5, year: 2022, round: 1, number: 18, topic: "금융상품 - 손상차손", areaId: 3 },
-  { id: 6, year: 2022, round: 2, number: 11, topic: "수익인식 - 계약변경", areaId: 4 },
-  { id: 7, year: 2024, round: 1, number: 25, topic: "리스회계 - 사용권자산", areaId: 5 },
-  { id: 8, year: 2023, round: 2, number: 19, topic: "충당부채 - 측정기준", areaId: 6 },
-  { id: 9, year: 2024, round: 2, number: 30, topic: "법인세회계 - 이연법인세", areaId: 7 },
-  { id: 10, year: 2022, round: 1, number: 33, topic: "연결재무제표 - 내부거래 제거", areaId: 8 },
-];
+interface WeakArea {
+  id: string;
+  name: string;
+  wrongCount: number;
+  relatedCount: number;
+  questionNumbers: number[];
+}
 
 const Edge = () => {
   const [searchParams] = useSearchParams();
@@ -75,9 +68,9 @@ const Edge = () => {
   const { hasAccess, isLoading: accessLoading } = useServiceAccess();
   
   // 상태
-  const [selectedQuestions, setSelectedQuestions] = useState<number[]>([1, 2, 3]);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [activeAreaFilter, setActiveAreaFilter] = useState<number | null>(null);
+  const [activeAreaFilter, setActiveAreaFilter] = useState<string | null>(null);
   
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -89,6 +82,68 @@ const Edge = () => {
   const wrongQuestions = wrongParam
     ? wrongParam.split(",").map(Number).filter(Boolean)
     : [];
+
+  const examInfo = exams[exam];
+  const dbSubject = subjectToDbValue[subject] as "financial_accounting" | "tax_law" | undefined;
+
+  // 틀린 문제에 해당하는 관련 기출문제 조회
+  const { data: relatedQuestions = [], isLoading: questionsLoading } = useQuery({
+    queryKey: ["related-questions", examInfo?.name, examInfo?.round, dbSubject, wrongQuestions],
+    queryFn: async () => {
+      if (!examInfo || !dbSubject || wrongQuestions.length === 0) return [];
+      
+      const { data, error } = await supabase
+        .from("related_questions")
+        .select("*")
+        .eq("exam_name", examInfo.name)
+        .eq("exam_round", examInfo.round)
+        .eq("subject", dbSubject)
+        .in("question_number", wrongQuestions);
+
+      if (error) throw error;
+      return data as RelatedQuestion[];
+    },
+    enabled: !!examInfo && !!dbSubject && wrongQuestions.length > 0,
+  });
+
+  // 취약 영역 분석 (토픽별 그룹화)
+  const weakAreas: WeakArea[] = useMemo(() => {
+    if (relatedQuestions.length === 0) return [];
+
+    const topicMap = new Map<string, WeakArea>();
+
+    relatedQuestions.forEach((q) => {
+      // topic에서 주요 카테고리 추출 (예: "충당부채 - 제품보증충당부채" -> "충당부채")
+      const mainTopic = q.topic.split(" - ")[0];
+      
+      if (!topicMap.has(mainTopic)) {
+        topicMap.set(mainTopic, {
+          id: mainTopic,
+          name: mainTopic,
+          wrongCount: 0,
+          relatedCount: 0,
+          questionNumbers: [],
+        });
+      }
+
+      const area = topicMap.get(mainTopic)!;
+      if (!area.questionNumbers.includes(q.question_number)) {
+        area.questionNumbers.push(q.question_number);
+        area.wrongCount += 1;
+      }
+      area.relatedCount += 1;
+    });
+
+    return Array.from(topicMap.values());
+  }, [relatedQuestions]);
+
+  // 선택된 모든 문제 초기화
+  useEffect(() => {
+    if (relatedQuestions.length > 0 && selectedQuestions.length === 0) {
+      // 처음 로드시 모든 문제 선택
+      setSelectedQuestions(relatedQuestions.map(q => q.id));
+    }
+  }, [relatedQuestions]);
 
   const hasData = subject && exam && wrongQuestions.length > 0;
 
@@ -114,7 +169,7 @@ const Edge = () => {
         window.removeEventListener("resize", checkScrollState);
       };
     }
-  }, [hasData]);
+  }, [hasData, weakAreas]);
 
   // 스크롤 핸들러
   const scrollWeakAreas = (direction: "left" | "right") => {
@@ -129,11 +184,12 @@ const Edge = () => {
   };
 
   // 필터링된 문제 목록
-  const filteredQuestions = initialPastQuestions.filter((q) => {
-    return activeAreaFilter === null || q.areaId === activeAreaFilter;
-  });
+  const filteredQuestions = useMemo(() => {
+    if (activeAreaFilter === null) return relatedQuestions;
+    return relatedQuestions.filter((q) => q.topic.startsWith(activeAreaFilter));
+  }, [relatedQuestions, activeAreaFilter]);
 
-  const toggleQuestion = (id: number) => {
+  const toggleQuestion = (id: string) => {
     setSelectedQuestions((prev) =>
       prev.includes(id) ? prev.filter((q) => q !== id) : [...prev, id]
     );
@@ -149,9 +205,14 @@ const Edge = () => {
     }
   };
 
-  const selectedPastQuestions = initialPastQuestions.filter((q) =>
+  const selectedPastQuestions = relatedQuestions.filter((q) =>
     selectedQuestions.includes(q.id)
   );
+
+  // 인쇄 핸들러
+  const handlePrint = () => {
+    window.print();
+  };
 
   // 접근 권한 체크
   if (accessLoading) {
@@ -215,15 +276,17 @@ const Edge = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-background print:bg-white">
+      <div className="print:hidden">
+        <Header />
+      </div>
 
-      <main className="pt-16">
-        <section className="py-20 md:py-28">
-          <div className="container mx-auto px-6">
-            <div className="max-w-4xl mx-auto">
+      <main className="pt-16 print:pt-0">
+        <section className="py-20 md:py-28 print:py-0">
+          <div className="container mx-auto px-6 print:px-0">
+            <div className="max-w-4xl mx-auto print:max-w-none">
               {/* 헤더 */}
-              <div className="text-center mb-16">
+              <div className="text-center mb-16 print:hidden">
                 <h1 className="text-3xl font-light mb-4">Edge</h1>
                 <p className="text-muted-foreground">
                   틀린 문제 기반 맞춤형 복습 시험지 생성
@@ -232,7 +295,7 @@ const Edge = () => {
 
               {!hasData ? (
                 /* 데이터 없음 상태 */
-                <div className="bg-muted/50 rounded-lg p-12 text-center">
+                <div className="bg-muted/50 rounded-lg p-12 text-center print:hidden">
                   <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground mb-6">
                     채점 결과가 없습니다.<br />
@@ -246,15 +309,35 @@ const Edge = () => {
                     빠른 채점으로 이동
                   </Button>
                 </div>
+              ) : questionsLoading ? (
+                <div className="flex items-center justify-center py-20 print:hidden">
+                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                  <span className="ml-3 text-muted-foreground">관련 기출문제 로딩 중...</span>
+                </div>
+              ) : relatedQuestions.length === 0 ? (
+                <div className="bg-muted/50 rounded-lg p-12 text-center print:hidden">
+                  <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-6">
+                    틀린 문제({wrongQuestions.join(", ")}번)에 대한<br />
+                    관련 기출문제가 아직 등록되지 않았습니다.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate("/quick-scoring")}
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    빠른 채점으로 돌아가기
+                  </Button>
+                </div>
               ) : (
-                <>
+                <div className="print:hidden">
                   {/* 과목/회차 정보 */}
                   <div className="flex items-center justify-center gap-4 mb-12 text-sm text-muted-foreground">
                     <span className="px-3 py-1 bg-muted rounded-full">
                       {subjects[subject]}
                     </span>
                     <span className="px-3 py-1 bg-muted rounded-full">
-                      {exams[exam]}
+                      {examInfo?.name} {examInfo?.round}회
                     </span>
                   </div>
 
@@ -277,93 +360,95 @@ const Edge = () => {
                   </div>
 
                   {/* 취약 영역 분석 (스크롤 인디케이터 포함) */}
-                  <div className="bg-card border border-border rounded-lg p-8 mb-8">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-lg font-light">취약 영역 분석</h2>
-                      {activeAreaFilter && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setActiveAreaFilter(null)}
-                          className="text-muted-foreground"
+                  {weakAreas.length > 0 && (
+                    <div className="bg-card border border-border rounded-lg p-8 mb-8">
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-lg font-light">취약 영역 분석</h2>
+                        {activeAreaFilter && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setActiveAreaFilter(null)}
+                            className="text-muted-foreground"
+                          >
+                            필터 초기화
+                          </Button>
+                        )}
+                      </div>
+                      <div className="relative">
+                        {/* 스크롤 인디케이터 - 왼쪽 */}
+                        {canScrollLeft && (
+                          <button
+                            onClick={() => scrollWeakAreas("left")}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-background/90 border border-border rounded-full flex items-center justify-center shadow-sm hover:bg-muted transition-colors"
+                            aria-label="왼쪽으로 스크롤"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                        )}
+                        {/* 스크롤 인디케이터 - 오른쪽 */}
+                        {canScrollRight && (
+                          <button
+                            onClick={() => scrollWeakAreas("right")}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-background/90 border border-border rounded-full flex items-center justify-center shadow-sm hover:bg-muted transition-colors"
+                            aria-label="오른쪽으로 스크롤"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        )}
+                        {/* 그라데이션 페이드 */}
+                        {canScrollLeft && (
+                          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent pointer-events-none z-[5]" />
+                        )}
+                        {canScrollRight && (
+                          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none z-[5]" />
+                        )}
+                        <div
+                          ref={scrollContainerRef}
+                          className="overflow-x-auto scrollbar-hide -mx-2 px-2 pb-2"
+                          role="listbox"
+                          aria-label="취약 영역 목록"
                         >
-                          필터 초기화
-                        </Button>
-                      )}
-                    </div>
-                    <div className="relative">
-                      {/* 스크롤 인디케이터 - 왼쪽 */}
-                      {canScrollLeft && (
-                        <button
-                          onClick={() => scrollWeakAreas("left")}
-                          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-background/90 border border-border rounded-full flex items-center justify-center shadow-sm hover:bg-muted transition-colors"
-                          aria-label="왼쪽으로 스크롤"
-                        >
-                          <ChevronLeft className="w-4 h-4" />
-                        </button>
-                      )}
-                      {/* 스크롤 인디케이터 - 오른쪽 */}
-                      {canScrollRight && (
-                        <button
-                          onClick={() => scrollWeakAreas("right")}
-                          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-background/90 border border-border rounded-full flex items-center justify-center shadow-sm hover:bg-muted transition-colors"
-                          aria-label="오른쪽으로 스크롤"
-                        >
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      )}
-                      {/* 그라데이션 페이드 */}
-                      {canScrollLeft && (
-                        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent pointer-events-none z-[5]" />
-                      )}
-                      {canScrollRight && (
-                        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none z-[5]" />
-                      )}
-                      <div
-                        ref={scrollContainerRef}
-                        className="overflow-x-auto scrollbar-hide -mx-2 px-2 pb-2"
-                        role="listbox"
-                        aria-label="취약 영역 목록"
-                      >
-                        <div className="flex gap-4 min-w-max">
-                          {mockWeakAreas.map((area) => (
-                            <button
-                              key={area.id}
-                              onClick={() =>
-                                setActiveAreaFilter(
-                                  activeAreaFilter === area.id ? null : area.id
-                                )
-                              }
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                  e.preventDefault();
+                          <div className="flex gap-4 min-w-max">
+                            {weakAreas.map((area) => (
+                              <button
+                                key={area.id}
+                                onClick={() =>
                                   setActiveAreaFilter(
                                     activeAreaFilter === area.id ? null : area.id
-                                  );
+                                  )
                                 }
-                              }}
-                              className={`p-4 rounded-lg text-center min-w-[140px] transition-all duration-200 ${
-                                activeAreaFilter === area.id
-                                  ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-card scale-[1.02]"
-                                  : "bg-muted/50 hover:bg-muted hover:scale-[1.01]"
-                              }`}
-                              role="option"
-                              aria-selected={activeAreaFilter === area.id}
-                              tabIndex={0}
-                            >
-                              <p className="font-medium mb-1">{area.name}</p>
-                              <p className={`text-sm ${activeAreaFilter === area.id ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                오답 {area.wrongCount}개
-                              </p>
-                              <p className={`text-xs ${activeAreaFilter === area.id ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                                관련 기출 {area.relatedCount}문제
-                              </p>
-                            </button>
-                          ))}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    setActiveAreaFilter(
+                                      activeAreaFilter === area.id ? null : area.id
+                                    );
+                                  }
+                                }}
+                                className={`p-4 rounded-lg text-center min-w-[140px] transition-all duration-200 ${
+                                  activeAreaFilter === area.id
+                                    ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-card scale-[1.02]"
+                                    : "bg-muted/50 hover:bg-muted hover:scale-[1.01]"
+                                }`}
+                                role="option"
+                                aria-selected={activeAreaFilter === area.id}
+                                tabIndex={0}
+                              >
+                                <p className="font-medium mb-1">{area.name}</p>
+                                <p className={`text-sm ${activeAreaFilter === area.id ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                  오답 {area.wrongCount}개
+                                </p>
+                                <p className={`text-xs ${activeAreaFilter === area.id ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                                  관련 기출 {area.relatedCount}문제
+                                </p>
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* 추천 기출문제 */}
                   <div className="bg-card border border-border rounded-lg p-8 mb-8">
@@ -427,7 +512,7 @@ const Edge = () => {
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium">{q.topic}</p>
                               <p className="text-xs text-muted-foreground">
-                                {q.year}년 {q.round}회 {q.number}번
+                                {q.related_year}년 {q.related_question_number}번 (SUMMIT {q.exam_round}회 {q.question_number}번 관련)
                               </p>
                             </div>
                           </div>
@@ -435,7 +520,6 @@ const Edge = () => {
                       )}
                     </div>
                   </div>
-
 
                   {/* 시험지 생성 버튼 */}
                   <div className="text-center">
@@ -449,33 +533,35 @@ const Edge = () => {
                       맞춤형 시험지 생성 ({selectedQuestions.length}문제)
                     </Button>
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>
         </section>
       </main>
 
-      <Footer />
+      <div className="print:hidden">
+        <Footer />
+      </div>
 
       {/* PDF 미리보기 모달 */}
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto print:max-w-none print:max-h-none print:overflow-visible">
+          <DialogHeader className="print:hidden">
             <DialogTitle className="flex items-center justify-between">
               <span>시험지 미리보기</span>
             </DialogTitle>
           </DialogHeader>
 
           {/* 시험지 미리보기 컨텐츠 */}
-          <div className="bg-white text-black p-8 rounded-lg border print:p-0 print:border-0">
+          <div className="bg-white text-black p-8 rounded-lg border print:p-0 print:border-0 print:rounded-none" id="print-content">
             {/* 시험지 헤더 */}
             <div className="text-center border-b-2 border-black pb-6 mb-8">
               <h1 className="text-2xl font-bold mb-2">
                 {subjects[subject]} 맞춤형 복습 시험지
               </h1>
               <p className="text-sm text-gray-600">
-                Wiser Lab Edge | {exams[exam]} 기반 | {selectedQuestions.length}문제
+                Wiser Lab Edge | {examInfo?.name} {examInfo?.round}회 기반 | {selectedPastQuestions.length}문제
               </p>
             </div>
 
@@ -491,13 +577,13 @@ const Edge = () => {
               </div>
             </div>
 
-            {/* 문제 목록 */}
+            {/* 문제 목록 - 실제 이미지 표시 */}
             <div className="space-y-8">
               {selectedPastQuestions.map((q, idx) => (
                 <div 
                   key={q.id} 
                   className={`pb-6 border-b border-gray-200 last:border-0 ${
-                    (idx + 1) % 5 === 0 ? "print:break-after-page" : ""
+                    (idx + 1) % 3 === 0 ? "print:break-after-page" : ""
                   }`}
                 >
                   <div className="flex items-start gap-4">
@@ -509,19 +595,16 @@ const Edge = () => {
                         <p className="font-medium">{q.topic}</p>
                       </div>
                       <p className="text-xs text-gray-500 mb-4">
-                        출처: {q.year}년 {q.round}회 {q.number}번
+                        출처: {q.related_year}년 CPA 1차 {q.related_question_number}번
                       </p>
-                      {/* 목업 문제 내용 */}
-                      <div className="bg-gray-50 p-4 rounded text-sm text-gray-600 mb-4">
-                        [문제 내용이 여기에 표시됩니다]
-                      </div>
-                      {/* 보기 */}
-                      <div className="space-y-2 text-sm">
-                        <p>① 보기 1</p>
-                        <p>② 보기 2</p>
-                        <p>③ 보기 3</p>
-                        <p>④ 보기 4</p>
-                        <p>⑤ 보기 5</p>
+                      {/* 실제 기출문제 이미지 */}
+                      <div className="bg-gray-50 rounded-lg overflow-hidden">
+                        <img 
+                          src={q.image_path} 
+                          alt={`${q.related_year}년 ${q.related_question_number}번 문제`}
+                          className="w-full h-auto"
+                          loading="lazy"
+                        />
                       </div>
                     </div>
                   </div>
@@ -553,7 +636,7 @@ const Edge = () => {
           </div>
 
           {/* 액션 버튼 */}
-          <div className="flex gap-4 mt-4">
+          <div className="flex gap-4 mt-4 print:hidden">
             <Button
               variant="outline"
               className="flex-1"
@@ -562,13 +645,38 @@ const Edge = () => {
               <X className="w-4 h-4 mr-2" />
               닫기
             </Button>
-            <Button className="flex-1" disabled>
-              <Download className="w-4 h-4 mr-2" />
-              PDF 다운로드 (준비중)
+            <Button className="flex-1" onClick={handlePrint}>
+              <Printer className="w-4 h-4 mr-2" />
+              인쇄 / PDF 저장
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* 인쇄 전용 스타일 */}
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #print-content, #print-content * {
+            visibility: visible;
+          }
+          #print-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 20mm;
+          }
+          .print\\:break-after-page {
+            break-after: page;
+          }
+          .print\\:break-before-page {
+            break-before: page;
+          }
+        }
+      `}</style>
     </div>
   );
 };

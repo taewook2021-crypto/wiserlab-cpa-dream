@@ -107,9 +107,15 @@ const HeroSection = () => {
             
             <div className="flex justify-between items-end">
               <div className="flex flex-col space-y-1 sm:space-y-2 text-sm sm:text-base text-muted-foreground">
-                <Link to="/summit" className="hover:text-foreground transition-colors">
-                  SUMMIT Contents
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link to="/summit" className="hover:text-foreground transition-colors">
+                    SUMMIT Contents
+                  </Link>
+                  <span className="text-muted-foreground/50">|</span>
+                  <Link to="/summit" className="hover:text-foreground transition-colors">
+                    구매하기
+                  </Link>
+                </div>
                 <Link to="/quick-scoring" onClick={handleQuickScoringClick} className="hover:text-foreground transition-colors">
                   빠른 채점하기
                 </Link>

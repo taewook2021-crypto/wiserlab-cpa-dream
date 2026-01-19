@@ -1,0 +1,1 @@
+DELETE FROM discount_codes WHERE id = '5c42efec-98c5-4f8f-b830-729fb6cb0e21';

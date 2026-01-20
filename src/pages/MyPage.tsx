@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check, Ticket } from "lucide-react";
+import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check, Ticket, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -349,6 +349,38 @@ const MyPage = () => {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 특별 자료 다운로드 카드 */}
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg font-normal">
+                <Download className="w-5 h-5 text-primary" />
+                특별 자료
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 bg-background/80 rounded-lg border border-border/50">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm">2026 개정세법 주요 문제 수정</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      개정세법 반영 문제 수정사항 안내
+                    </p>
+                  </div>
+                  <a
+                    href="/downloads/2026_개정세법_주요_문제_수정.pdf"
+                    download="2026_개정세법_주요_문제_수정.pdf"
+                    className="flex-shrink-0"
+                  >
+                    <Button size="sm" className="h-8">
+                      <Download className="w-4 h-4 mr-1" />
+                      다운로드
+                    </Button>
+                  </a>
+                </div>
               </div>
             </CardContent>
           </Card>

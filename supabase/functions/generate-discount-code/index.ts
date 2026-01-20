@@ -115,73 +115,139 @@ const handler = async (req: Request): Promise<Response> => {
     const resend = new Resend(resendApiKey);
 
     console.log("Sending email via Resend", {
-      from: "WISER LAB <support@wiserlab.co.kr>",
+      from: "Wiser Lab <support@wiserlab.co.kr>",
       to: recipient_email,
       kakao_email,
       batch_name,
       code: discountCode,
     });
 
-    const emailResponse = await resend.emails.send({
-      from: "WISER LAB <support@wiserlab.co.kr>",
-      to: [recipient_email],
-      subject: "[WISER LAB] SUMMIT 할인 코드가 발급되었습니다",
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
-            .header { text-align: center; margin-bottom: 40px; }
-            .logo { font-size: 24px; font-weight: bold; color: #000; }
-            .code-box { background: #f8f9fa; border: 2px dashed #e9ecef; border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0; }
-            .code { font-size: 32px; font-weight: bold; color: #000; letter-spacing: 4px; font-family: monospace; }
-            .discount { font-size: 18px; color: #16a34a; margin-top: 10px; }
-            .info { background: #fff3cd; border-radius: 8px; padding: 20px; margin: 20px 0; }
-            .footer { margin-top: 40px; text-align: center; color: #666; font-size: 14px; }
-            .button { display: inline-block; background: #000; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; margin-top: 20px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <div class="logo">WISER LAB</div>
-            </div>
-            
-            <h2>할인 코드가 발급되었습니다 🎉</h2>
-            
-            <p>안녕하세요!</p>
-            <p>SUMMIT 모의고사 구매에 사용할 수 있는 할인 코드가 발급되었습니다.</p>
-            
-            <div class="code-box">
-              <div class="code">${discountCode}</div>
-              <div class="discount">20,000원 할인</div>
-            </div>
-            
-            <div class="info">
-              <strong>📌 사용 안내</strong>
-              <ul>
-                <li>카카오 계정 이메일: <strong>${kakao_email}</strong></li>
-                <li>위 카카오 계정으로 로그인하면 할인이 자동 적용됩니다</li>
-                <li>또는 결제 시 위 코드를 직접 입력하셔도 됩니다</li>
+    // Plain text version for better deliverability
+    const plainTextContent = `Wiser Lab
+
+할인 코드가 발급되었습니다
+
+안녕하세요,
+
+SUMMIT 모의고사 구매에 사용할 수 있는 할인 코드가 발급되었습니다.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+할인 코드: ${discountCode}
+할인 금액: 20,000원
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+사용 안내
+- 카카오 계정 이메일: ${kakao_email}
+- 위 카카오 계정으로 로그인하면 할인이 자동 적용됩니다
+- 또는 결제 시 위 코드를 직접 입력하셔도 됩니다
+- 할인 코드는 1회만 사용 가능합니다
+
+SUMMIT 구매하기: https://wiserlab.co.kr/summit
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+본 메일은 발신 전용입니다.
+문의사항이 있으시면 wiserlab.co.kr을 방문해 주세요.
+
+© 2025 Wiser Lab. All rights reserved.
+`;
+
+    // HTML version matching website's minimalist monochrome design
+    const htmlContent = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Wiser Lab - 할인 코드 발급</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #000000;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="max-width: 600px; margin: 0 auto;">
+    <!-- Header -->
+    <tr>
+      <td style="padding: 48px 24px 32px; text-align: center; border-bottom: 1px solid #e5e5e5;">
+        <span style="font-size: 20px; font-weight: 300; letter-spacing: 2px; color: #000000;">Wiser Lab</span>
+      </td>
+    </tr>
+    
+    <!-- Main Content -->
+    <tr>
+      <td style="padding: 48px 24px;">
+        <h1 style="margin: 0 0 24px; font-size: 24px; font-weight: 300; color: #000000; text-align: center;">
+          할인 코드가 발급되었습니다
+        </h1>
+        
+        <p style="margin: 0 0 32px; font-size: 15px; color: #666666; text-align: center; font-weight: 300;">
+          SUMMIT 모의고사 구매에 사용할 수 있는 할인 코드입니다.
+        </p>
+        
+        <!-- Code Box -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 32px;">
+          <tr>
+            <td style="background-color: #fafafa; border: 1px solid #e5e5e5; padding: 32px; text-align: center;">
+              <div style="font-size: 28px; font-weight: 500; letter-spacing: 4px; font-family: 'SF Mono', 'Consolas', monospace; color: #000000; margin-bottom: 12px;">
+                ${discountCode}
+              </div>
+              <div style="font-size: 16px; color: #000000; font-weight: 300;">
+                20,000원 할인
+              </div>
+            </td>
+          </tr>
+        </table>
+        
+        <!-- Info Section -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 32px;">
+          <tr>
+            <td style="background-color: #fafafa; padding: 24px; border-left: 2px solid #000000;">
+              <p style="margin: 0 0 16px; font-size: 14px; font-weight: 500; color: #000000;">
+                사용 안내
+              </p>
+              <ul style="margin: 0; padding: 0 0 0 20px; font-size: 14px; color: #666666; font-weight: 300;">
+                <li style="margin-bottom: 8px;">카카오 계정: <strong style="color: #000000;">${kakao_email}</strong></li>
+                <li style="margin-bottom: 8px;">위 카카오 계정으로 로그인하면 할인이 자동 적용됩니다</li>
+                <li style="margin-bottom: 8px;">또는 결제 시 코드를 직접 입력하셔도 됩니다</li>
                 <li>할인 코드는 1회만 사용 가능합니다</li>
               </ul>
-            </div>
-            
-            <p style="text-align: center;">
-              <a href="https://wiserlab.co.kr/summit" class="button">SUMMIT 구매하기</a>
-            </p>
-            
-            <div class="footer">
-              <p>본 메일은 발신 전용입니다.</p>
-              <p>© 2025 WISER LAB. All rights reserved.</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `,
+            </td>
+          </tr>
+        </table>
+        
+        <!-- CTA Button -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto;">
+          <tr>
+            <td style="background-color: #000000; padding: 14px 48px;">
+              <a href="https://wiserlab.co.kr/summit" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 400; letter-spacing: 0.5px;">
+                SUMMIT 구매하기
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    
+    <!-- Footer -->
+    <tr>
+      <td style="padding: 32px 24px; border-top: 1px solid #e5e5e5; text-align: center;">
+        <p style="margin: 0 0 8px; font-size: 12px; color: #999999; font-weight: 300;">
+          본 메일은 발신 전용입니다.
+        </p>
+        <p style="margin: 0; font-size: 12px; color: #999999; font-weight: 300;">
+          © 2025 Wiser Lab. All rights reserved.
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+    const emailResponse = await resend.emails.send({
+      from: "Wiser Lab <support@wiserlab.co.kr>",
+      to: [recipient_email],
+      subject: "SUMMIT 할인 코드가 발급되었습니다",
+      html: htmlContent,
+      text: plainTextContent,
     });
 
     const emailId = (emailResponse as any)?.data?.id;

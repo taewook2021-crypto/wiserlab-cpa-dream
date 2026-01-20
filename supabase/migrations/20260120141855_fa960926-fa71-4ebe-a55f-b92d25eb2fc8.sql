@@ -1,0 +1,1 @@
+DELETE FROM discount_codes WHERE assigned_email = 'wiserlabtest1@kakao.com';

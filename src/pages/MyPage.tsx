@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check } from "lucide-react";
+import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check, Ticket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -57,6 +57,15 @@ interface Order {
   status: string;
   created_at: string;
   payment_key: string | null;
+}
+
+interface DiscountCode {
+  id: string;
+  code: string;
+  discount_amount: number;
+  is_used: boolean;
+  expires_at: string | null;
+  created_at: string;
 }
 
 const subjectNames: Record<string, string> = {
@@ -98,6 +107,9 @@ const MyPage = () => {
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [profile, setProfile] = useState<{ exam_number: string } | null>(null);
   const [copiedExamNumber, setCopiedExamNumber] = useState(false);
+  const [discountCodes, setDiscountCodes] = useState<DiscountCode[]>([]);
+  const [loadingDiscountCodes, setLoadingDiscountCodes] = useState(true);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const copyExamNumber = async () => {
     if (!profile?.exam_number) return;
@@ -105,6 +117,13 @@ const MyPage = () => {
     setCopiedExamNumber(true);
     toast.success("수험번호가 복사되었습니다.");
     setTimeout(() => setCopiedExamNumber(false), 2000);
+  };
+
+  const copyDiscountCode = async (code: string) => {
+    await navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    toast.success("할인 코드가 복사되었습니다.");
+    setTimeout(() => setCopiedCode(null), 2000);
   };
 
 
@@ -191,11 +210,30 @@ const MyPage = () => {
       if (data) setProfile(data);
     };
 
+    const fetchDiscountCodes = async () => {
+      if (!user?.email) {
+        setLoadingDiscountCodes(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("discount_codes")
+        .select("id, code, discount_amount, is_used, expires_at, created_at")
+        .eq("assigned_email", user.email)
+        .order("created_at", { ascending: false });
+
+      if (!error && data) {
+        setDiscountCodes(data);
+      }
+      setLoadingDiscountCodes(false);
+    };
+
     if (user) {
       fetchResults();
       fetchCartItems();
       fetchOrders();
       fetchProfile();
+      fetchDiscountCodes();
     }
   }, [user]);
 
@@ -456,6 +494,77 @@ const MyPage = () => {
                         </div>
                       );
                   })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 할인 코드 카드 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg font-normal">
+                <Ticket className="w-5 h-5" />
+                할인 코드
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingDiscountCodes ? (
+                <p className="text-muted-foreground text-sm animate-pulse">불러오는 중...</p>
+              ) : discountCodes.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  발급된 할인 코드가 없습니다.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {discountCodes.map((discountCode) => (
+                    <div
+                      key={discountCode.id}
+                      className={`p-3 rounded-lg ${discountCode.is_used ? "bg-muted/30" : "bg-muted/50"}`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Badge
+                            variant="outline"
+                            className={`font-mono text-sm px-2 py-1 ${discountCode.is_used ? "opacity-50 line-through" : ""}`}
+                          >
+                            {discountCode.code}
+                          </Badge>
+                          {!discountCode.is_used && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => copyDiscountCode(discountCode.code)}
+                              className="h-7 w-7 p-0"
+                            >
+                              {copiedCode === discountCode.code ? (
+                                <Check className="w-3.5 h-3.5 text-green-500" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="text-sm font-medium text-primary">
+                            {formatPrice(discountCode.discount_amount)}원
+                          </span>
+                          <Badge
+                            className={`text-[10px] px-1.5 py-0.5 ${
+                              discountCode.is_used
+                                ? "bg-gray-500 text-white"
+                                : "bg-green-500 text-white"
+                            }`}
+                          >
+                            {discountCode.is_used ? "사용완료" : "사용가능"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        발급일: {formatDate(discountCode.created_at)}
+                        {discountCode.expires_at && ` · 만료일: ${formatDate(discountCode.expires_at)}`}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>

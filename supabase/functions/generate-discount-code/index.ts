@@ -168,7 +168,7 @@ SUMMIT 구매하기: https://wiserlab.co.kr/summit
     <!-- Header -->
     <tr>
       <td style="padding: 48px 24px 32px; text-align: center; border-bottom: 1px solid #e5e5e5;">
-        <span style="font-size: 20px; font-weight: 300; letter-spacing: 2px; color: #000000;">Wiser Lab</span>
+        <img src="https://wiserlab.lovable.app/email/wiser-lab-logo.svg" alt="Wiser Lab" width="160" height="28" style="display: block; margin: 0 auto; max-width: 160px; height: auto;" />
       </td>
     </tr>
     

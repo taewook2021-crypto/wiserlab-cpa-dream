@@ -572,33 +572,67 @@ const Edge = () => {
                     width: '210mm',
                     height: '297mm',
                     margin: '0 auto 16px',
-                    padding: '0',
+                    padding: '2mm 0',
                     boxSizing: 'border-box',
                     border: '1px solid #ccc',
                     overflow: 'hidden'
                   }}
                 >
-                  {/* 시험지 상단 헤더 - 극소화 */}
+                  {/* 시험지 상단 헤더 - 최소화 */}
                   <div 
-                    className="flex items-center justify-between px-1"
-                    style={{ borderBottom: '1px solid black', height: '14px' }}
+                    className="flex items-center justify-between px-2"
+                    style={{ borderBottom: '1px solid black', height: '20px' }}
                   >
-                    <span style={{ fontSize: '8px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}>
-                      {pageNum}/{totalPages} ①형
-                    </span>
-                    <span style={{ fontSize: '12px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontWeight: 'bold' }}>
-                      {subject === 'financial' ? '회계학' : '세법학'}
-                    </span>
-                    <span style={{ fontSize: '8px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}>
-                      제3교시
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <span 
+                        className="text-xs font-bold"
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '10px' }}
+                      >{pageNum}/{totalPages}</span>
+                      <span 
+                        className="inline-flex items-center justify-center border border-black rounded-full font-bold"
+                        style={{ width: '12px', height: '12px', fontSize: '8px', borderWidth: '1px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                      >
+                        ①
+                      </span>
+                      <span 
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '10px' }}
+                      >형</span>
+                    </div>
+                    
+                    <div className="text-center flex-1">
+                      <h1 
+                        className="font-bold tracking-widest"
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '20px' }}
+                      >
+                        {subject === 'financial' ? '회계학' : '세법학'}
+                      </h1>
+                    </div>
+                    
+                    <div className="text-right">
+                      <span 
+                        className="font-bold"
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '12px' }}
+                      >제3교시</span>
+                    </div>
                   </div>
 
-                  {/* 본문 영역 - 중앙선 제거하고 영역 최대화 */}
+                  {/* T자형 본문 영역 - 세로로 연속된 중앙선 */}
                   <div 
                     className="relative"
-                    style={{ height: 'calc(100% - 14px)' }}
+                    style={{ height: 'calc(100% - 20px)' }}
                   >
+                    {/* 중앙 세로선 */}
+                    <div 
+                      style={{ 
+                        position: 'absolute', 
+                        left: '50%', 
+                        top: 0, 
+                        bottom: 0, 
+                        width: '1px', 
+                        backgroundColor: 'black' 
+                      }} 
+                    />
+                    
                     <div className="grid grid-cols-2 h-full">
                       {/* 왼쪽 상단 */}
                       <div 

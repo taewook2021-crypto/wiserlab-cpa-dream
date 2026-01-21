@@ -553,16 +553,14 @@ const Edge = () => {
             </DialogTitle>
           </DialogHeader>
 
-          {/* 시험지 미리보기 컨텐츠 - CPA 시험지 양식 (T자형 2단 레이아웃, 4문제/페이지) */}
+          {/* 시험지 미리보기 컨텐츠 - CPA 시험지 양식 (T자형 2단 레이아웃, 2문제/페이지) */}
           <div className="bg-white text-black" id="print-content">
-            {/* 4문제씩 페어로 묶어서 페이지 생성 */}
-            {Array.from({ length: Math.ceil(selectedPastQuestions.length / 4) }).map((_, pageIdx) => {
-              const topLeftQ = selectedPastQuestions[pageIdx * 4];
-              const topRightQ = selectedPastQuestions[pageIdx * 4 + 1];
-              const bottomLeftQ = selectedPastQuestions[pageIdx * 4 + 2];
-              const bottomRightQ = selectedPastQuestions[pageIdx * 4 + 3];
+            {/* 2문제씩 페어로 묶어서 페이지 생성 */}
+            {Array.from({ length: Math.ceil(selectedPastQuestions.length / 2) }).map((_, pageIdx) => {
+              const leftQ = selectedPastQuestions[pageIdx * 2];
+              const rightQ = selectedPastQuestions[pageIdx * 2 + 1];
               const pageNum = pageIdx + 1;
-              const totalPages = Math.ceil(selectedPastQuestions.length / 4);
+              const totalPages = Math.ceil(selectedPastQuestions.length / 2);
               
               return (
                 <div 
@@ -635,57 +633,29 @@ const Edge = () => {
                     />
                     
                     <div className="grid grid-cols-2 h-full">
-                      {/* 왼쪽 상단 */}
+                      {/* 왼쪽 열 - 전체 높이 사용 */}
                       <div 
                         className="p-1 overflow-hidden"
-                        style={{ height: '50%' }}
+                        style={{ height: '100%' }}
                       >
-                        {topLeftQ && (
+                        {leftQ && (
                           <img 
-                            src={topLeftQ.image_path} 
-                            alt={`${topLeftQ.related_year}년 ${topLeftQ.related_question_number}번`}
+                            src={leftQ.image_path} 
+                            alt={`${leftQ.related_year}년 ${leftQ.related_question_number}번`}
                             style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
                           />
                         )}
                       </div>
 
-                      {/* 오른쪽 상단 */}
+                      {/* 오른쪽 열 - 전체 높이 사용 */}
                       <div 
                         className="p-1 overflow-hidden"
-                        style={{ height: '50%' }}
+                        style={{ height: '100%' }}
                       >
-                        {topRightQ && (
+                        {rightQ && (
                           <img 
-                            src={topRightQ.image_path} 
-                            alt={`${topRightQ.related_year}년 ${topRightQ.related_question_number}번`}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
-                          />
-                        )}
-                      </div>
-
-                      {/* 왼쪽 하단 */}
-                      <div 
-                        className="p-1 overflow-hidden"
-                        style={{ height: '50%' }}
-                      >
-                        {bottomLeftQ && (
-                          <img 
-                            src={bottomLeftQ.image_path} 
-                            alt={`${bottomLeftQ.related_year}년 ${bottomLeftQ.related_question_number}번`}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
-                          />
-                        )}
-                      </div>
-
-                      {/* 오른쪽 하단 */}
-                      <div 
-                        className="p-1 overflow-hidden"
-                        style={{ height: '50%' }}
-                      >
-                        {bottomRightQ && (
-                          <img 
-                            src={bottomRightQ.image_path} 
-                            alt={`${bottomRightQ.related_year}년 ${bottomRightQ.related_question_number}번`}
+                            src={rightQ.image_path} 
+                            alt={`${rightQ.related_year}년 ${rightQ.related_question_number}번`}
                             style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
                           />
                         )}

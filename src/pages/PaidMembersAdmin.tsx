@@ -4,7 +4,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -96,12 +95,14 @@ const PaidMembersAdmin = () => {
       profilesData?.map((p) => [p.id, p.exam_number]) || []
     );
 
-    // Transform data
-    const membersData: PaidMember[] = (ordersData || []).map((order) => ({
-      ...order,
-      is_admin_granted: order.order_id.startsWith("ADMIN-GRANT-"),
-      exam_number: examNumberMap.get(order.user_id) || null,
-    }));
+    // Transform data - 관리자 부여 회원 제외
+    const membersData: PaidMember[] = (ordersData || [])
+      .filter((order) => !order.order_id.startsWith("ADMIN-GRANT-"))
+      .map((order) => ({
+        ...order,
+        is_admin_granted: false,
+        exam_number: examNumberMap.get(order.user_id) || null,
+      }));
 
     setMembers(membersData);
   };
@@ -123,11 +124,7 @@ const PaidMembersAdmin = () => {
 
   // Statistics
   const totalMembers = members.length;
-  const realPurchasers = members.filter((m) => !m.is_admin_granted).length;
-  const adminGranted = members.filter((m) => m.is_admin_granted).length;
-  const totalRevenue = members
-    .filter((m) => !m.is_admin_granted)
-    .reduce((sum, m) => sum + m.amount, 0);
+  const totalRevenue = members.reduce((sum, m) => sum + m.amount, 0);
 
   // CSV download - 기본 정보
   const handleDownloadCSV = () => {
@@ -153,17 +150,16 @@ const PaidMembersAdmin = () => {
     link.click();
   };
 
-  // 물류택배 양식 다운로드 - 실제 구매자만
+  // 물류택배 양식 다운로드
   const handleDownloadShippingCSV = () => {
-    const realPurchasersList = filteredMembers.filter((m) => !m.is_admin_granted);
-    
-    if (realPurchasersList.length === 0) {
-      alert("다운로드할 실제 구매자가 없습니다.");
+    if (filteredMembers.length === 0) {
+      alert("다운로드할 구매자가 없습니다.");
       return;
     }
 
+
     const headers = ["상호", "핸드폰번호", "핸드폰번호", "주소", "내품수량", "배송메세지1", "박스타입", "박스수량"];
-    const rows = realPurchasersList.map((m) => {
+    const rows = filteredMembers.map((m) => {
       const fullAddress = m.shipping_detail_address 
         ? `${m.shipping_address} ${m.shipping_detail_address}` 
         : m.shipping_address;
@@ -242,21 +238,13 @@ const PaidMembersAdmin = () => {
               <h1 className="text-3xl font-light mb-4">유료 회원 관리</h1>
 
               {/* Statistics Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="border border-border rounded-lg p-4">
-                  <p className="text-sm text-muted-foreground">총 유료 회원</p>
+                  <p className="text-sm text-muted-foreground">총 구매자</p>
                   <p className="text-2xl font-bold">{totalMembers}명</p>
                 </div>
                 <div className="border border-border rounded-lg p-4">
-                  <p className="text-sm text-muted-foreground">실제 구매자</p>
-                  <p className="text-2xl font-bold text-green-600">{realPurchasers}명</p>
-                </div>
-                <div className="border border-border rounded-lg p-4">
-                  <p className="text-sm text-muted-foreground">관리자 부여</p>
-                  <p className="text-2xl font-bold text-blue-600">{adminGranted}명</p>
-                </div>
-                <div className="border border-border rounded-lg p-4">
-                  <p className="text-sm text-muted-foreground">실제 매출</p>
+                  <p className="text-sm text-muted-foreground">총 매출</p>
                   <p className="text-2xl font-bold">{formatPrice(totalRevenue)}</p>
                 </div>
               </div>
@@ -283,7 +271,7 @@ const PaidMembersAdmin = () => {
                   </Button>
                   <Button onClick={handleDownloadShippingCSV}>
                     <Truck className="h-4 w-4 mr-2" />
-                    물류택배 양식 ({realPurchasers}명)
+                    물류택배 양식 ({totalMembers}명)
                   </Button>
                 </div>
               </div>
@@ -298,15 +286,14 @@ const PaidMembersAdmin = () => {
                       <TableHead>이메일</TableHead>
                       <TableHead>상품</TableHead>
                       <TableHead>금액</TableHead>
-                      <TableHead>구분</TableHead>
                       <TableHead>결제일</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredMembers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                          유료 회원이 없습니다
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          구매자가 없습니다
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -324,17 +311,6 @@ const PaidMembersAdmin = () => {
                           </TableCell>
                           <TableCell>
                             {member.amount > 0 ? formatPrice(member.amount) : "-"}
-                          </TableCell>
-                          <TableCell>
-                            {member.is_admin_granted ? (
-                              <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                                관리자 부여
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary" className="bg-green-100 text-green-700">
-                                실제 구매
-                              </Badge>
-                            )}
                           </TableCell>
                           <TableCell className="text-sm">
                             {formatDate(member.paid_at)}

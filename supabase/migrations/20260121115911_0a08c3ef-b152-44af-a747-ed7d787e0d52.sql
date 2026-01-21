@@ -1,0 +1,1 @@
+DELETE FROM exam_numbers;

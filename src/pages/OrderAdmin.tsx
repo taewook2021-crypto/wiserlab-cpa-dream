@@ -34,7 +34,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Package, RefreshCw, XCircle, UserPlus } from "lucide-react";
+import { Package, RefreshCw, XCircle, UserPlus, Truck } from "lucide-react";
 
 interface Order {
   id: string;
@@ -307,6 +307,44 @@ const OrderAdmin = () => {
     });
   };
 
+  // 물류택배 양식 다운로드 - 결제완료된 실제 구매자만
+  const handleDownloadShippingCSV = () => {
+    const paidOrders = filteredOrders.filter((o) => o.status === "paid");
+    
+    if (paidOrders.length === 0) {
+      toast.error("다운로드할 결제완료 주문이 없습니다.");
+      return;
+    }
+
+    const headers = ["상호", "핸드폰번호", "핸드폰번호", "주소", "내품수량", "배송메세지1", "박스타입", "박스수량"];
+    const rows = paidOrders.map((o) => {
+      const fullAddress = o.shipping_detail_address 
+        ? `${o.shipping_address} ${o.shipping_detail_address}` 
+        : o.shipping_address;
+      
+      return [
+        o.buyer_name,
+        o.buyer_phone,
+        o.buyer_phone,
+        fullAddress,
+        "1",
+        "",
+        "극소",
+        "1",
+      ];
+    });
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `shipping_list_${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+  };
+
   if (loading || isCheckingAdmin) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
@@ -360,7 +398,7 @@ const OrderAdmin = () => {
             <Package className="w-6 h-6" />
             주문 관리
           </h1>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button
               variant="outline"
               size="sm"
@@ -372,6 +410,10 @@ const OrderAdmin = () => {
             <Button variant="outline" size="sm" onClick={fetchOrders}>
               <RefreshCw className="w-4 h-4 mr-2" />
               새로고침
+            </Button>
+            <Button size="sm" onClick={handleDownloadShippingCSV}>
+              <Truck className="w-4 h-4 mr-2" />
+              물류택배 양식
             </Button>
           </div>
         </div>

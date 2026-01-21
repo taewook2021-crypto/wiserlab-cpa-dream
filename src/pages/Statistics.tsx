@@ -21,6 +21,9 @@ import { Lock, Users, TrendingUp, Trophy, BarChart3 } from "lucide-react";
 const SAFE_ZONE_CUTOFF = 28; // 80점
 const COMPETITIVE_ZONE_CUTOFF = 22; // 약 63점
 
+// 안정권/경합권 지표 공개 여부 (관리자가 true로 변경시 공개)
+const ZONE_METRICS_RELEASED = false;
+
 interface BillboardEntry {
   rank: number;
   examNumber: string;
@@ -46,6 +49,15 @@ interface WeekOption {
 }
 
 const getZoneInfo = (score: number) => {
+  // 지표가 공개되지 않은 경우 존 정보를 숨김
+  if (!ZONE_METRICS_RELEASED) {
+    return {
+      zone: "채점 완료",
+      description: "통계 분석 중",
+      intensity: "hidden",
+    };
+  }
+  
   if (score >= SAFE_ZONE_CUTOFF) {
     return {
       zone: "안정권",
@@ -475,7 +487,9 @@ const Statistics = () => {
                     </p>
                     <div className="mt-6 mb-6">
                       <span className={`inline-block px-6 py-2 text-sm font-medium border ${
-                        userZone.intensity === "high" 
+                        userZone.intensity === "hidden"
+                          ? "bg-muted text-foreground border-border"
+                          : userZone.intensity === "high" 
                           ? "bg-foreground text-background border-foreground" 
                           : userZone.intensity === "medium"
                           ? "bg-muted text-foreground border-border"
@@ -484,14 +498,18 @@ const Statistics = () => {
                         {userZone.zone}
                       </span>
                     </div>
-                    {/* 실제 등수 표시 - 서울대/연세대 기준 */}
-                    {snuYsuParticipants > 0 && myRank !== null ? (
+                    {/* 등수 표시 - 지표 공개 시에만 */}
+                    {ZONE_METRICS_RELEASED && snuYsuParticipants > 0 && myRank !== null ? (
                       <p className="text-sm text-muted-foreground">
                         서울대·연세대 {snuYsuParticipants}명 중 <span className="font-medium text-foreground">{myRank}등</span> · 상위 {percentile}%
                       </p>
-                    ) : myRank === null && snuYsuParticipants > 0 ? (
+                    ) : ZONE_METRICS_RELEASED && myRank === null && snuYsuParticipants > 0 ? (
                       <p className="text-sm text-muted-foreground">
                         서울대·연세대 응시자 {snuYsuParticipants}명
+                      </p>
+                    ) : !ZONE_METRICS_RELEASED ? (
+                      <p className="text-sm text-muted-foreground">
+                        상세 통계는 추후 공개됩니다
                       </p>
                     ) : (
                       <p className="text-sm text-muted-foreground">
@@ -526,28 +544,30 @@ const Statistics = () => {
               )}
 
 
-              {/* 존 가이드 */}
-              <div className="grid grid-cols-3 gap-px bg-border mb-10">
-                <div className="bg-foreground text-background p-6 text-center">
-                  <p className="font-medium text-sm mb-1">안정권</p>
-                  <p className="text-xs opacity-70">상위 40%</p>
-                  <p className="text-xs opacity-70 mt-1">{SAFE_ZONE_CUTOFF}점 이상</p>
+              {/* 존 가이드 - 지표 공개 시에만 표시 */}
+              {ZONE_METRICS_RELEASED && (
+                <div className="grid grid-cols-3 gap-px bg-border mb-10">
+                  <div className="bg-foreground text-background p-6 text-center">
+                    <p className="font-medium text-sm mb-1">안정권</p>
+                    <p className="text-xs opacity-70">상위 40%</p>
+                    <p className="text-xs opacity-70 mt-1">{SAFE_ZONE_CUTOFF}점 이상</p>
+                  </div>
+                  <div className="bg-muted text-foreground p-6 text-center">
+                    <p className="font-medium text-sm mb-1">경합권</p>
+                    <p className="text-xs text-muted-foreground">상위 40~70%</p>
+                    <p className="text-xs text-muted-foreground mt-1">{COMPETITIVE_ZONE_CUTOFF}~{SAFE_ZONE_CUTOFF - 1}점</p>
+                  </div>
+                  <div className="bg-background text-muted-foreground p-6 text-center border border-border">
+                    <p className="font-medium text-sm mb-1">레드라인</p>
+                    <p className="text-xs">상위 70% 이하</p>
+                    <p className="text-xs mt-1">{COMPETITIVE_ZONE_CUTOFF - 1}점 이하</p>
+                  </div>
                 </div>
-                <div className="bg-muted text-foreground p-6 text-center">
-                  <p className="font-medium text-sm mb-1">경합권</p>
-                  <p className="text-xs text-muted-foreground">상위 40~70%</p>
-                  <p className="text-xs text-muted-foreground mt-1">{COMPETITIVE_ZONE_CUTOFF}~{SAFE_ZONE_CUTOFF - 1}점</p>
-                </div>
-                <div className="bg-background text-muted-foreground p-6 text-center border border-border">
-                  <p className="font-medium text-sm mb-1">레드라인</p>
-                  <p className="text-xs">상위 70% 이하</p>
-                  <p className="text-xs mt-1">{COMPETITIVE_ZONE_CUTOFF - 1}점 이하</p>
-                </div>
-              </div>
+              )}
 
 
-              {/* 빌보드 차트 - 안정권 진입자만 (공개 시간 이후) */}
-              {isStatsReleased ? (
+              {/* 빌보드 차트 - 지표 공개 후에만 표시 */}
+              {ZONE_METRICS_RELEASED && isStatsReleased ? (
                 <div className="mb-8">
                   <div className="mb-6">
                     <h2 className="text-xl font-light">전국 빌보드</h2>
@@ -602,12 +622,12 @@ const Statistics = () => {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : ZONE_METRICS_RELEASED ? (
                 <div className="border border-border p-6 mb-8 text-center">
                   <h2 className="text-xl font-light mb-2">전국 빌보드</h2>
                   <p className="text-muted-foreground">{releaseTimeText}</p>
                 </div>
-              )}
+              ) : null}
 
             </div>
           </div>

@@ -637,7 +637,7 @@ const Edge = () => {
                     <div className="grid grid-cols-2 h-full">
                       {/* 왼쪽 상단 */}
                       <div 
-                        className="overflow-hidden"
+                        className="overflow-hidden flex items-center justify-center"
                         style={{ height: '50%', padding: '0' }}
                       >
                         {topLeftQ && (
@@ -648,7 +648,9 @@ const Edge = () => {
                               width: '100%', 
                               height: '100%', 
                               objectFit: topLeftQ.image_path.includes('2021_6') ? 'contain' : 'cover',
-                              objectPosition: 'top center'
+                              objectPosition: 'top center',
+                              transform: topLeftQ.image_path.includes('2021_6') ? 'scale(1.25)' : 'none',
+                              transformOrigin: 'center center'
                             }}
                           />
                         )}
@@ -656,7 +658,7 @@ const Edge = () => {
 
                       {/* 오른쪽 상단 */}
                       <div 
-                        className="overflow-hidden"
+                        className="overflow-hidden flex items-center justify-center"
                         style={{ height: '50%', padding: '0' }}
                       >
                         {topRightQ && (
@@ -667,7 +669,9 @@ const Edge = () => {
                               width: '100%', 
                               height: '100%', 
                               objectFit: topRightQ.image_path.includes('2021_6') ? 'contain' : 'cover',
-                              objectPosition: 'top center'
+                              objectPosition: 'top center',
+                              transform: topRightQ.image_path.includes('2021_6') ? 'scale(1.25)' : 'none',
+                              transformOrigin: 'center center'
                             }}
                           />
                         )}
@@ -675,7 +679,7 @@ const Edge = () => {
 
                       {/* 왼쪽 하단 */}
                       <div 
-                        className="overflow-hidden"
+                        className="overflow-hidden flex items-center justify-center"
                         style={{ height: '50%', padding: '0' }}
                       >
                         {bottomLeftQ && (
@@ -686,7 +690,9 @@ const Edge = () => {
                               width: '100%', 
                               height: '100%', 
                               objectFit: bottomLeftQ.image_path.includes('2021_6') ? 'contain' : 'cover',
-                              objectPosition: 'top center'
+                              objectPosition: 'top center',
+                              transform: bottomLeftQ.image_path.includes('2021_6') ? 'scale(1.25)' : 'none',
+                              transformOrigin: 'center center'
                             }}
                           />
                         )}
@@ -694,7 +700,7 @@ const Edge = () => {
 
                       {/* 오른쪽 하단 */}
                       <div 
-                        className="overflow-hidden"
+                        className="overflow-hidden flex items-center justify-center"
                         style={{ height: '50%', padding: '0' }}
                       >
                         {bottomRightQ && (
@@ -705,7 +711,9 @@ const Edge = () => {
                               width: '100%', 
                               height: '100%', 
                               objectFit: bottomRightQ.image_path.includes('2021_6') ? 'contain' : 'cover',
-                              objectPosition: 'top center'
+                              objectPosition: 'top center',
+                              transform: bottomRightQ.image_path.includes('2021_6') ? 'scale(1.25)' : 'none',
+                              transformOrigin: 'center center'
                             }}
                           />
                         )}

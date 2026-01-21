@@ -647,10 +647,8 @@ const Edge = () => {
                             style={{ 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: 'contain', 
-                              objectPosition: 'top',
-                              transform: topLeftQ.image_path.includes('2021_6') ? 'scale(1)' : 'scale(1.3)',
-                              transformOrigin: 'top center'
+                              objectFit: topLeftQ.image_path.includes('2021_6') ? 'contain' : 'cover',
+                              objectPosition: 'top center'
                             }}
                           />
                         )}
@@ -668,10 +666,8 @@ const Edge = () => {
                             style={{ 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: 'contain', 
-                              objectPosition: 'top',
-                              transform: topRightQ.image_path.includes('2021_6') ? 'scale(1)' : 'scale(1.3)',
-                              transformOrigin: 'top center'
+                              objectFit: topRightQ.image_path.includes('2021_6') ? 'contain' : 'cover',
+                              objectPosition: 'top center'
                             }}
                           />
                         )}
@@ -689,10 +685,8 @@ const Edge = () => {
                             style={{ 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: 'contain', 
-                              objectPosition: 'top',
-                              transform: bottomLeftQ.image_path.includes('2021_6') ? 'scale(1)' : 'scale(1.3)',
-                              transformOrigin: 'top center'
+                              objectFit: bottomLeftQ.image_path.includes('2021_6') ? 'contain' : 'cover',
+                              objectPosition: 'top center'
                             }}
                           />
                         )}
@@ -710,10 +704,8 @@ const Edge = () => {
                             style={{ 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: 'contain', 
-                              objectPosition: 'top',
-                              transform: bottomRightQ.image_path.includes('2021_6') ? 'scale(1)' : 'scale(1.3)',
-                              transformOrigin: 'top center'
+                              objectFit: bottomRightQ.image_path.includes('2021_6') ? 'contain' : 'cover',
+                              objectPosition: 'top center'
                             }}
                           />
                         )}

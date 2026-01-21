@@ -116,6 +116,8 @@ const OrderAdmin = () => {
     }
   }, [user, loading]);
 
+  const [periodFilter, setPeriodFilter] = useState<"all" | "day" | "week" | "month">("all");
+
   const fetchOrders = async () => {
     setLoadingOrders(true);
     const { data, error } = await supabase
@@ -124,7 +126,11 @@ const OrderAdmin = () => {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setOrders(data as Order[]);
+      // 관리자 부여(ADMIN-GRANT-) 및 무료 응시(FREE_) 제외 - 실제 결제만
+      const realOrders = (data as Order[]).filter(
+        (order) => !order.order_id.startsWith("ADMIN-GRANT-") && !order.order_id.startsWith("FREE_")
+      );
+      setOrders(realOrders);
     }
     setLoadingOrders(false);
   };
@@ -134,6 +140,34 @@ const OrderAdmin = () => {
       fetchOrders();
     }
   }, [isAdmin]);
+
+  // 기간별 필터링
+  const filteredOrders = orders.filter((order) => {
+    if (periodFilter === "all") return true;
+    
+    const orderDate = new Date(order.created_at);
+    const now = new Date();
+    
+    if (periodFilter === "day") {
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      return orderDate >= startOfDay;
+    }
+    
+    if (periodFilter === "week") {
+      const dayOfWeek = now.getDay();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - dayOfWeek);
+      startOfWeek.setHours(0, 0, 0, 0);
+      return orderDate >= startOfWeek;
+    }
+    
+    if (periodFilter === "month") {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      return orderDate >= startOfMonth;
+    }
+    
+    return true;
+  });
 
   const handleRefund = async () => {
     if (!selectedOrder || !refundReason.trim()) {
@@ -342,10 +376,42 @@ const OrderAdmin = () => {
           </div>
         </div>
 
+        {/* Period Filter */}
+        <div className="flex gap-2 mb-6">
+          <Button
+            variant={periodFilter === "all" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPeriodFilter("all")}
+          >
+            전체
+          </Button>
+          <Button
+            variant={periodFilter === "day" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPeriodFilter("day")}
+          >
+            오늘
+          </Button>
+          <Button
+            variant={periodFilter === "week" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPeriodFilter("week")}
+          >
+            이번 주
+          </Button>
+          <Button
+            variant={periodFilter === "month" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPeriodFilter("month")}
+          >
+            이번 달
+          </Button>
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-normal">
-              전체 주문 ({orders.length}건)
+              실제 결제 주문 ({filteredOrders.length}건)
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -353,9 +419,9 @@ const OrderAdmin = () => {
               <p className="text-muted-foreground text-center py-8 animate-pulse">
                 주문 목록을 불러오는 중...
               </p>
-            ) : orders.length === 0 ? (
+            ) : filteredOrders.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
-                주문 내역이 없습니다.
+                해당 기간의 주문 내역이 없습니다.
               </p>
             ) : (
               <div className="overflow-x-auto">
@@ -373,7 +439,7 @@ const OrderAdmin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {orders.map((order) => (
+                    {filteredOrders.map((order) => (
                       <TableRow key={order.id}>
                         <TableCell className="font-mono text-xs">
                           {order.order_id.slice(0, 20)}...

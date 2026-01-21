@@ -647,10 +647,12 @@ const Edge = () => {
                             style={{ 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: topLeftQ.image_path.includes('2021_6') ? 'contain' : 'cover',
-                              objectPosition: 'top center',
-                              transform: topLeftQ.image_path.includes('2021_6') ? 'scale(1.25)' : 'none',
-                              transformOrigin: 'center center'
+                              // 하단이 잘리지 않도록 기본은 항상 contain
+                              objectFit: 'contain',
+                              objectPosition: 'center',
+                              // 2021_6만 살짝 작게
+                              transform: topLeftQ.image_path.includes('2021_6') ? 'scale(0.92)' : 'none',
+                              transformOrigin: 'center center',
                             }}
                           />
                         )}
@@ -668,10 +670,10 @@ const Edge = () => {
                             style={{ 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: topRightQ.image_path.includes('2021_6') ? 'contain' : 'cover',
-                              objectPosition: 'top center',
-                              transform: topRightQ.image_path.includes('2021_6') ? 'scale(1.25)' : 'none',
-                              transformOrigin: 'center center'
+                              objectFit: 'contain',
+                              objectPosition: 'center',
+                              transform: topRightQ.image_path.includes('2021_6') ? 'scale(0.92)' : 'none',
+                              transformOrigin: 'center center',
                             }}
                           />
                         )}
@@ -689,10 +691,10 @@ const Edge = () => {
                             style={{ 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: bottomLeftQ.image_path.includes('2021_6') ? 'contain' : 'cover',
-                              objectPosition: 'top center',
-                              transform: bottomLeftQ.image_path.includes('2021_6') ? 'scale(1.25)' : 'none',
-                              transformOrigin: 'center center'
+                              objectFit: 'contain',
+                              objectPosition: 'center',
+                              transform: bottomLeftQ.image_path.includes('2021_6') ? 'scale(0.92)' : 'none',
+                              transformOrigin: 'center center',
                             }}
                           />
                         )}
@@ -710,10 +712,10 @@ const Edge = () => {
                             style={{ 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: bottomRightQ.image_path.includes('2021_6') ? 'contain' : 'cover',
-                              objectPosition: 'top center',
-                              transform: bottomRightQ.image_path.includes('2021_6') ? 'scale(1.25)' : 'none',
-                              transformOrigin: 'center center'
+                              objectFit: 'contain',
+                              objectPosition: 'center',
+                              transform: bottomRightQ.image_path.includes('2021_6') ? 'scale(0.92)' : 'none',
+                              transformOrigin: 'center center',
                             }}
                           />
                         )}

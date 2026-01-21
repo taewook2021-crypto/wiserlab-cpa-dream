@@ -572,7 +572,7 @@ const Edge = () => {
                     width: '210mm',
                     height: '297mm',
                     margin: '0 auto 16px',
-                    padding: '8mm 0',
+                    padding: '13mm 0',
                     boxSizing: 'border-box',
                     border: '1px solid #ccc',
                     overflow: 'hidden'

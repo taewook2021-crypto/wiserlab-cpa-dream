@@ -620,14 +620,14 @@ const Edge = () => {
                   {/* T자형 본문 영역 - 세로로 연속된 중앙선 */}
                   <div 
                     className="relative"
-                    style={{ height: 'calc(100% - 20px)' }}
+                    style={{ height: 'calc(100% - 50px)', paddingTop: '8px' }}
                   >
                     {/* 중앙 세로선 */}
                     <div 
                       style={{ 
                         position: 'absolute', 
                         left: '50%', 
-                        top: 0, 
+                        top: '8px', 
                         bottom: 0, 
                         width: '1px', 
                         backgroundColor: 'black' 

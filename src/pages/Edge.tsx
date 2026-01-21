@@ -572,25 +572,25 @@ const Edge = () => {
                     width: '210mm',
                     height: '297mm',
                     margin: '0 auto 16px',
-                    padding: '10mm 2mm',
+                    padding: '5mm 1mm',
                     boxSizing: 'border-box',
                     border: '1px solid #ccc',
                     overflow: 'hidden'
                   }}
                 >
-                  {/* 시험지 상단 헤더 */}
+                  {/* 시험지 상단 헤더 - 최소화 */}
                   <div 
-                    className="flex items-center justify-between px-3 py-1"
-                    style={{ borderBottom: '2px solid black', height: '32px' }}
+                    className="flex items-center justify-between px-2"
+                    style={{ borderBottom: '2px solid black', height: '28px' }}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       <span 
-                        className="text-sm font-bold"
+                        className="text-xs font-bold"
                         style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
                       >{pageNum}/{totalPages}</span>
                       <span 
-                        className="inline-flex items-center justify-center w-5 h-5 border border-black rounded-full text-sm font-bold"
-                        style={{ borderWidth: '1.5px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                        className="inline-flex items-center justify-center w-4 h-4 border border-black rounded-full text-xs font-bold"
+                        style={{ borderWidth: '1px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
                       >
                         ①
                       </span>
@@ -603,7 +603,7 @@ const Edge = () => {
                     <div className="text-center flex-1">
                       <h1 
                         className="font-bold tracking-widest"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '36px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '28px' }}
                       >
                         {subject === 'financial' ? '회계학' : '세법학'}
                       </h1>
@@ -612,7 +612,7 @@ const Edge = () => {
                     <div className="text-right">
                       <span 
                         className="font-bold"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '22px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '18px' }}
                       >제3교시</span>
                     </div>
                   </div>
@@ -620,7 +620,7 @@ const Edge = () => {
                   {/* T자형 본문 영역 - 세로로 연속된 중앙선 */}
                   <div 
                     className="relative"
-                    style={{ height: 'calc(100% - 32px)' }}
+                    style={{ height: 'calc(100% - 28px)' }}
                   >
                     {/* 중앙 세로선 */}
                     <div 

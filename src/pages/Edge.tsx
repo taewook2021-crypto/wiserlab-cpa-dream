@@ -578,31 +578,32 @@ const Edge = () => {
                     overflow: 'hidden'
                   }}
                 >
-                  {/* 시험지 상단 헤더 - 최소화 */}
+                  {/* 시험지 상단 헤더 */}
                   <div 
-                    className="flex items-center justify-between px-2"
-                    style={{ borderBottom: '1px solid black', height: '20px' }}
+                    className="flex items-center justify-between px-4"
+                    style={{ borderBottom: '2px solid black', height: '50px' }}
                   >
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <span 
-                        className="text-xs font-bold"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '10px' }}
+                        className="font-bold"
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '18px' }}
                       >{pageNum}/{totalPages}</span>
                       <span 
                         className="inline-flex items-center justify-center border border-black rounded-full font-bold"
-                        style={{ width: '12px', height: '12px', fontSize: '8px', borderWidth: '1px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                        style={{ width: '24px', height: '24px', fontSize: '16px', borderWidth: '2px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
                       >
                         ①
                       </span>
                       <span 
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '10px' }}
+                        className="font-bold"
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '20px' }}
                       >형</span>
                     </div>
                     
                     <div className="text-center flex-1">
                       <h1 
                         className="font-bold tracking-widest"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '20px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '48px' }}
                       >
                         {subject === 'financial' ? '회계학' : '세법학'}
                       </h1>
@@ -611,7 +612,7 @@ const Edge = () => {
                     <div className="text-right">
                       <span 
                         className="font-bold"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '12px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '24px' }}
                       >제3교시</span>
                     </div>
                   </div>

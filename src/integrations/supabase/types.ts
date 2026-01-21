@@ -173,6 +173,39 @@ export type Database = {
         }
         Relationships: []
       }
+      omr_scoring_results: {
+        Row: {
+          correct_count: number
+          created_at: string
+          exam_round: number
+          id: string
+          participant_number: number
+          score_percentage: number
+          subject: string
+          total_questions: number
+        }
+        Insert: {
+          correct_count: number
+          created_at?: string
+          exam_round: number
+          id?: string
+          participant_number: number
+          score_percentage: number
+          subject: string
+          total_questions: number
+        }
+        Update: {
+          correct_count?: number
+          created_at?: string
+          exam_round?: number
+          id?: string
+          participant_number?: number
+          score_percentage?: number
+          subject?: string
+          total_questions?: number
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount: number

@@ -120,7 +120,7 @@ const OmrScoringAdmin = () => {
   // 저장된 결과 불러오기
   const fetchSavedResults = async () => {
     const { data, error } = await supabase
-      .from("omr_scoring_results")
+      .from("omr_scoring_results" as any)
       .select("*")
       .order("participant_number", { ascending: true });
 
@@ -129,7 +129,7 @@ const OmrScoringAdmin = () => {
       return;
     }
 
-    setSavedResults(data || []);
+    setSavedResults((data as unknown as SavedResult[]) || []);
   };
 
   useEffect(() => {
@@ -255,7 +255,7 @@ const OmrScoringAdmin = () => {
     try {
       // 다음 참가자 번호 가져오기
       const { data: existingResults } = await supabase
-        .from("omr_scoring_results")
+        .from("omr_scoring_results" as any)
         .select("participant_number")
         .eq("subject", subject.dbValue)
         .eq("exam_round", exam.round)
@@ -263,14 +263,14 @@ const OmrScoringAdmin = () => {
         .limit(1);
 
       const nextNumber = existingResults && existingResults.length > 0 
-        ? existingResults[0].participant_number + 1 
+        ? (existingResults as any[])[0].participant_number + 1 
         : 1;
 
       const correctCount = results.filter((r) => r.isCorrect).length;
       const totalQuestions = results.length;
       const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
 
-      const { error } = await supabase.from("omr_scoring_results").insert({
+      const { error } = await supabase.from("omr_scoring_results" as any).insert({
         participant_number: nextNumber,
         subject: subject.dbValue,
         exam_round: exam.round,
@@ -297,7 +297,7 @@ const OmrScoringAdmin = () => {
 
     try {
       const { error } = await supabase
-        .from("omr_scoring_results")
+        .from("omr_scoring_results" as any)
         .delete()
         .eq("id", id);
 

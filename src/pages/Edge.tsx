@@ -553,14 +553,16 @@ const Edge = () => {
             </DialogTitle>
           </DialogHeader>
 
-          {/* 시험지 미리보기 컨텐츠 - CPA 시험지 양식 (T자형 2단 레이아웃, 2문제/페이지) */}
+          {/* 시험지 미리보기 컨텐츠 - CPA 시험지 양식 (T자형 2단 레이아웃, 4문제/페이지) */}
           <div className="bg-white text-black" id="print-content">
-            {/* 2문제씩 페어로 묶어서 페이지 생성 */}
-            {Array.from({ length: Math.ceil(selectedPastQuestions.length / 2) }).map((_, pageIdx) => {
-              const leftQ = selectedPastQuestions[pageIdx * 2];
-              const rightQ = selectedPastQuestions[pageIdx * 2 + 1];
+            {/* 4문제씩 페어로 묶어서 페이지 생성 */}
+            {Array.from({ length: Math.ceil(selectedPastQuestions.length / 4) }).map((_, pageIdx) => {
+              const topLeftQ = selectedPastQuestions[pageIdx * 4];
+              const topRightQ = selectedPastQuestions[pageIdx * 4 + 1];
+              const bottomLeftQ = selectedPastQuestions[pageIdx * 4 + 2];
+              const bottomRightQ = selectedPastQuestions[pageIdx * 4 + 3];
               const pageNum = pageIdx + 1;
-              const totalPages = Math.ceil(selectedPastQuestions.length / 2);
+              const totalPages = Math.ceil(selectedPastQuestions.length / 4);
               
               return (
                 <div 
@@ -570,7 +572,7 @@ const Edge = () => {
                     width: '210mm',
                     height: '297mm',
                     margin: '0 auto 16px',
-                    padding: '17mm 4mm',
+                    padding: '10mm 2mm',
                     boxSizing: 'border-box',
                     border: '1px solid #ccc',
                     overflow: 'hidden'
@@ -579,7 +581,7 @@ const Edge = () => {
                   {/* 시험지 상단 헤더 */}
                   <div 
                     className="flex items-center justify-between px-3 py-1"
-                    style={{ borderBottom: '2px solid black', height: '36px' }}
+                    style={{ borderBottom: '2px solid black', height: '32px' }}
                   >
                     <div className="flex items-center gap-2">
                       <span 
@@ -601,7 +603,7 @@ const Edge = () => {
                     <div className="text-center flex-1">
                       <h1 
                         className="font-bold tracking-widest"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '40px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '36px' }}
                       >
                         {subject === 'financial' ? '회계학' : '세법학'}
                       </h1>
@@ -610,7 +612,7 @@ const Edge = () => {
                     <div className="text-right">
                       <span 
                         className="font-bold"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '25px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '22px' }}
                       >제3교시</span>
                     </div>
                   </div>
@@ -618,7 +620,7 @@ const Edge = () => {
                   {/* T자형 본문 영역 - 세로로 연속된 중앙선 */}
                   <div 
                     className="relative"
-                    style={{ height: 'calc(100% - 36px)' }}
+                    style={{ height: 'calc(100% - 32px)' }}
                   >
                     {/* 중앙 세로선 */}
                     <div 
@@ -633,29 +635,57 @@ const Edge = () => {
                     />
                     
                     <div className="grid grid-cols-2 h-full">
-                      {/* 왼쪽 열 - 전체 높이 사용 */}
+                      {/* 왼쪽 상단 */}
                       <div 
-                        className="p-1 overflow-hidden"
-                        style={{ height: '100%' }}
+                        className="overflow-hidden"
+                        style={{ height: '50%', padding: '2px' }}
                       >
-                        {leftQ && (
+                        {topLeftQ && (
                           <img 
-                            src={leftQ.image_path} 
-                            alt={`${leftQ.related_year}년 ${leftQ.related_question_number}번`}
+                            src={topLeftQ.image_path} 
+                            alt={`${topLeftQ.related_year}년 ${topLeftQ.related_question_number}번`}
                             style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
                           />
                         )}
                       </div>
 
-                      {/* 오른쪽 열 - 전체 높이 사용 */}
+                      {/* 오른쪽 상단 */}
                       <div 
-                        className="p-1 overflow-hidden"
-                        style={{ height: '100%' }}
+                        className="overflow-hidden"
+                        style={{ height: '50%', padding: '2px' }}
                       >
-                        {rightQ && (
+                        {topRightQ && (
                           <img 
-                            src={rightQ.image_path} 
-                            alt={`${rightQ.related_year}년 ${rightQ.related_question_number}번`}
+                            src={topRightQ.image_path} 
+                            alt={`${topRightQ.related_year}년 ${topRightQ.related_question_number}번`}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
+                          />
+                        )}
+                      </div>
+
+                      {/* 왼쪽 하단 */}
+                      <div 
+                        className="overflow-hidden"
+                        style={{ height: '50%', padding: '2px' }}
+                      >
+                        {bottomLeftQ && (
+                          <img 
+                            src={bottomLeftQ.image_path} 
+                            alt={`${bottomLeftQ.related_year}년 ${bottomLeftQ.related_question_number}번`}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
+                          />
+                        )}
+                      </div>
+
+                      {/* 오른쪽 하단 */}
+                      <div 
+                        className="overflow-hidden"
+                        style={{ height: '50%', padding: '2px' }}
+                      >
+                        {bottomRightQ && (
+                          <img 
+                            src={bottomRightQ.image_path} 
+                            alt={`${bottomRightQ.related_year}년 ${bottomRightQ.related_question_number}번`}
                             style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
                           />
                         )}

@@ -638,13 +638,20 @@ const Edge = () => {
                       {/* 왼쪽 상단 */}
                       <div 
                         className="overflow-hidden"
-                        style={{ height: '50%', padding: '2px' }}
+                        style={{ height: '50%', padding: '0' }}
                       >
                         {topLeftQ && (
                           <img 
                             src={topLeftQ.image_path} 
                             alt={`${topLeftQ.related_year}년 ${topLeftQ.related_question_number}번`}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'contain', 
+                              objectPosition: 'top',
+                              transform: topLeftQ.image_path.includes('2021_6') ? 'scale(1)' : 'scale(1.3)',
+                              transformOrigin: 'top center'
+                            }}
                           />
                         )}
                       </div>
@@ -652,13 +659,20 @@ const Edge = () => {
                       {/* 오른쪽 상단 */}
                       <div 
                         className="overflow-hidden"
-                        style={{ height: '50%', padding: '2px' }}
+                        style={{ height: '50%', padding: '0' }}
                       >
                         {topRightQ && (
                           <img 
                             src={topRightQ.image_path} 
                             alt={`${topRightQ.related_year}년 ${topRightQ.related_question_number}번`}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'contain', 
+                              objectPosition: 'top',
+                              transform: topRightQ.image_path.includes('2021_6') ? 'scale(1)' : 'scale(1.3)',
+                              transformOrigin: 'top center'
+                            }}
                           />
                         )}
                       </div>
@@ -666,13 +680,20 @@ const Edge = () => {
                       {/* 왼쪽 하단 */}
                       <div 
                         className="overflow-hidden"
-                        style={{ height: '50%', padding: '2px' }}
+                        style={{ height: '50%', padding: '0' }}
                       >
                         {bottomLeftQ && (
                           <img 
                             src={bottomLeftQ.image_path} 
                             alt={`${bottomLeftQ.related_year}년 ${bottomLeftQ.related_question_number}번`}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'contain', 
+                              objectPosition: 'top',
+                              transform: bottomLeftQ.image_path.includes('2021_6') ? 'scale(1)' : 'scale(1.3)',
+                              transformOrigin: 'top center'
+                            }}
                           />
                         )}
                       </div>
@@ -680,13 +701,20 @@ const Edge = () => {
                       {/* 오른쪽 하단 */}
                       <div 
                         className="overflow-hidden"
-                        style={{ height: '50%', padding: '2px' }}
+                        style={{ height: '50%', padding: '0' }}
                       >
                         {bottomRightQ && (
                           <img 
                             src={bottomRightQ.image_path} 
                             alt={`${bottomRightQ.related_year}년 ${bottomRightQ.related_question_number}번`}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top' }}
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'contain', 
+                              objectPosition: 'top',
+                              transform: bottomRightQ.image_path.includes('2021_6') ? 'scale(1)' : 'scale(1.3)',
+                              transformOrigin: 'top center'
+                            }}
                           />
                         )}
                       </div>

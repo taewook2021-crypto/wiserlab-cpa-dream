@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Download, RefreshCw, Search } from "lucide-react";
+import { Download, RefreshCw, Search, Truck } from "lucide-react";
 
 interface PaidMember {
   id: string;
@@ -26,6 +26,10 @@ interface PaidMember {
   amount: number;
   buyer_name: string;
   buyer_email: string;
+  buyer_phone: string;
+  shipping_address: string;
+  shipping_detail_address: string | null;
+  shipping_postal_code: string;
   paid_at: string | null;
   created_at: string;
   is_admin_granted: boolean;
@@ -68,7 +72,7 @@ const PaidMembersAdmin = () => {
     // Get all paid orders
     const { data: ordersData, error: ordersError } = await supabase
       .from("orders")
-      .select("id, user_id, order_id, product_name, amount, buyer_name, buyer_email, paid_at, created_at")
+      .select("id, user_id, order_id, product_name, amount, buyer_name, buyer_email, buyer_phone, shipping_address, shipping_detail_address, shipping_postal_code, paid_at, created_at")
       .eq("status", "paid")
       .order("paid_at", { ascending: false });
 
@@ -125,7 +129,7 @@ const PaidMembersAdmin = () => {
     .filter((m) => !m.is_admin_granted)
     .reduce((sum, m) => sum + m.amount, 0);
 
-  // CSV download
+  // CSV download - 기본 정보
   const handleDownloadCSV = () => {
     const headers = ["수험번호", "구매자명", "이메일", "상품명", "금액", "구분", "결제일"];
     const rows = filteredMembers.map((m) => [
@@ -146,6 +150,44 @@ const PaidMembersAdmin = () => {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = `paid_members_${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+  };
+
+  // 물류택배 양식 다운로드 - 실제 구매자만
+  const handleDownloadShippingCSV = () => {
+    const realPurchasersList = filteredMembers.filter((m) => !m.is_admin_granted);
+    
+    if (realPurchasersList.length === 0) {
+      alert("다운로드할 실제 구매자가 없습니다.");
+      return;
+    }
+
+    const headers = ["상호", "핸드폰번호", "핸드폰번호", "주소", "내품수량", "배송메세지1", "박스타입", "박스수량"];
+    const rows = realPurchasersList.map((m) => {
+      const fullAddress = m.shipping_detail_address 
+        ? `${m.shipping_address} ${m.shipping_detail_address}` 
+        : m.shipping_address;
+      
+      return [
+        m.buyer_name,
+        m.buyer_phone,
+        m.buyer_phone,
+        fullAddress,
+        "1",
+        "",
+        "극소",
+        "1",
+      ];
+    });
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `shipping_list_${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
   };
 
@@ -230,14 +272,18 @@ const PaidMembersAdmin = () => {
                     className="pl-10"
                   />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button variant="outline" onClick={fetchMembers}>
                     <RefreshCw className="h-4 w-4 mr-2" />
                     새로고침
                   </Button>
                   <Button variant="outline" onClick={handleDownloadCSV}>
                     <Download className="h-4 w-4 mr-2" />
-                    CSV 다운로드
+                    전체 CSV
+                  </Button>
+                  <Button onClick={handleDownloadShippingCSV}>
+                    <Truck className="h-4 w-4 mr-2" />
+                    물류택배 양식 ({realPurchasers}명)
                   </Button>
                 </div>
               </div>

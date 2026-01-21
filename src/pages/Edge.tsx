@@ -580,7 +580,7 @@ const Edge = () => {
                 >
                   {/* 시험지 상단 헤더 */}
                   <div 
-                    className="flex items-start justify-between px-4 pb-3"
+                    className="flex items-end justify-between px-4 pb-1"
                     style={{ borderBottom: '2px solid black', height: '50px' }}
                   >
                     <div className="flex items-center gap-2">

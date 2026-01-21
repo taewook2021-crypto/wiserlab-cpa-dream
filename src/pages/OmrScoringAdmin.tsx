@@ -64,14 +64,11 @@ const OmrScoringAdmin = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAdmin, setIsCheckingAdmin] = useState(true);
 
-  const [examNumber, setExamNumber] = useState("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [isScoring, setIsScoring] = useState(false);
   const [results, setResults] = useState<ScoringResult[] | null>(null);
   const [answers, setAnswers] = useState<AnswerGroup[]>(() => createAnswerGroups(35));
-  const [foundUser, setFoundUser] = useState<{ id: string; email: string } | null>(null);
-  const [searchingUser, setSearchingUser] = useState(false);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -95,63 +92,6 @@ const OmrScoringAdmin = () => {
     checkAdmin();
   }, [user]);
 
-  // 수험번호로 사용자 찾기
-  const searchUserByExamNumber = async () => {
-    if (!examNumber.trim()) {
-      toast.error("수험번호를 입력해주세요");
-      return;
-    }
-
-    setSearchingUser(true);
-    setFoundUser(null);
-
-    // profiles 테이블에서 수험번호로 검색
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("id, email")
-      .eq("exam_number", examNumber.trim().toUpperCase())
-      .maybeSingle();
-
-    if (error) {
-      console.error("Search error:", error);
-      toast.error("사용자 검색 중 오류가 발생했습니다");
-    } else if (profile) {
-      setFoundUser({ id: profile.id, email: profile.email || "이메일 없음" });
-      toast.success("사용자를 찾았습니다");
-    } else {
-      // exam_numbers 테이블에서도 검색
-      const { data: examNumberData, error: examError } = await supabase
-        .from("exam_numbers")
-        .select("user_id")
-        .eq("exam_number", examNumber.trim().toUpperCase())
-        .eq("is_used", true)
-        .maybeSingle();
-
-      if (examError) {
-        console.error("Exam number search error:", examError);
-        toast.error("검색 중 오류가 발생했습니다");
-      } else if (examNumberData?.user_id) {
-        // user_id로 profiles에서 이메일 가져오기
-        const { data: userProfile } = await supabase
-          .from("profiles")
-          .select("id, email")
-          .eq("id", examNumberData.user_id)
-          .maybeSingle();
-
-        if (userProfile) {
-          setFoundUser({ id: userProfile.id, email: userProfile.email || "이메일 없음" });
-          toast.success("사용자를 찾았습니다");
-        } else {
-          toast.error("해당 수험번호의 사용자를 찾을 수 없습니다");
-        }
-      } else {
-        toast.error("해당 수험번호의 사용자를 찾을 수 없습니다");
-      }
-    }
-
-    setSearchingUser(false);
-  };
-
   const handleAnswerChange = (index: number, value: string) => {
     const group = answers[index];
     const maxLength = group.endNum - group.startNum + 1;
@@ -169,11 +109,6 @@ const OmrScoringAdmin = () => {
   };
 
   const handleSubmit = async () => {
-    if (!foundUser) {
-      toast.error("먼저 수험번호로 사용자를 검색해주세요");
-      return;
-    }
-
     const subject = subjects.find((s) => s.id === selectedSubject);
     const exam = exams.find((e) => e.id === selectedExam);
 
@@ -185,21 +120,6 @@ const OmrScoringAdmin = () => {
     setIsScoring(true);
 
     try {
-      // 기존 결과 확인
-      const { data: existingResult } = await supabase
-        .from("scoring_results")
-        .select("id")
-        .eq("user_id", foundUser.id)
-        .eq("subject", subject.dbValue)
-        .eq("exam_round", exam.round)
-        .maybeSingle();
-
-      if (existingResult) {
-        toast.error("해당 사용자는 이미 이 시험을 채점한 기록이 있습니다");
-        setIsScoring(false);
-        return;
-      }
-
       // 정답표 가져오기
       const { data: answerKeys, error } = await supabase
         .from("exam_answer_keys")
@@ -239,46 +159,7 @@ const OmrScoringAdmin = () => {
       setResults(scoringResults);
 
       const correctCount = scoringResults.filter((r) => r.isCorrect).length;
-      const scorePercentage = Math.round((correctCount / scoringResults.length) * 100);
-
-      // 결과 저장
-      const { data: insertedResult, error: saveError } = await supabase
-        .from("scoring_results")
-        .insert({
-          user_id: foundUser.id,
-          subject: subject.dbValue,
-          exam_name: "SUMMIT",
-          exam_round: exam.round,
-          correct_count: correctCount,
-          total_questions: scoringResults.length,
-          score_percentage: scorePercentage,
-        })
-        .select("id")
-        .single();
-
-      if (saveError) {
-        console.error("Save error:", saveError);
-        toast.error("결과 저장 중 오류가 발생했습니다");
-      } else if (insertedResult) {
-        // 개별 답안 저장
-        const answersToInsert = scoringResults.map((r) => ({
-          scoring_result_id: insertedResult.id,
-          question_number: r.questionNumber,
-          user_answer: r.userAnswer,
-          correct_answer: r.correctAnswer,
-          is_correct: r.isCorrect,
-        }));
-
-        const { error: answersError } = await supabase
-          .from("scoring_answers")
-          .insert(answersToInsert);
-
-        if (answersError) {
-          console.error("Answers save error:", answersError);
-        }
-
-        toast.success(`채점 완료 및 저장! ${correctCount}/${scoringResults.length}문제 정답`);
-      }
+      toast.success(`채점 완료! ${correctCount}/${scoringResults.length}문제 정답`);
     } catch (error) {
       console.error("Scoring error:", error);
       toast.error("채점 중 오류가 발생했습니다");
@@ -288,14 +169,11 @@ const OmrScoringAdmin = () => {
   };
 
   const resetForm = () => {
-    setExamNumber("");
-    setFoundUser(null);
     setResults(null);
     setAnswers(createAnswerGroups(getQuestionCount(selectedSubject || "financial")));
   };
 
   const isFormValid =
-    foundUser &&
     selectedSubject &&
     selectedExam &&
     answers.every((group) => {
@@ -350,35 +228,6 @@ const OmrScoringAdmin = () => {
                 <RotateCcw className="w-4 h-4 mr-2" />
                 초기화
               </Button>
-            </div>
-
-            {/* 수험번호 검색 */}
-            <div className="bg-muted/50 border border-border rounded-lg p-6 mb-8">
-              <Label className="mb-3 block font-medium">수험번호로 사용자 찾기</Label>
-              <div className="flex gap-3">
-                <Input
-                  value={examNumber}
-                  onChange={(e) => setExamNumber(e.target.value.toUpperCase())}
-                  placeholder="WLS-XXXX"
-                  className="font-mono text-center tracking-wider max-w-[200px]"
-                  maxLength={8}
-                />
-                <Button
-                  onClick={searchUserByExamNumber}
-                  disabled={searchingUser || !examNumber.trim()}
-                  variant="outline"
-                >
-                  {searchingUser ? "검색 중..." : "검색"}
-                </Button>
-              </div>
-              {foundUser && (
-                <div className="mt-4 p-4 bg-background border border-border rounded-lg">
-                  <p className="text-sm">
-                    <span className="text-muted-foreground">사용자: </span>
-                    <span className="font-medium">{foundUser.email}</span>
-                  </p>
-                </div>
-              )}
             </div>
 
             {/* 과목/회차 선택 */}
@@ -496,10 +345,10 @@ const OmrScoringAdmin = () => {
                 {/* 채점 버튼 */}
                 <Button
                   onClick={handleSubmit}
-                  disabled={!isFormValid || isScoring || !!results}
+                  disabled={!isFormValid || isScoring}
                   className="w-full h-12"
                 >
-                  {isScoring ? "채점 중..." : results ? "채점 완료" : "채점하기"}
+                  {isScoring ? "채점 중..." : results ? "다시 채점하기" : "채점하기"}
                 </Button>
               </div>
             )}

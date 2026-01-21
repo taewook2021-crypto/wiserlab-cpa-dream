@@ -572,7 +572,7 @@ const Edge = () => {
                     width: '210mm',
                     height: '297mm',
                     margin: '0 auto 16px',
-                    padding: '5mm 1mm',
+                    padding: '2mm 0',
                     boxSizing: 'border-box',
                     border: '1px solid #ccc',
                     overflow: 'hidden'
@@ -581,29 +581,28 @@ const Edge = () => {
                   {/* 시험지 상단 헤더 - 최소화 */}
                   <div 
                     className="flex items-center justify-between px-2"
-                    style={{ borderBottom: '2px solid black', height: '28px' }}
+                    style={{ borderBottom: '1px solid black', height: '20px' }}
                   >
                     <div className="flex items-center gap-1">
                       <span 
                         className="text-xs font-bold"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '10px' }}
                       >{pageNum}/{totalPages}</span>
                       <span 
-                        className="inline-flex items-center justify-center w-4 h-4 border border-black rounded-full text-xs font-bold"
-                        style={{ borderWidth: '1px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                        className="inline-flex items-center justify-center border border-black rounded-full font-bold"
+                        style={{ width: '12px', height: '12px', fontSize: '8px', borderWidth: '1px', fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
                       >
                         ①
                       </span>
                       <span 
-                        className="text-xs"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '10px' }}
                       >형</span>
                     </div>
                     
                     <div className="text-center flex-1">
                       <h1 
                         className="font-bold tracking-widest"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '28px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '20px' }}
                       >
                         {subject === 'financial' ? '회계학' : '세법학'}
                       </h1>
@@ -612,7 +611,7 @@ const Edge = () => {
                     <div className="text-right">
                       <span 
                         className="font-bold"
-                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '18px' }}
+                        style={{ fontFamily: '"Joseon Gungseo Bold", "궁서체", serif', fontSize: '12px' }}
                       >제3교시</span>
                     </div>
                   </div>
@@ -620,7 +619,7 @@ const Edge = () => {
                   {/* T자형 본문 영역 - 세로로 연속된 중앙선 */}
                   <div 
                     className="relative"
-                    style={{ height: 'calc(100% - 28px)' }}
+                    style={{ height: 'calc(100% - 20px)' }}
                   >
                     {/* 중앙 세로선 */}
                     <div 
@@ -637,7 +636,7 @@ const Edge = () => {
                     <div className="grid grid-cols-2 h-full">
                       {/* 왼쪽 상단 */}
                       <div 
-                        className="overflow-hidden flex items-center justify-center"
+                        className="flex items-start justify-center"
                         style={{ height: '50%', padding: '0' }}
                       >
                         {topLeftQ && (
@@ -645,14 +644,10 @@ const Edge = () => {
                             src={topLeftQ.image_path} 
                             alt={`${topLeftQ.related_year}년 ${topLeftQ.related_question_number}번`}
                             style={{ 
-                              width: '100%', 
+                              width: topLeftQ.image_path.includes('2021_6') ? '85%' : '100%', 
                               height: '100%', 
-                              // 하단이 잘리지 않도록 기본은 항상 contain
                               objectFit: 'contain',
-                              objectPosition: 'center',
-                              // 2021_6만 살짝 작게
-                              transform: topLeftQ.image_path.includes('2021_6') ? 'scale(0.92)' : 'none',
-                              transformOrigin: 'center center',
+                              objectPosition: 'top center'
                             }}
                           />
                         )}
@@ -660,7 +655,7 @@ const Edge = () => {
 
                       {/* 오른쪽 상단 */}
                       <div 
-                        className="overflow-hidden flex items-center justify-center"
+                        className="flex items-start justify-center"
                         style={{ height: '50%', padding: '0' }}
                       >
                         {topRightQ && (
@@ -668,12 +663,10 @@ const Edge = () => {
                             src={topRightQ.image_path} 
                             alt={`${topRightQ.related_year}년 ${topRightQ.related_question_number}번`}
                             style={{ 
-                              width: '100%', 
+                              width: topRightQ.image_path.includes('2021_6') ? '85%' : '100%', 
                               height: '100%', 
                               objectFit: 'contain',
-                              objectPosition: 'center',
-                              transform: topRightQ.image_path.includes('2021_6') ? 'scale(0.92)' : 'none',
-                              transformOrigin: 'center center',
+                              objectPosition: 'top center'
                             }}
                           />
                         )}
@@ -681,7 +674,7 @@ const Edge = () => {
 
                       {/* 왼쪽 하단 */}
                       <div 
-                        className="overflow-hidden flex items-center justify-center"
+                        className="flex items-start justify-center"
                         style={{ height: '50%', padding: '0' }}
                       >
                         {bottomLeftQ && (
@@ -689,12 +682,10 @@ const Edge = () => {
                             src={bottomLeftQ.image_path} 
                             alt={`${bottomLeftQ.related_year}년 ${bottomLeftQ.related_question_number}번`}
                             style={{ 
-                              width: '100%', 
+                              width: bottomLeftQ.image_path.includes('2021_6') ? '85%' : '100%', 
                               height: '100%', 
                               objectFit: 'contain',
-                              objectPosition: 'center',
-                              transform: bottomLeftQ.image_path.includes('2021_6') ? 'scale(0.92)' : 'none',
-                              transformOrigin: 'center center',
+                              objectPosition: 'top center'
                             }}
                           />
                         )}
@@ -702,7 +693,7 @@ const Edge = () => {
 
                       {/* 오른쪽 하단 */}
                       <div 
-                        className="overflow-hidden flex items-center justify-center"
+                        className="flex items-start justify-center"
                         style={{ height: '50%', padding: '0' }}
                       >
                         {bottomRightQ && (
@@ -710,12 +701,10 @@ const Edge = () => {
                             src={bottomRightQ.image_path} 
                             alt={`${bottomRightQ.related_year}년 ${bottomRightQ.related_question_number}번`}
                             style={{ 
-                              width: '100%', 
+                              width: bottomRightQ.image_path.includes('2021_6') ? '85%' : '100%', 
                               height: '100%', 
                               objectFit: 'contain',
-                              objectPosition: 'center',
-                              transform: bottomRightQ.image_path.includes('2021_6') ? 'scale(0.92)' : 'none',
-                              transformOrigin: 'center center',
+                              objectPosition: 'top center'
                             }}
                           />
                         )}

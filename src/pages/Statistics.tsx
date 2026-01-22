@@ -17,25 +17,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useServiceAccess } from "@/hooks/useServiceAccess";
 import { Lock, Users, TrendingUp, Trophy, BarChart3 } from "lucide-react";
 
-// 과목/회차별 컷오프 설정
-const ZONE_CUTOFFS: Record<string, Record<number, { safe: number; competitive: number }>> = {
-  financial_accounting: {
-    1: { safe: 23, competitive: 14 },
-  },
-  tax_law: {
-    1: { safe: 20, competitive: 16 },
-  },
+// 기본 컷오프 (DB에서 값이 없을 때 사용)
+const DEFAULT_CUTOFFS: Record<string, { safe: number; competitive: number }> = {
+  financial_accounting: { safe: 23, competitive: 14 },
+  tax_law: { safe: 20, competitive: 16 },
 };
 
-// 기본 컷오프
-const DEFAULT_CUTOFFS = { safe: 23, competitive: 14 };
-
-const getCutoffs = (subject: string, round: number) => {
-  const subjectCutoffs = ZONE_CUTOFFS[subject];
-  if (subjectCutoffs && subjectCutoffs[round]) {
-    return subjectCutoffs[round];
-  }
-  return DEFAULT_CUTOFFS;
+const getDefaultCutoffs = (subject: string) => {
+  return DEFAULT_CUTOFFS[subject] || { safe: 23, competitive: 14 };
 };
 
 interface BillboardEntry {
@@ -123,6 +112,9 @@ const Statistics = () => {
   // 통계 공개 여부 (DB에서 조회)
   const [isZoneMetricsReleased, setIsZoneMetricsReleased] = useState(false);
   
+  // 컷오프 (DB에서 조회)
+  const [cutoffs, setCutoffs] = useState<{ safe: number; competitive: number }>({ safe: 23, competitive: 14 });
+  
   // 전체 통계 및 주차 옵션
   const [overallStats, setOverallStats] = useState<OverallStats>({
     totalParticipants: 0,
@@ -140,10 +132,9 @@ const Statistics = () => {
     return match ? parseInt(match[1], 10) : 1;
   };
 
-  // 현재 선택된 과목/회차에 맞는 컷오프 가져오기
+  // 현재 선택된 과목/회차
   const subjectDbValue = getSubjectDbValue(selectedSubject);
   const examRound = getExamRound(selectedExam);
-  const cutoffs = getCutoffs(subjectDbValue, examRound);
 
   // 유저 존 계산
   const userZone = userScore !== null 
@@ -170,15 +161,23 @@ const Statistics = () => {
       
       setLoading(true);
 
-      // 공개 설정 조회
+      // 공개 설정 및 컷오프 조회
       const { data: settingsData } = await supabase
         .from("statistics_settings")
-        .select("is_released")
+        .select("is_released, safe_cutoff, competitive_cutoff")
         .eq("subject", subjectDbValue)
         .eq("exam_round", examRound)
         .maybeSingle();
       
       setIsZoneMetricsReleased(settingsData?.is_released ?? false);
+      
+      // DB에서 컷오프 가져오기, 없으면 기본값 사용
+      const defaultCutoffs = getDefaultCutoffs(subjectDbValue);
+      const fetchedCutoffs = {
+        safe: settingsData?.safe_cutoff ?? defaultCutoffs.safe,
+        competitive: settingsData?.competitive_cutoff ?? defaultCutoffs.competitive,
+      };
+      setCutoffs(fetchedCutoffs);
 
       // 1. 내 프로필 및 채점 결과 조회
       if (user) {
@@ -221,9 +220,9 @@ const Statistics = () => {
 
       if (omrResults && omrResults.length > 0) {
         const scores = omrResults.map(r => r.correct_count);
-        const safeCount = scores.filter(s => s >= cutoffs.safe).length;
-        const competitiveCount = scores.filter(s => s >= cutoffs.competitive && s < cutoffs.safe).length;
-        const redLineCount = scores.filter(s => s < cutoffs.competitive).length;
+        const safeCount = scores.filter(s => s >= fetchedCutoffs.safe).length;
+        const competitiveCount = scores.filter(s => s >= fetchedCutoffs.competitive && s < fetchedCutoffs.safe).length;
+        const redLineCount = scores.filter(s => s < fetchedCutoffs.competitive).length;
         
         setOverallStats({
           totalParticipants: omrResults.length,
@@ -247,7 +246,7 @@ const Statistics = () => {
         }
 
         // 빌보드 데이터 생성 (안정권 진입자만)
-        const safeZoneResults = omrResults.filter(r => r.correct_count >= cutoffs.safe);
+        const safeZoneResults = omrResults.filter(r => r.correct_count >= fetchedCutoffs.safe);
         const topResults = safeZoneResults.slice(0, 15);
 
         const billboardData: BillboardEntry[] = topResults.map((r, i) => ({
@@ -279,7 +278,7 @@ const Statistics = () => {
     if (!accessLoading) {
       fetchData();
     }
-  }, [user, selectedSubject, selectedExam, hasAccess, accessLoading, subjectDbValue, examRound, cutoffs.safe, cutoffs.competitive, userScore]);
+  }, [user, selectedSubject, selectedExam, hasAccess, accessLoading, subjectDbValue, examRound]);
 
   // 접근 권한 체크
   if (accessLoading) {

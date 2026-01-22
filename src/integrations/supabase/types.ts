@@ -467,29 +467,35 @@ export type Database = {
       }
       statistics_settings: {
         Row: {
+          competitive_cutoff: number
           created_at: string | null
           exam_round: number
           id: string
           is_released: boolean | null
           released_at: string | null
+          safe_cutoff: number
           subject: string
           updated_at: string | null
         }
         Insert: {
+          competitive_cutoff?: number
           created_at?: string | null
           exam_round: number
           id?: string
           is_released?: boolean | null
           released_at?: string | null
+          safe_cutoff?: number
           subject: string
           updated_at?: string | null
         }
         Update: {
+          competitive_cutoff?: number
           created_at?: string | null
           exam_round?: number
           id?: string
           is_released?: boolean | null
           released_at?: string | null
+          safe_cutoff?: number
           subject?: string
           updated_at?: string | null
         }

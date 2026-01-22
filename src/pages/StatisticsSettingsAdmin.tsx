@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -23,28 +24,10 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Eye, EyeOff, Trophy, Users, TrendingUp, BarChart3 } from "lucide-react";
-
-// 과목/회차별 컷오프 설정
-const ZONE_CUTOFFS: Record<string, Record<number, { safe: number; competitive: number }>> = {
-  financial_accounting: {
-    1: { safe: 23, competitive: 14 },
-  },
-  tax_law: {
-    1: { safe: 20, competitive: 16 },
-  },
-};
+import { RefreshCw, Eye, EyeOff, Trophy, Users, TrendingUp, BarChart3, Save } from "lucide-react";
 
 // 기본 컷오프
 const DEFAULT_CUTOFFS = { safe: 23, competitive: 14 };
-
-const getCutoffs = (subject: string, round: number) => {
-  const subjectCutoffs = ZONE_CUTOFFS[subject];
-  if (subjectCutoffs && subjectCutoffs[round]) {
-    return subjectCutoffs[round];
-  }
-  return DEFAULT_CUTOFFS;
-};
 
 interface OmrResult {
   participant_number: number;
@@ -75,10 +58,15 @@ const StatisticsSettingsAdmin = () => {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingCutoffs, setSavingCutoffs] = useState(false);
   
   const [selectedSubject, setSelectedSubject] = useState<string>("financial_accounting");
   const [selectedRound, setSelectedRound] = useState<number>(1);
   const [isReleased, setIsReleased] = useState(false);
+  
+  // 컷오프 편집 상태
+  const [safeCutoff, setSafeCutoff] = useState<number>(DEFAULT_CUTOFFS.safe);
+  const [competitiveCutoff, setCompetitiveCutoff] = useState<number>(DEFAULT_CUTOFFS.competitive);
   
   const [omrResults, setOmrResults] = useState<OmrResult[]>([]);
   const [billboard, setBillboard] = useState<BillboardEntry[]>([]);
@@ -92,7 +80,7 @@ const StatisticsSettingsAdmin = () => {
     redLineCount: 0,
   });
 
-  const cutoffs = useMemo(() => getCutoffs(selectedSubject, selectedRound), [selectedSubject, selectedRound]);
+  const cutoffs = useMemo(() => ({ safe: safeCutoff, competitive: competitiveCutoff }), [safeCutoff, competitiveCutoff]);
   const totalQuestions = selectedSubject === "tax_law" ? 40 : 35;
 
   // 관리자 권한 확인
@@ -118,15 +106,17 @@ const StatisticsSettingsAdmin = () => {
   const fetchData = async () => {
     setLoading(true);
     
-    // 공개 설정 조회
+    // 공개 설정 및 컷오프 조회
     const { data: settingsData } = await supabase
       .from("statistics_settings")
-      .select("is_released")
+      .select("is_released, safe_cutoff, competitive_cutoff")
       .eq("subject", selectedSubject)
       .eq("exam_round", selectedRound)
       .maybeSingle();
     
     setIsReleased(settingsData?.is_released ?? false);
+    setSafeCutoff(settingsData?.safe_cutoff ?? (selectedSubject === "tax_law" ? 20 : 23));
+    setCompetitiveCutoff(settingsData?.competitive_cutoff ?? (selectedSubject === "tax_law" ? 16 : 14));
     
     // OMR 결과 조회
     const { data: omrData } = await supabase
@@ -201,6 +191,8 @@ const StatisticsSettingsAdmin = () => {
         exam_round: selectedRound,
         is_released: newValue,
         released_at: newValue ? new Date().toISOString() : null,
+        safe_cutoff: safeCutoff,
+        competitive_cutoff: competitiveCutoff,
       }, {
         onConflict: "subject,exam_round",
       });
@@ -222,6 +214,40 @@ const StatisticsSettingsAdmin = () => {
     }
     
     setSaving(false);
+  };
+
+  // 컷오프 저장
+  const handleSaveCutoffs = async () => {
+    setSavingCutoffs(true);
+    
+    const { error } = await supabase
+      .from("statistics_settings")
+      .upsert({
+        subject: selectedSubject,
+        exam_round: selectedRound,
+        is_released: isReleased,
+        safe_cutoff: safeCutoff,
+        competitive_cutoff: competitiveCutoff,
+      }, {
+        onConflict: "subject,exam_round",
+      });
+    
+    if (error) {
+      toast({
+        title: "오류",
+        description: "컷오프 저장 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "저장 완료",
+        description: "컷오프 값이 저장되었습니다.",
+      });
+      // 통계 재계산
+      fetchData();
+    }
+    
+    setSavingCutoffs(false);
   };
 
   const getSubjectLabel = (subject: string) => {
@@ -322,21 +348,52 @@ const StatisticsSettingsAdmin = () => {
 
           {/* 컷오프 정보 */}
           <div className="border border-border p-6 mb-8 bg-card">
-            <h2 className="text-lg font-medium mb-4">
-              {getSubjectLabel(selectedSubject)} {selectedRound}회 컷오프 설정
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium">
+                {getSubjectLabel(selectedSubject)} {selectedRound}회 컷오프 설정
+              </h2>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSaveCutoffs}
+                disabled={savingCutoffs}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {savingCutoffs ? "저장 중..." : "컷오프 저장"}
+              </Button>
+            </div>
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-foreground text-background p-4 text-center">
-                <p className="font-medium text-sm mb-1">안정권</p>
-                <p className="text-2xl font-light">{cutoffs.safe}개 이상</p>
+              <div className="bg-foreground text-background p-4">
+                <p className="font-medium text-sm mb-3 text-center">안정권</p>
+                <div className="flex items-center justify-center gap-2">
+                  <Input
+                    type="number"
+                    value={safeCutoff}
+                    onChange={(e) => setSafeCutoff(Number(e.target.value))}
+                    className="w-20 h-8 text-center bg-background text-foreground"
+                    min={1}
+                    max={totalQuestions}
+                  />
+                  <span className="text-sm">개 이상</span>
+                </div>
               </div>
-              <div className="bg-muted text-foreground p-4 text-center">
-                <p className="font-medium text-sm mb-1">경합권</p>
-                <p className="text-2xl font-light">{cutoffs.competitive}~{cutoffs.safe - 1}개</p>
+              <div className="bg-muted text-foreground p-4">
+                <p className="font-medium text-sm mb-3 text-center">경합권</p>
+                <div className="flex items-center justify-center gap-2">
+                  <Input
+                    type="number"
+                    value={competitiveCutoff}
+                    onChange={(e) => setCompetitiveCutoff(Number(e.target.value))}
+                    className="w-20 h-8 text-center"
+                    min={1}
+                    max={totalQuestions}
+                  />
+                  <span className="text-sm">~{safeCutoff - 1}개</span>
+                </div>
               </div>
-              <div className="bg-background text-muted-foreground p-4 text-center border border-border">
-                <p className="font-medium text-sm mb-1">레드라인</p>
-                <p className="text-2xl font-light">{cutoffs.competitive - 1}개 이하</p>
+              <div className="bg-background text-muted-foreground p-4 border border-border">
+                <p className="font-medium text-sm mb-3 text-center">레드라인</p>
+                <p className="text-2xl font-light text-center">{competitiveCutoff - 1}개 이하</p>
               </div>
             </div>
           </div>

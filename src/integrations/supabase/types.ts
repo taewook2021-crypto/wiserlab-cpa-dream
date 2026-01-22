@@ -465,6 +465,36 @@ export type Database = {
           },
         ]
       }
+      statistics_settings: {
+        Row: {
+          created_at: string | null
+          exam_round: number
+          id: string
+          is_released: boolean | null
+          released_at: string | null
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          exam_round: number
+          id?: string
+          is_released?: boolean | null
+          released_at?: string | null
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          exam_round?: number
+          id?: string
+          is_released?: boolean | null
+          released_at?: string | null
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

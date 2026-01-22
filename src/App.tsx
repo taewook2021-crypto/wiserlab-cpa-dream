@@ -25,6 +25,7 @@ import NoticeAdmin from "./pages/NoticeAdmin";
 import OrderAdmin from "./pages/OrderAdmin";
 import ExamNumbersAdmin from "./pages/ExamNumbersAdmin";
 import StatisticsAdmin from "./pages/StatisticsAdmin";
+import StatisticsSettingsAdmin from "./pages/StatisticsSettingsAdmin";
 import FreeCodesAdmin from "./pages/FreeCodesAdmin";
 import DiscountCodesAdmin from "./pages/DiscountCodesAdmin";
 import PaidMembersAdmin from "./pages/PaidMembersAdmin";
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="/orderadmin" element={<OrderAdmin />} />
             <Route path="/exam-numbers-admin" element={<ExamNumbersAdmin />} />
             <Route path="/statistics-admin" element={<StatisticsAdmin />} />
+            <Route path="/statistics-settings-admin" element={<StatisticsSettingsAdmin />} />
             <Route path="/free-codes-admin" element={<FreeCodesAdmin />} />
             <Route path="/discount-codes-admin" element={<DiscountCodesAdmin />} />
             <Route path="/paid-members-admin" element={<PaidMembersAdmin />} />

@@ -17,12 +17,26 @@ import { useAuth } from "@/hooks/useAuth";
 import { useServiceAccess } from "@/hooks/useServiceAccess";
 import { Lock, Users, TrendingUp, Trophy, BarChart3 } from "lucide-react";
 
-// 상위 40% 컷라인 점수 (35문제 기준)
-const SAFE_ZONE_CUTOFF = 28; // 80점
-const COMPETITIVE_ZONE_CUTOFF = 22; // 약 63점
+// 과목/회차별 컷오프 설정
+const ZONE_CUTOFFS: Record<string, Record<number, { safe: number; competitive: number }>> = {
+  financial_accounting: {
+    1: { safe: 23, competitive: 14 },
+  },
+  tax_law: {
+    1: { safe: 20, competitive: 16 },
+  },
+};
 
-// 안정권/경합권 지표 공개 여부 (관리자가 true로 변경시 공개)
-const ZONE_METRICS_RELEASED = false;
+// 기본 컷오프
+const DEFAULT_CUTOFFS = { safe: 23, competitive: 14 };
+
+const getCutoffs = (subject: string, round: number) => {
+  const subjectCutoffs = ZONE_CUTOFFS[subject];
+  if (subjectCutoffs && subjectCutoffs[round]) {
+    return subjectCutoffs[round];
+  }
+  return DEFAULT_CUTOFFS;
+};
 
 interface BillboardEntry {
   rank: number;
@@ -41,9 +55,9 @@ interface OverallStats {
   redLineCount: number;
 }
 
-const getZoneInfo = (score: number) => {
+const getZoneInfo = (score: number, safeCutoff: number, competitiveCutoff: number, isReleased: boolean) => {
   // 지표가 공개되지 않은 경우 존 정보를 숨김
-  if (!ZONE_METRICS_RELEASED) {
+  if (!isReleased) {
     return {
       zone: "채점 완료",
       description: "통계 분석 중",
@@ -51,13 +65,13 @@ const getZoneInfo = (score: number) => {
     };
   }
   
-  if (score >= SAFE_ZONE_CUTOFF) {
+  if (score >= safeCutoff) {
     return {
       zone: "안정권",
       description: "상위 40% 이내",
       intensity: "high",
     };
-  } else if (score >= COMPETITIVE_ZONE_CUTOFF) {
+  } else if (score >= competitiveCutoff) {
     return {
       zone: "경합권",
       description: "상위 40% ~ 70%",
@@ -106,6 +120,9 @@ const Statistics = () => {
   const [loading, setLoading] = useState(true);
   const [userScore, setUserScore] = useState<number | null>(scoreFromUrl ? parseInt(scoreFromUrl, 10) : null);
   
+  // 통계 공개 여부 (DB에서 조회)
+  const [isZoneMetricsReleased, setIsZoneMetricsReleased] = useState(false);
+  
   // 전체 통계 및 주차 옵션
   const [overallStats, setOverallStats] = useState<OverallStats>({
     totalParticipants: 0,
@@ -117,17 +134,24 @@ const Statistics = () => {
     redLineCount: 0,
   });
 
-  // 유저 존 계산
-  const userZone = userScore !== null ? getZoneInfo(userScore) : null;
-  const percentile = myRank !== null && snuYsuParticipants > 0 
-    ? Math.round((myRank / snuYsuParticipants) * 100) 
-    : null;
-
   // exam 파라미터에서 회차 추출 (예: "summit-1" -> 1)
   const getExamRound = (exam: string): number => {
     const match = exam.match(/summit-(\d+)/);
     return match ? parseInt(match[1], 10) : 1;
   };
+
+  // 현재 선택된 과목/회차에 맞는 컷오프 가져오기
+  const subjectDbValue = getSubjectDbValue(selectedSubject);
+  const examRound = getExamRound(selectedExam);
+  const cutoffs = getCutoffs(subjectDbValue, examRound);
+
+  // 유저 존 계산
+  const userZone = userScore !== null 
+    ? getZoneInfo(userScore, cutoffs.safe, cutoffs.competitive, isZoneMetricsReleased) 
+    : null;
+  const percentile = myRank !== null && snuYsuParticipants > 0 
+    ? Math.round((myRank / snuYsuParticipants) * 100) 
+    : null;
 
   // 통계 공개 시간 확인
   const getStatsReleaseDate = (exam: string): Date => {
@@ -145,9 +169,16 @@ const Statistics = () => {
       if (!hasAccess) return;
       
       setLoading(true);
+
+      // 공개 설정 조회
+      const { data: settingsData } = await supabase
+        .from("statistics_settings")
+        .select("is_released")
+        .eq("subject", subjectDbValue)
+        .eq("exam_round", examRound)
+        .maybeSingle();
       
-      const subjectDbValue = getSubjectDbValue(selectedSubject);
-      const examRound = getExamRound(selectedExam);
+      setIsZoneMetricsReleased(settingsData?.is_released ?? false);
 
       // 1. 내 프로필 및 채점 결과 조회
       if (user) {
@@ -190,9 +221,9 @@ const Statistics = () => {
 
       if (omrResults && omrResults.length > 0) {
         const scores = omrResults.map(r => r.correct_count);
-        const safeCount = scores.filter(s => s >= SAFE_ZONE_CUTOFF).length;
-        const competitiveCount = scores.filter(s => s >= COMPETITIVE_ZONE_CUTOFF && s < SAFE_ZONE_CUTOFF).length;
-        const redLineCount = scores.filter(s => s < COMPETITIVE_ZONE_CUTOFF).length;
+        const safeCount = scores.filter(s => s >= cutoffs.safe).length;
+        const competitiveCount = scores.filter(s => s >= cutoffs.competitive && s < cutoffs.safe).length;
+        const redLineCount = scores.filter(s => s < cutoffs.competitive).length;
         
         setOverallStats({
           totalParticipants: omrResults.length,
@@ -215,8 +246,8 @@ const Statistics = () => {
           setMyRank(null);
         }
 
-        // 빌보드 데이터 생성 (안정권 진입자만 - 28점 이상)
-        const safeZoneResults = omrResults.filter(r => r.correct_count >= SAFE_ZONE_CUTOFF);
+        // 빌보드 데이터 생성 (안정권 진입자만)
+        const safeZoneResults = omrResults.filter(r => r.correct_count >= cutoffs.safe);
         const topResults = safeZoneResults.slice(0, 15);
 
         const billboardData: BillboardEntry[] = topResults.map((r, i) => ({
@@ -248,7 +279,7 @@ const Statistics = () => {
     if (!accessLoading) {
       fetchData();
     }
-  }, [user, selectedSubject, selectedExam, hasAccess, accessLoading]);
+  }, [user, selectedSubject, selectedExam, hasAccess, accessLoading, subjectDbValue, examRound, cutoffs.safe, cutoffs.competitive, userScore]);
 
   // 접근 권한 체크
   if (accessLoading) {
@@ -384,15 +415,15 @@ const Statistics = () => {
                       </span>
                     </div>
                     {/* 등수 표시 - 지표 공개 시에만 */}
-                    {ZONE_METRICS_RELEASED && snuYsuParticipants > 0 && myRank !== null ? (
+                    {isZoneMetricsReleased && snuYsuParticipants > 0 && myRank !== null ? (
                       <p className="text-sm text-muted-foreground">
                         서울대·연세대 {snuYsuParticipants}명 중 <span className="font-medium text-foreground">{myRank}등</span> · 상위 {percentile}%
                       </p>
-                    ) : ZONE_METRICS_RELEASED && myRank === null && snuYsuParticipants > 0 ? (
+                    ) : isZoneMetricsReleased && myRank === null && snuYsuParticipants > 0 ? (
                       <p className="text-sm text-muted-foreground">
                         서울대·연세대 응시자 {snuYsuParticipants}명
                       </p>
-                    ) : !ZONE_METRICS_RELEASED ? (
+                    ) : !isZoneMetricsReleased ? (
                       <p className="text-sm text-muted-foreground">
                         상세 통계는 추후 공개됩니다
                       </p>
@@ -430,33 +461,33 @@ const Statistics = () => {
 
 
               {/* 존 가이드 - 지표 공개 시에만 표시 */}
-              {ZONE_METRICS_RELEASED && (
+              {isZoneMetricsReleased && (
                 <div className="grid grid-cols-3 gap-px bg-border mb-10">
                   <div className="bg-foreground text-background p-6 text-center">
                     <p className="font-medium text-sm mb-1">안정권</p>
                     <p className="text-xs opacity-70">상위 40%</p>
-                    <p className="text-xs opacity-70 mt-1">{SAFE_ZONE_CUTOFF}점 이상</p>
+                    <p className="text-xs opacity-70 mt-1">{cutoffs.safe}점 이상</p>
                   </div>
                   <div className="bg-muted text-foreground p-6 text-center">
                     <p className="font-medium text-sm mb-1">경합권</p>
                     <p className="text-xs text-muted-foreground">상위 40~70%</p>
-                    <p className="text-xs text-muted-foreground mt-1">{COMPETITIVE_ZONE_CUTOFF}~{SAFE_ZONE_CUTOFF - 1}점</p>
+                    <p className="text-xs text-muted-foreground mt-1">{cutoffs.competitive}~{cutoffs.safe - 1}점</p>
                   </div>
                   <div className="bg-background text-muted-foreground p-6 text-center border border-border">
                     <p className="font-medium text-sm mb-1">레드라인</p>
                     <p className="text-xs">상위 70% 이하</p>
-                    <p className="text-xs mt-1">{COMPETITIVE_ZONE_CUTOFF - 1}점 이하</p>
+                    <p className="text-xs mt-1">{cutoffs.competitive - 1}점 이하</p>
                   </div>
                 </div>
               )}
 
 
               {/* 빌보드 차트 - 지표 공개 후에만 표시 */}
-              {ZONE_METRICS_RELEASED && isStatsReleased ? (
+              {isZoneMetricsReleased && isStatsReleased ? (
                 <div className="mb-8">
                   <div className="mb-6">
                     <h2 className="text-xl font-light">전국 빌보드</h2>
-                    <p className="text-sm text-muted-foreground">안정권 진입자 ({SAFE_ZONE_CUTOFF}점 이상)</p>
+                    <p className="text-sm text-muted-foreground">안정권 진입자 ({cutoffs.safe}점 이상)</p>
                   </div>
 
                   {loading ? (
@@ -507,7 +538,7 @@ const Statistics = () => {
                     </div>
                   )}
                 </div>
-              ) : ZONE_METRICS_RELEASED ? (
+              ) : isZoneMetricsReleased ? (
                 <div className="border border-border p-6 mb-8 text-center">
                   <h2 className="text-xl font-light mb-2">전국 빌보드</h2>
                   <p className="text-muted-foreground">{releaseTimeText}</p>

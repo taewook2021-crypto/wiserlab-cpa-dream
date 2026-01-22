@@ -210,7 +210,7 @@ const Statistics = () => {
         setUserScore(null);
       }
 
-      // 2. OMR 채점 결과 조회 (관리자가 입력한 통합 데이터)
+      // 2. OMR 채점 결과 조회 (관리자가 입력한 통합 데이터) - 통계용
       const { data: omrResults } = await supabase
         .from("omr_scoring_results")
         .select("participant_number, correct_count")
@@ -244,19 +244,6 @@ const Statistics = () => {
         } else {
           setMyRank(null);
         }
-
-        // 빌보드 데이터 생성 (안정권 진입자만)
-        const safeZoneResults = omrResults.filter(r => r.correct_count >= fetchedCutoffs.safe);
-        const topResults = safeZoneResults.slice(0, 15);
-
-        const billboardData: BillboardEntry[] = topResults.map((r, i) => ({
-          rank: i + 1,
-          examNumber: `응시자 ${r.participant_number}`,
-          score: r.correct_count,
-          isMe: false, // OMR 데이터에는 user_id 매핑 없음
-        }));
-
-        setBillboard(billboardData);
       } else {
         setOverallStats({
           totalParticipants: 0,
@@ -269,6 +256,37 @@ const Statistics = () => {
         });
         setSnuYsuParticipants(0);
         setMyRank(null);
+      }
+
+      // 3. 빌보드 데이터 - 빠른채점(scoring_results) 기준, 안정권 진입자
+      const { data: scoringResults } = await supabase
+        .from("scoring_results")
+        .select("user_id, correct_count")
+        .eq("subject", subjectDbValue)
+        .eq("exam_round", examRound)
+        .gte("correct_count", fetchedCutoffs.safe)
+        .order("correct_count", { ascending: false })
+        .limit(15);
+
+      if (scoringResults && scoringResults.length > 0) {
+        // 유저별 수험번호 조회
+        const userIds = scoringResults.map(r => r.user_id);
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, exam_number")
+          .in("id", userIds);
+
+        const profileMap = new Map(profiles?.map(p => [p.id, p.exam_number]) || []);
+
+        const billboardData: BillboardEntry[] = scoringResults.map((r, i) => ({
+          rank: i + 1,
+          examNumber: profileMap.get(r.user_id) || "Unknown",
+          score: r.correct_count,
+          isMe: user?.id === r.user_id,
+        }));
+
+        setBillboard(billboardData);
+      } else {
         setBillboard([]);
       }
 

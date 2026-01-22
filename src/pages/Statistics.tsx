@@ -41,13 +41,6 @@ interface OverallStats {
   redLineCount: number;
 }
 
-interface WeekOption {
-  value: string;
-  label: string;
-  startDate: Date;
-  endDate: Date;
-}
-
 const getZoneInfo = (score: number) => {
   // 지표가 공개되지 않은 경우 존 정보를 숨김
   if (!ZONE_METRICS_RELEASED) {
@@ -91,52 +84,6 @@ const getTotalQuestions = (subject: string): number => {
   return subject === "tax" ? 40 : 35;
 };
 
-// 주차 옵션 생성 (데이터 기반)
-const generateWeekOptions = (dates: Date[]): WeekOption[] => {
-  if (dates.length === 0) return [];
-  
-  const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());
-  const firstDate = sortedDates[0];
-  const lastDate = sortedDates[sortedDates.length - 1];
-  
-  // 첫 번째 날짜가 속한 주의 월요일 찾기
-  const getMonday = (d: Date) => {
-    const date = new Date(d);
-    const day = date.getDay();
-    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-    date.setDate(diff);
-    date.setHours(0, 0, 0, 0);
-    return date;
-  };
-  
-  const weeks: WeekOption[] = [];
-  let currentMonday = getMonday(firstDate);
-  let weekNum = 1;
-  
-  while (currentMonday <= lastDate) {
-    const weekEnd = new Date(currentMonday);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
-    
-    // 해당 주에 데이터가 있는지 확인
-    const hasData = dates.some(d => d >= currentMonday && d <= weekEnd);
-    
-    if (hasData) {
-      weeks.push({
-        value: `week-${weekNum}`,
-        label: `${weekNum}주차`,
-        startDate: new Date(currentMonday),
-        endDate: new Date(weekEnd),
-      });
-    }
-    
-    currentMonday.setDate(currentMonday.getDate() + 7);
-    weekNum++;
-  }
-  
-  return weeks;
-};
-
 const Statistics = () => {
   const { user } = useAuth();
   const { hasAccess, isLoading: accessLoading } = useServiceAccess();
@@ -150,7 +97,6 @@ const Statistics = () => {
   
   const [selectedSubject, setSelectedSubject] = useState<string>(subjectFromUrl || "financial");
   const [selectedExam, setSelectedExam] = useState<string>(examFromUrl || "summit-1");
-  const [selectedWeek, setSelectedWeek] = useState<string>("all");
   
   // 실제 데이터 상태
   const [myExamNumber, setMyExamNumber] = useState<string | null>(null);
@@ -170,7 +116,6 @@ const Statistics = () => {
     competitiveZoneCount: 0,
     redLineCount: 0,
   });
-  const [weekOptions, setWeekOptions] = useState<WeekOption[]>([]);
 
   // 유저 존 계산
   const userZone = userScore !== null ? getZoneInfo(userScore) : null;
@@ -235,44 +180,22 @@ const Statistics = () => {
         setUserScore(null);
       }
 
-      // 2. 전체 응시자 데이터 조회 (모든 사용자)
-      const { data: allScoringResults } = await supabase
-        .from("scoring_results")
-        .select("user_id, correct_count, created_at")
+      // 2. OMR 채점 결과 조회 (관리자가 입력한 통합 데이터)
+      const { data: omrResults } = await supabase
+        .from("omr_scoring_results")
+        .select("participant_number, correct_count")
         .eq("subject", subjectDbValue)
         .eq("exam_round", examRound)
         .order("correct_count", { ascending: false });
 
-      // 주차 옵션 생성
-      if (allScoringResults && allScoringResults.length > 0) {
-        const dates = allScoringResults.map(r => new Date(r.created_at));
-        const weeks = generateWeekOptions(dates);
-        setWeekOptions(weeks);
-      } else {
-        setWeekOptions([]);
-      }
-
-      // 주단위 필터 적용
-      let filteredResults = allScoringResults || [];
-      if (selectedWeek !== "all" && weekOptions.length > 0) {
-        const selectedWeekOption = weekOptions.find(w => w.value === selectedWeek);
-        if (selectedWeekOption) {
-          filteredResults = filteredResults.filter(r => {
-            const resultDate = new Date(r.created_at);
-            return resultDate >= selectedWeekOption.startDate && resultDate <= selectedWeekOption.endDate;
-          });
-        }
-      }
-
-      // 전체 통계 계산
-      if (filteredResults.length > 0) {
-        const scores = filteredResults.map(r => r.correct_count);
+      if (omrResults && omrResults.length > 0) {
+        const scores = omrResults.map(r => r.correct_count);
         const safeCount = scores.filter(s => s >= SAFE_ZONE_CUTOFF).length;
         const competitiveCount = scores.filter(s => s >= COMPETITIVE_ZONE_CUTOFF && s < SAFE_ZONE_CUTOFF).length;
         const redLineCount = scores.filter(s => s < COMPETITIVE_ZONE_CUTOFF).length;
         
         setOverallStats({
-          totalParticipants: filteredResults.length,
+          totalParticipants: omrResults.length,
           avgScore: Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10,
           maxScore: Math.max(...scores),
           minScore: Math.min(...scores),
@@ -280,6 +203,30 @@ const Statistics = () => {
           competitiveZoneCount: competitiveCount,
           redLineCount: redLineCount,
         });
+
+        // 전체 응시자 수 설정
+        setSnuYsuParticipants(omrResults.length);
+
+        // 내 등수 계산 (내 점수보다 높은 사람 수 + 1)
+        if (userScore !== null) {
+          const higherCount = omrResults.filter(r => r.correct_count > userScore).length;
+          setMyRank(higherCount + 1);
+        } else {
+          setMyRank(null);
+        }
+
+        // 빌보드 데이터 생성 (안정권 진입자만 - 28점 이상)
+        const safeZoneResults = omrResults.filter(r => r.correct_count >= SAFE_ZONE_CUTOFF);
+        const topResults = safeZoneResults.slice(0, 15);
+
+        const billboardData: BillboardEntry[] = topResults.map((r, i) => ({
+          rank: i + 1,
+          examNumber: `응시자 ${r.participant_number}`,
+          score: r.correct_count,
+          isMe: false, // OMR 데이터에는 user_id 매핑 없음
+        }));
+
+        setBillboard(billboardData);
       } else {
         setOverallStats({
           totalParticipants: 0,
@@ -290,68 +237,6 @@ const Statistics = () => {
           competitiveZoneCount: 0,
           redLineCount: 0,
         });
-      }
-
-      // 3. 서울대/연세대 수험번호(WLP-S, WLP-Y)를 가진 사용자 조회
-      const { data: snuYsuExamNumbers } = await supabase
-        .from("exam_numbers")
-        .select("id, exam_number, user_id")
-        .or("exam_number.like.WLP-S%,exam_number.like.WLP-Y%")
-        .not("user_id", "is", null);
-
-      const snuYsuUserIds = (snuYsuExamNumbers || []).map(en => en.user_id).filter(Boolean);
-
-      if (snuYsuUserIds.length === 0) {
-        setSnuYsuParticipants(0);
-        setMyRank(null);
-        setBillboard([]);
-        setLoading(false);
-        return;
-      }
-
-      // 4. 서울대/연세대 채점 결과 (주차 필터 적용)
-      let snuYsuResults = filteredResults.filter(r => snuYsuUserIds.includes(r.user_id));
-      snuYsuResults = snuYsuResults.sort((a, b) => b.correct_count - a.correct_count);
-
-      if (snuYsuResults.length > 0) {
-        setSnuYsuParticipants(snuYsuResults.length);
-
-        // 내 등수 찾기 (서울대/연세대 기준)
-        if (user && userScore !== null) {
-          const myIndex = snuYsuResults.findIndex(r => r.user_id === user.id);
-          if (myIndex !== -1) {
-            setMyRank(myIndex + 1);
-          } else {
-            const isSnuYsu = snuYsuUserIds.includes(user.id);
-            if (isSnuYsu) {
-              const higherCount = snuYsuResults.filter(r => r.correct_count > userScore).length;
-              setMyRank(higherCount + 1);
-            } else {
-              setMyRank(null);
-            }
-          }
-        }
-
-        // 5. 빌보드 데이터 생성 (안정권 진입자만 - 28점 이상)
-        const safeZoneResults = snuYsuResults.filter(r => r.correct_count >= SAFE_ZONE_CUTOFF);
-        const topResults = safeZoneResults.slice(0, 15);
-        const userIds = topResults.map(r => r.user_id);
-
-        // profiles에서 exam_number 조회
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("id, exam_number")
-          .in("id", userIds);
-
-        const billboardData: BillboardEntry[] = topResults.map((r, i) => ({
-          rank: i + 1,
-          examNumber: profiles?.find(p => p.id === r.user_id)?.exam_number || "???",
-          score: r.correct_count,
-          isMe: user?.id === r.user_id,
-        }));
-
-        setBillboard(billboardData);
-      } else {
         setSnuYsuParticipants(0);
         setMyRank(null);
         setBillboard([]);
@@ -363,7 +248,7 @@ const Statistics = () => {
     if (!accessLoading) {
       fetchData();
     }
-  }, [user, selectedSubject, selectedExam, selectedWeek, hasAccess, accessLoading]);
+  }, [user, selectedSubject, selectedExam, hasAccess, accessLoading]);
 
   // 접근 권한 체크
   if (accessLoading) {

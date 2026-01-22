@@ -473,7 +473,7 @@ const MyPage = () => {
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2 text-lg font-normal">
                   <MapPin className="w-5 h-5" />
-                  배송 정보
+                  배송 정보 및 연락처
                 </span>
                 {!isEditingShipping && (
                   <Button variant="ghost" size="sm" onClick={startEditingShipping}>
@@ -580,7 +580,7 @@ const MyPage = () => {
                     </>
                   ) : (
                     <p className="text-muted-foreground text-sm">
-                      배송 정보를 등록하면 결제 시 자동으로 입력됩니다.
+                      배송 정보와 연락처를 등록하면 결제 시 자동으로 입력됩니다.
                     </p>
                   )}
                 </div>

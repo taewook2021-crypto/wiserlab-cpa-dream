@@ -371,7 +371,7 @@ const MyPage = () => {
                     </p>
                   </div>
                   <a
-                    href="/downloads/2026_개정세법_주요_문제_수정.pdf"
+                    href="/downloads/2026_tax_law_amendment.pdf"
                     download="2026_개정세법_주요_문제_수정.pdf"
                     className="flex-shrink-0"
                   >

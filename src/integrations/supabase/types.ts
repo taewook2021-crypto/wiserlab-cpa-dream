@@ -323,6 +323,10 @@ export type Database = {
           email: string | null
           exam_number: string
           id: string
+          phone: string | null
+          shipping_address: string | null
+          shipping_detail_address: string | null
+          shipping_postal_code: string | null
           updated_at: string
         }
         Insert: {
@@ -330,6 +334,10 @@ export type Database = {
           email?: string | null
           exam_number: string
           id: string
+          phone?: string | null
+          shipping_address?: string | null
+          shipping_detail_address?: string | null
+          shipping_postal_code?: string | null
           updated_at?: string
         }
         Update: {
@@ -337,6 +345,10 @@ export type Database = {
           email?: string | null
           exam_number?: string
           id?: string
+          phone?: string | null
+          shipping_address?: string | null
+          shipping_detail_address?: string | null
+          shipping_postal_code?: string | null
           updated_at?: string
         }
         Relationships: []

@@ -134,6 +134,39 @@ const Payment = () => {
     }
   }, [user, loading, navigate]);
 
+  // 프로필에서 배송 정보 자동 완성
+  useEffect(() => {
+    const loadProfileData = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+      
+      if (data) {
+        const profile = data as Record<string, unknown>;
+        if (profile.phone) {
+          setBuyerPhone(profile.phone as string);
+        }
+        if (profile.shipping_postal_code) {
+          setPostcode(profile.shipping_postal_code as string);
+        }
+        if (profile.shipping_address) {
+          setAddress(profile.shipping_address as string);
+        }
+        if (profile.shipping_detail_address) {
+          setDetailAddress(profile.shipping_detail_address as string);
+        }
+      }
+    };
+
+    if (user) {
+      loadProfileData();
+    }
+  }, [user]);
+
   // 유효하지 않은 주문이면 summit으로 리다이렉트
   useEffect(() => {
     if (!isValidOrder) {

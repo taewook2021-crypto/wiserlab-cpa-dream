@@ -27,9 +27,28 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check, Ticket, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { User, FileText, Trophy, ShoppingCart, Package, BarChart3, Zap, Trash2, Copy, Check, Ticket, Download, MapPin, Phone, Search, Pencil, Save, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+declare global {
+  interface Window {
+    daum: {
+      Postcode: new (options: {
+        oncomplete: (data: DaumPostcodeData) => void;
+      }) => { open: () => void };
+    };
+  }
+}
+
+interface DaumPostcodeData {
+  zonecode: string;
+  address: string;
+  addressType: string;
+  bname: string;
+  buildingName: string;
+}
 
 interface ScoringResult {
   id: string;
@@ -105,11 +124,25 @@ const MyPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [deletingAccount, setDeletingAccount] = useState(false);
-  const [profile, setProfile] = useState<{ exam_number: string } | null>(null);
+  const [profile, setProfile] = useState<{ 
+    exam_number: string;
+    phone?: string | null;
+    shipping_address?: string | null;
+    shipping_detail_address?: string | null;
+    shipping_postal_code?: string | null;
+  } | null>(null);
   const [copiedExamNumber, setCopiedExamNumber] = useState(false);
   const [discountCodes, setDiscountCodes] = useState<DiscountCode[]>([]);
   const [loadingDiscountCodes, setLoadingDiscountCodes] = useState(true);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  
+  // 배송정보 편집 상태
+  const [isEditingShipping, setIsEditingShipping] = useState(false);
+  const [editPhone, setEditPhone] = useState("");
+  const [editPostcode, setEditPostcode] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editDetailAddress, setEditDetailAddress] = useState("");
+  const [savingShipping, setSavingShipping] = useState(false);
 
   const copyExamNumber = async () => {
     if (!profile?.exam_number) return;
@@ -126,6 +159,79 @@ const MyPage = () => {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+  // 다음 우편번호 스크립트 로드
+  useEffect(() => {
+    const daumScript = document.createElement("script");
+    daumScript.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    daumScript.async = true;
+    document.head.appendChild(daumScript);
+
+    return () => {
+      if (document.head.contains(daumScript)) {
+        document.head.removeChild(daumScript);
+      }
+    };
+  }, []);
+
+  // 배송정보 편집 시작
+  const startEditingShipping = () => {
+    setEditPhone(profile?.phone || "");
+    setEditPostcode(profile?.shipping_postal_code || "");
+    setEditAddress(profile?.shipping_address || "");
+    setEditDetailAddress(profile?.shipping_detail_address || "");
+    setIsEditingShipping(true);
+  };
+
+  // 배송정보 저장
+  const saveShippingInfo = async () => {
+    if (!user) return;
+    
+    setSavingShipping(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          phone: editPhone || null,
+          shipping_postal_code: editPostcode || null,
+          shipping_address: editAddress || null,
+          shipping_detail_address: editDetailAddress || null,
+        } as Record<string, unknown>)
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      setProfile(prev => prev ? {
+        ...prev,
+        phone: editPhone || null,
+        shipping_postal_code: editPostcode || null,
+        shipping_address: editAddress || null,
+        shipping_detail_address: editDetailAddress || null,
+      } : null);
+      
+      setIsEditingShipping(false);
+      toast.success("배송 정보가 저장되었습니다.");
+    } catch (error) {
+      console.error("Error saving shipping info:", error);
+      toast.error("배송 정보 저장에 실패했습니다.");
+    } finally {
+      setSavingShipping(false);
+    }
+  };
+
+  // 우편번호 검색
+  const handlePostcodeSearch = () => {
+    if (!window.daum || !window.daum.Postcode) {
+      toast.error("주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
+    new window.daum.Postcode({
+      oncomplete: (data: DaumPostcodeData) => {
+        setEditPostcode(data.zonecode);
+        setEditAddress(data.address);
+      },
+    }).open();
+  };
 
   const handleDeleteAccount = async () => {
     setDeletingAccount(true);
@@ -140,7 +246,7 @@ const MyPage = () => {
       toast.success("회원 탈퇴가 완료되었습니다.");
       await signOut();
       navigate("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error deleting account:", error);
       toast.error("회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
@@ -204,10 +310,18 @@ const MyPage = () => {
       if (!user) return;
       const { data } = await supabase
         .from("profiles")
-        .select("exam_number")
+        .select("*")
         .eq("id", user.id)
         .maybeSingle();
-      if (data) setProfile(data);
+      if (data) {
+        setProfile({
+          exam_number: data.exam_number,
+          phone: (data as Record<string, unknown>).phone as string | null,
+          shipping_address: (data as Record<string, unknown>).shipping_address as string | null,
+          shipping_detail_address: (data as Record<string, unknown>).shipping_detail_address as string | null,
+          shipping_postal_code: (data as Record<string, unknown>).shipping_postal_code as string | null,
+        });
+      }
     };
 
     const fetchDiscountCodes = async () => {
@@ -350,6 +464,127 @@ const MyPage = () => {
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* 배송 정보 관리 카드 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2 text-lg font-normal">
+                  <MapPin className="w-5 h-5" />
+                  배송 정보
+                </span>
+                {!isEditingShipping && (
+                  <Button variant="ghost" size="sm" onClick={startEditingShipping}>
+                    <Pencil className="w-4 h-4 mr-1" />
+                    편집
+                  </Button>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isEditingShipping ? (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="editPhone" className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      연락처
+                    </Label>
+                    <Input
+                      id="editPhone"
+                      placeholder="010-0000-0000"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="editPostcode">우편번호</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="editPostcode"
+                        placeholder="우편번호"
+                        value={editPostcode}
+                        readOnly
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePostcodeSearch}
+                        size="sm"
+                      >
+                        <Search className="w-4 h-4 mr-1" />
+                        검색
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="editAddress">주소</Label>
+                    <Input
+                      id="editAddress"
+                      placeholder="주소를 검색해주세요"
+                      value={editAddress}
+                      readOnly
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="editDetailAddress">상세 주소</Label>
+                    <Input
+                      id="editDetailAddress"
+                      placeholder="상세 주소를 입력하세요"
+                      value={editDetailAddress}
+                      onChange={(e) => setEditDetailAddress(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <Button 
+                      onClick={saveShippingInfo} 
+                      disabled={savingShipping}
+                      size="sm"
+                    >
+                      <Save className="w-4 h-4 mr-1" />
+                      {savingShipping ? "저장 중..." : "저장"}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsEditingShipping(false)}
+                      size="sm"
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      취소
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {profile?.phone || profile?.shipping_address ? (
+                    <>
+                      {profile.phone && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Phone className="w-4 h-4 text-muted-foreground" />
+                          <span>{profile.phone}</span>
+                        </div>
+                      )}
+                      {profile.shipping_address && (
+                        <div className="flex items-start gap-2 text-sm">
+                          <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
+                          <div>
+                            <p>{profile.shipping_postal_code && `[${profile.shipping_postal_code}]`} {profile.shipping_address}</p>
+                            {profile.shipping_detail_address && (
+                              <p className="text-muted-foreground">{profile.shipping_detail_address}</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">
+                      배송 정보를 등록하면 결제 시 자동으로 입력됩니다.
+                    </p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

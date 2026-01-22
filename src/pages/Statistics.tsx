@@ -463,19 +463,16 @@ const Statistics = () => {
               {isZoneMetricsReleased && (
                 <div className="grid grid-cols-3 gap-px bg-border mb-10">
                   <div className="bg-foreground text-background p-6 text-center">
-                    <p className="font-medium text-sm mb-1">안정권</p>
-                    <p className="text-xs opacity-70">상위 40%</p>
-                    <p className="text-xs opacity-70 mt-1">{cutoffs.safe}점 이상</p>
+                    <p className="font-medium text-sm mb-2">안정권</p>
+                    <p className="text-lg font-light">{cutoffs.safe}점 이상</p>
                   </div>
                   <div className="bg-muted text-foreground p-6 text-center">
-                    <p className="font-medium text-sm mb-1">경합권</p>
-                    <p className="text-xs text-muted-foreground">상위 40~70%</p>
-                    <p className="text-xs text-muted-foreground mt-1">{cutoffs.competitive}~{cutoffs.safe - 1}점</p>
+                    <p className="font-medium text-sm mb-2">경합권</p>
+                    <p className="text-lg font-light">{cutoffs.competitive}~{cutoffs.safe - 1}점</p>
                   </div>
                   <div className="bg-background text-muted-foreground p-6 text-center border border-border">
-                    <p className="font-medium text-sm mb-1">레드라인</p>
-                    <p className="text-xs">상위 70% 이하</p>
-                    <p className="text-xs mt-1">{cutoffs.competitive - 1}점 이하</p>
+                    <p className="font-medium text-sm mb-2">레드라인</p>
+                    <p className="text-lg font-light">{cutoffs.competitive - 1}점 이하</p>
                   </div>
                 </div>
               )}

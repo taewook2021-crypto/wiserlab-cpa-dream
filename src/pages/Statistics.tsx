@@ -432,13 +432,9 @@ const Statistics = () => {
                       </span>
                     </div>
                     {/* 등수 표시 - 지표 공개 시에만 */}
-                    {isZoneMetricsReleased && snuYsuParticipants > 0 && myRank !== null ? (
+                    {isZoneMetricsReleased && myRank !== null ? (
                       <p className="text-sm text-muted-foreground">
-                        서울대·연세대 {snuYsuParticipants}명 중 <span className="font-medium text-foreground">{myRank}등</span> · 상위 {percentile}%
-                      </p>
-                    ) : isZoneMetricsReleased && myRank === null && snuYsuParticipants > 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        서울대·연세대 응시자 {snuYsuParticipants}명
+                        전체 <span className="font-medium text-foreground">{myRank}등</span>
                       </p>
                     ) : !isZoneMetricsReleased ? (
                       <p className="text-sm text-muted-foreground">

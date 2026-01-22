@@ -478,15 +478,15 @@ const Statistics = () => {
                 <div className="grid grid-cols-3 gap-px bg-border mb-10">
                   <div className="bg-foreground text-background p-6 text-center">
                     <p className="font-medium text-sm mb-2">안정권</p>
-                    <p className="text-lg font-light">{cutoffs.safe}점 이상</p>
+                    <p className="text-lg font-light">{cutoffs.safe}개 이상</p>
                   </div>
                   <div className="bg-muted text-foreground p-6 text-center">
                     <p className="font-medium text-sm mb-2">경합권</p>
-                    <p className="text-lg font-light">{cutoffs.competitive}~{cutoffs.safe - 1}점</p>
+                    <p className="text-lg font-light">{cutoffs.competitive}~{cutoffs.safe - 1}개</p>
                   </div>
                   <div className="bg-background text-muted-foreground p-6 text-center border border-border">
                     <p className="font-medium text-sm mb-2">레드라인</p>
-                    <p className="text-lg font-light">{cutoffs.competitive - 1}점 이하</p>
+                    <p className="text-lg font-light">{cutoffs.competitive - 1}개 이하</p>
                   </div>
                 </div>
               )}
@@ -497,7 +497,7 @@ const Statistics = () => {
                 <div className="mb-8">
                   <div className="mb-6">
                     <h2 className="text-xl font-light">전국 빌보드</h2>
-                    <p className="text-sm text-muted-foreground">안정권 진입자 ({cutoffs.safe}점 이상)</p>
+                    <p className="text-sm text-muted-foreground">안정권 진입자 ({cutoffs.safe}개 이상)</p>
                   </div>
 
                   {loading ? (

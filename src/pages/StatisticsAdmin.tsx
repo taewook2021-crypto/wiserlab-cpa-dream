@@ -113,10 +113,15 @@ const StatisticsAdmin = () => {
   const fetchData = async () => {
     setLoading(true);
     
-    // 수험번호 목록 조회
+    // 수험번호 목록 조회 (무료 사용자용)
     const { data: examNumbersData } = await supabase
       .from("exam_numbers")
       .select("*");
+    
+    // 프로필 데이터 조회 (유료 사용자 수험번호)
+    const { data: profilesData } = await supabase
+      .from("profiles")
+      .select("id, exam_number");
     
     setExamNumbers(examNumbersData || []);
 
@@ -133,15 +138,25 @@ const StatisticsAdmin = () => {
 
     setScoringAnswers(answersData || []);
 
-    // 수험번호와 매핑
+    // 수험번호 매핑 (무료 사용자: exam_numbers 테이블)
     const examNumberMap = new Map(
       (examNumbersData || []).map((en) => [en.id, en.exam_number])
     );
 
+    // 프로필 수험번호 매핑 (유료 사용자: profiles 테이블, user_id -> exam_number)
+    const profileExamNumberMap = new Map(
+      (profilesData || []).map((p) => [p.id, p.exam_number])
+    );
+
     const enrichedResults: ScoringWithExamNumber[] = (scoringData || []).map((result) => {
-      const examNumber = result.exam_number_id 
-        ? examNumberMap.get(result.exam_number_id) 
-        : undefined;
+      // 1순위: profiles 테이블에서 수험번호 조회 (유료 사용자 - WLS-*)
+      let examNumber = profileExamNumberMap.get(result.user_id);
+      
+      // 2순위: exam_numbers 테이블에서 조회 (무료 사용자 - WLP-*)
+      if (!examNumber && result.exam_number_id) {
+        examNumber = examNumberMap.get(result.exam_number_id);
+      }
+      
       return {
         ...result,
         exam_number: examNumber,

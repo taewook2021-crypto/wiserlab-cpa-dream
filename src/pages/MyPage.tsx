@@ -87,6 +87,24 @@ interface DiscountCode {
   created_at: string;
 }
 
+interface StatisticsSetting {
+  subject: string;
+  exam_round: number;
+  is_released: boolean;
+  safe_cutoff: number;
+  competitive_cutoff: number;
+}
+
+// 기본 컷오프 (DB에서 값이 없을 때 사용)
+const DEFAULT_CUTOFFS: Record<string, { safe: number; competitive: number }> = {
+  financial_accounting: { safe: 23, competitive: 14 },
+  tax_law: { safe: 20, competitive: 16 },
+};
+
+const getDefaultCutoffs = (subject: string) => {
+  return DEFAULT_CUTOFFS[subject] || { safe: 23, competitive: 14 };
+};
+
 const subjectNames: Record<string, string> = {
   financial_accounting: "재무회계",
   tax_law: "세법",
@@ -135,6 +153,9 @@ const MyPage = () => {
   const [discountCodes, setDiscountCodes] = useState<DiscountCode[]>([]);
   const [loadingDiscountCodes, setLoadingDiscountCodes] = useState(true);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  
+  // 통계 설정 (컷오프 및 공개 여부)
+  const [statisticsSettings, setStatisticsSettings] = useState<StatisticsSetting[]>([]);
   
   // 배송정보 편집 상태
   const [isEditingShipping, setIsEditingShipping] = useState(false);
@@ -342,12 +363,23 @@ const MyPage = () => {
       setLoadingDiscountCodes(false);
     };
 
+    const fetchStatisticsSettings = async () => {
+      const { data, error } = await supabase
+        .from("statistics_settings")
+        .select("subject, exam_round, is_released, safe_cutoff, competitive_cutoff");
+
+      if (!error && data) {
+        setStatisticsSettings(data);
+      }
+    };
+
     if (user) {
       fetchResults();
       fetchCartItems();
       fetchOrders();
       fetchProfile();
       fetchDiscountCodes();
+      fetchStatisticsSettings();
     }
   }, [user]);
 
@@ -710,11 +742,25 @@ const MyPage = () => {
                       navigate(`/edge?subject=${subjectId}&exam=${examId}&wrong=${wrongNumbers}`);
                     };
                     
-                      const getScoreZone = (percentage: number) => {
-                        if (percentage >= 80) return "안정권";
-                        if (percentage >= 60) return "경합권";
-                        return "레드라인";
-                      };
+                    // DB 컷오프 기반 등급 계산 (통계 페이지와 동일한 로직)
+                    const getScoreZone = () => {
+                      // 해당 과목/회차의 설정 찾기
+                      const setting = statisticsSettings.find(
+                        s => s.subject === result.subject && s.exam_round === result.exam_round
+                      );
+                      
+                      // 설정이 없거나 공개되지 않은 경우
+                      if (!setting || !setting.is_released) {
+                        return "통계 분석 중";
+                      }
+                      
+                      const safeCutoff = setting.safe_cutoff;
+                      const competitiveCutoff = setting.competitive_cutoff;
+                      
+                      if (result.correct_count >= safeCutoff) return "안정권";
+                      if (result.correct_count >= competitiveCutoff) return "경합권";
+                      return "레드라인";
+                    };
 
                       return (
                         <div
@@ -736,7 +782,7 @@ const MyPage = () => {
                                 <span className="text-muted-foreground"> / {result.total_questions}</span>
                               </p>
                               <p className="text-xs">
-                                {getScoreZone(result.score_percentage)}
+                                {getScoreZone()}
                               </p>
                             </div>
                           </div>

@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ShoppingCart, ChevronLeft, ChevronRight, GraduationCap } from "lucide-react";
+import { ShoppingCart, ChevronLeft, ChevronRight, GraduationCap, X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import summitFeature from "@/assets/summit-front.png";
 import summitCover from "@/assets/summit-cover-mockup.png";
 import summitFinancial from "@/assets/summit-financial.png";
@@ -83,26 +89,40 @@ const REVIEWS = [
   {
     university: "연세대학교 / 재시",
     content: "보기에는 쉬운 듯하면서도 개념을 정확히 모르면 틀리는 문제들이 여럿 있어서 기본개념을 복습하기에 좋았습니다.",
+    hasDetail: true,
+    detail: {
+      school: "연세대",
+      status: "재시",
+      difficulty: "적당",
+      similarity: 4,
+      pros: "보기에는 쉬운 듯하면서도 개념을 정확히 모르면 틀리는 문제들이 여럿 있어서 기본개념을 복습하기에 좋았습니다.",
+      reapply: "있음",
+    },
   },
   {
     university: "연세대학교",
     content: "서울대, 연세대 데이터 기반 분석 덕분에 내 위치를 정확히 파악할 수 있었어요.",
+    hasDetail: false,
   },
   {
     university: "서울대학교",
     content: "해설이 정말 상세해서 틀린 문제도 완벽하게 이해할 수 있었습니다.",
+    hasDetail: false,
   },
   {
     university: "연세대학교",
     content: "안정권/경합권 분석이 남은 기간 공부 방향 잡는 데 결정적이었어요.",
+    hasDetail: false,
   },
   {
     university: "서울대학교",
     content: "기출의 결을 그대로 가져왔다는 말이 정말 맞았어요. 실전 그 자체입니다.",
+    hasDetail: false,
   },
   {
     university: "연세대학교",
     content: "모의고사 퀄리티가 다른 곳과 비교가 안 됩니다. 강력 추천합니다.",
+    hasDetail: false,
   },
 ] as const;
 
@@ -167,6 +187,7 @@ const Summit = () => {
 
   // Auto-scroll reviews carousel every 6 seconds
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+  const [selectedReview, setSelectedReview] = useState<typeof REVIEWS[0] | null>(null);
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -435,7 +456,10 @@ const Summit = () => {
                     key={index}
                     className="flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[35vw] xl:w-[30vw] snap-center"
                   >
-                    <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm border border-border/50 h-full flex flex-col">
+                    <div 
+                      className={`bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm border border-border/50 h-full flex flex-col ${review.hasDetail ? 'cursor-pointer hover:shadow-md hover:border-primary/30 transition-all' : ''}`}
+                      onClick={() => review.hasDetail && setSelectedReview(review)}
+                    >
                       {/* University Badge */}
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full mb-4 w-fit">
                         <GraduationCap className="w-4 h-4 text-muted-foreground" />
@@ -447,6 +471,9 @@ const Summit = () => {
                       <p className="text-base md:text-lg text-foreground leading-relaxed flex-1">
                         "{review.content}"
                       </p>
+                      {review.hasDetail && (
+                        <p className="text-sm text-muted-foreground mt-4">클릭하여 상세 후기 보기</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -739,6 +766,57 @@ const Summit = () => {
         </section>
 
       </main>
+
+      {/* Review Detail Dialog */}
+      <Dialog open={!!selectedReview} onOpenChange={() => setSelectedReview(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GraduationCap className="w-5 h-5" />
+              후기 전문
+            </DialogTitle>
+          </DialogHeader>
+          {selectedReview?.hasDetail && selectedReview.detail && (
+            <div className="space-y-4 pt-2">
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">①</span>
+                <div>
+                  <span className="text-muted-foreground">응시 학교 / 수험 상태 : </span>
+                  <span className="font-medium">{selectedReview.detail.school} / {selectedReview.detail.status}</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">②</span>
+                <div>
+                  <span className="text-muted-foreground">체감 난이도 : </span>
+                  <span className="font-medium">{selectedReview.detail.difficulty}</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">③</span>
+                <div>
+                  <span className="text-muted-foreground">실제 1차 대비 유사도 : </span>
+                  <span className="font-medium">{selectedReview.detail.similarity} / 5</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">④</span>
+                <div>
+                  <span className="text-muted-foreground">좋았던 점 : </span>
+                  <span className="font-medium">{selectedReview.detail.pros}</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">⑤</span>
+                <div>
+                  <span className="text-muted-foreground">다음 회차 재응시 의향 : </span>
+                  <span className="font-medium">{selectedReview.detail.reapply}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

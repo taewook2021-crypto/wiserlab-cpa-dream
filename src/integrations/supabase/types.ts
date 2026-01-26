@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliates: {
+        Row: {
+          account_holder: string | null
+          bank_account: string | null
+          bank_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_holder?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_holder?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -352,6 +394,91 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          affiliate_id: string
+          code: string
+          created_at: string
+          discount_amount: number
+          id: string
+          is_active: boolean
+          reward_amount: number
+          usage_count: number
+        }
+        Insert: {
+          affiliate_id: string
+          code: string
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          is_active?: boolean
+          reward_amount?: number
+          usage_count?: number
+        }
+        Update: {
+          affiliate_id?: string
+          code?: string
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          is_active?: boolean
+          reward_amount?: number
+          usage_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_codes_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_usages: {
+        Row: {
+          created_at: string
+          discount_applied: number
+          id: string
+          is_settled: boolean
+          order_id: string
+          referral_code_id: string
+          reward_amount: number
+          settled_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          discount_applied: number
+          id?: string
+          is_settled?: boolean
+          order_id: string
+          referral_code_id: string
+          reward_amount: number
+          settled_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          discount_applied?: number
+          id?: string
+          is_settled?: boolean
+          order_id?: string
+          referral_code_id?: string
+          reward_amount?: number
+          settled_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_usages_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       related_questions: {
         Row: {

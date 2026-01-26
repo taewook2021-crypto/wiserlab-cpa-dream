@@ -767,51 +767,55 @@ const Summit = () => {
 
       </main>
 
-      {/* Review Detail Dialog */}
+      {/* Review Detail Dialog - Apple-inspired design */}
       <Dialog open={!!selectedReview} onOpenChange={() => setSelectedReview(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5" />
-              후기 전문
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-md p-0 gap-0 overflow-hidden border-0 shadow-2xl">
+          {/* Header */}
+          <div className="bg-foreground text-background px-8 py-6">
+            <div className="flex items-center gap-3 mb-1">
+              <GraduationCap className="w-5 h-5 opacity-80" />
+              <span className="text-sm font-medium opacity-80">실제 응시자 후기</span>
+            </div>
+            <h3 className="text-2xl font-semibold tracking-tight">
+              {selectedReview?.hasDetail && selectedReview.detail?.school} / {selectedReview?.hasDetail && selectedReview.detail?.status}
+            </h3>
+          </div>
+          
+          {/* Content */}
           {selectedReview?.hasDetail && selectedReview.detail && (
-            <div className="space-y-4 pt-2">
-              <div className="flex items-start gap-3">
-                <span className="text-primary font-medium shrink-0">①</span>
+            <div className="px-8 py-8 space-y-6 bg-background">
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <span className="text-muted-foreground">응시 학교 / 수험 상태 : </span>
-                  <span className="font-medium">{selectedReview.detail.school} / {selectedReview.detail.status}</span>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">체감 난이도</p>
+                  <p className="text-lg font-medium">{selectedReview.detail.difficulty}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">실제 1차 대비 유사도</p>
+                  <p className="text-lg font-medium">{selectedReview.detail.similarity} / 5</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="text-primary font-medium shrink-0">②</span>
-                <div>
-                  <span className="text-muted-foreground">체감 난이도 : </span>
-                  <span className="font-medium">{selectedReview.detail.difficulty}</span>
-                </div>
+              
+              {/* Divider */}
+              <div className="h-px bg-border" />
+              
+              {/* Pros Section */}
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">좋았던 점</p>
+                <p className="text-base leading-relaxed text-foreground">
+                  {selectedReview.detail.pros}
+                </p>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="text-primary font-medium shrink-0">③</span>
-                <div>
-                  <span className="text-muted-foreground">실제 1차 대비 유사도 : </span>
-                  <span className="font-medium">{selectedReview.detail.similarity} / 5</span>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-primary font-medium shrink-0">④</span>
-                <div>
-                  <span className="text-muted-foreground">좋았던 점 : </span>
-                  <span className="font-medium">{selectedReview.detail.pros}</span>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-primary font-medium shrink-0">⑤</span>
-                <div>
-                  <span className="text-muted-foreground">다음 회차 재응시 의향 : </span>
-                  <span className="font-medium">{selectedReview.detail.reapply}</span>
-                </div>
+              
+              {/* Divider */}
+              <div className="h-px bg-border" />
+              
+              {/* Reapply */}
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">다음 회차 재응시 의향</p>
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-foreground text-background text-sm font-medium">
+                  {selectedReview.detail.reapply}
+                </span>
               </div>
             </div>
           )}

@@ -117,7 +117,7 @@ const REVIEWS: Review[] = [
     },
   },
   {
-    university: "연세대학교 / 1회차 현장응시",
+    university: "연세대학교",
     content: "틀렸던 문제들에서 제가 어떤 부분이 취약한지도 파악할 수 있어서 좋았습니다. 특히 회계 해설 같은 경우는 출제자 코멘트가 실전적인 능력을 기르는데 도움이 많이 되었습니다.",
     hasDetail: true,
     detail: {
@@ -126,8 +126,11 @@ const REVIEWS: Review[] = [
   },
   {
     university: "서울대학교",
-    content: "해설이 정말 상세해서 틀린 문제도 완벽하게 이해할 수 있었습니다.",
-    hasDetail: false,
+    content: "다른 사설보다도 문제 퀄리티가 좋아서 풀면서 감탄했네요.",
+    hasDetail: true,
+    detail: {
+      fullText: "안녕하세요, 이번에 서울대에서 써밋 응시한 참가자입니다.\n우선 좋은 모의고사를 무료로 제공해주신 점 감사드립니다.\n다른 사설보다도 문제 퀄리티가 좋아서 풀면서 감탄했네요ㅎㅎ",
+    },
   },
   {
     university: "연세대학교",
@@ -796,9 +799,9 @@ const Summit = () => {
           <DialogTitle className="sr-only">실제 응시자 후기</DialogTitle>
           {selectedReview?.hasDetail && selectedReview.detail && (
             <div className="p-8 sm:p-10 space-y-6">
-              {/* Header */}
-              <div className="flex items-center gap-3">
-                <GraduationCap className="w-5 h-5 text-muted-foreground" />
+              {/* Header - Rounded Badge like gallery blocks */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full w-fit">
+                <GraduationCap className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-muted-foreground">실제 응시자 후기</span>
               </div>
               

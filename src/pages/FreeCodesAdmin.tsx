@@ -9,7 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, RefreshCw, Download } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Search, RefreshCw, Download, Plus } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface FreeCodeWithUser {
   id: string;
@@ -28,6 +31,11 @@ const FreeCodesAdmin = () => {
   const [freeCodes, setFreeCodes] = useState<FreeCodeWithUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newCodePrefix, setNewCodePrefix] = useState("WLP-");
+  const [newCodeSuffix, setNewCodeSuffix] = useState("");
+  const [newBatchName, setNewBatchName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 관리자 권한 확인
   useEffect(() => {
@@ -87,6 +95,80 @@ const FreeCodesAdmin = () => {
   const totalCodes = freeCodes.length;
   const usedCodes = freeCodes.filter(c => c.is_used).length;
   const unusedCodes = totalCodes - usedCodes;
+
+  // 코드 추가 함수
+  const handleAddCode = async () => {
+    const examNumber = `${newCodePrefix}${newCodeSuffix}`.toUpperCase();
+    
+    if (!newCodeSuffix.trim()) {
+      toast({
+        title: "오류",
+        description: "코드 접미사를 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!newBatchName.trim()) {
+      toast({
+        title: "오류",
+        description: "배치명을 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // 중복 체크
+      const { data: existing } = await supabase
+        .from('exam_numbers')
+        .select('id')
+        .eq('exam_number', examNumber)
+        .maybeSingle();
+
+      if (existing) {
+        toast({
+          title: "오류",
+          description: "이미 존재하는 코드입니다.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('exam_numbers')
+        .insert({
+          exam_number: examNumber,
+          batch_name: newBatchName.trim(),
+          is_used: false,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "성공",
+        description: `코드 ${examNumber}가 추가되었습니다.`,
+      });
+
+      // 폼 초기화 및 목록 새로고침
+      setNewCodeSuffix("");
+      setNewBatchName("");
+      setIsAddDialogOpen(false);
+      fetchFreeCodes();
+    } catch (error) {
+      console.error('Error adding code:', error);
+      toast({
+        title: "오류",
+        description: "코드 추가에 실패했습니다.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // CSV 다운로드
   const handleDownloadCSV = () => {
@@ -178,6 +260,60 @@ const FreeCodesAdmin = () => {
             />
           </div>
           <div className="flex gap-2">
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  코드 추가
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>무료 코드 추가</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="exam-number">코드</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="code-prefix"
+                        value={newCodePrefix}
+                        onChange={(e) => setNewCodePrefix(e.target.value.toUpperCase())}
+                        className="w-24"
+                        placeholder="WLP-"
+                      />
+                      <Input
+                        id="code-suffix"
+                        value={newCodeSuffix}
+                        onChange={(e) => setNewCodeSuffix(e.target.value.toUpperCase())}
+                        placeholder="S001"
+                        className="flex-1"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      최종 코드: {newCodePrefix}{newCodeSuffix || "____"}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="batch-name">배치명</Label>
+                    <Input
+                      id="batch-name"
+                      value={newBatchName}
+                      onChange={(e) => setNewBatchName(e.target.value)}
+                      placeholder="예: 서울대 1차"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">취소</Button>
+                  </DialogClose>
+                  <Button onClick={handleAddCode} disabled={isSubmitting}>
+                    {isSubmitting ? "추가 중..." : "추가"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             <Button variant="outline" onClick={fetchFreeCodes}>
               <RefreshCw className="h-4 w-4 mr-2" />
               새로고침

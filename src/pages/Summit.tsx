@@ -85,7 +85,24 @@ const GALLERY_ITEMS = [
 ] as const;
 
 // Reviews data
-const REVIEWS = [
+type ReviewDetail = {
+  school?: string;
+  status?: string;
+  difficulty?: string;
+  similarity?: number;
+  pros?: string;
+  reapply?: string;
+  fullText?: string;
+};
+
+type Review = {
+  university: string;
+  content: string;
+  hasDetail: boolean;
+  detail?: ReviewDetail;
+};
+
+const REVIEWS: Review[] = [
   {
     university: "연세대학교 / 재시",
     content: "보기에는 쉬운 듯하면서도 개념을 정확히 모르면 틀리는 문제들이 여럿 있어서 기본개념을 복습하기에 좋았습니다.",
@@ -100,9 +117,12 @@ const REVIEWS = [
     },
   },
   {
-    university: "연세대학교",
-    content: "서울대, 연세대 데이터 기반 분석 덕분에 내 위치를 정확히 파악할 수 있었어요.",
-    hasDetail: false,
+    university: "연세대학교 / 1회차 현장응시",
+    content: "틀렸던 문제들에서 제가 어떤 부분이 취약한지도 파악할 수 있어서 좋았습니다. 특히 회계 해설 같은 경우는 출제자 코멘트가 실전적인 능력을 기르는데 도움이 많이 되었습니다.",
+    hasDetail: true,
+    detail: {
+      fullText: "안녕하세요, 1회차 연세대에서 현장응시했습니다. 회계,세법 모두 개인적인 만족도는 매우 높았습니다. 전체적인 틀은 분명 문제집에서 본 문제인데, 디테일한 부분에서 확실한 차이가 있어서 출제하실때 많은 연구를 하셨다고 느꼈습니다. 틀렸던 문제들도 제가 부족했던 부분에서 틀린거라 합리적으로 납득이 가능하고 어떤 부분이 취약한지도 파악할 수 있어서 좋았습니다. 특히 회계 해설 같은 경우는 출제자 코멘트가 실전적인 능력을 기르는데 도움이 많이 되었습니다. 앞으로 공부 방향이나 전략을 짤 때 도움이 많이 될 것 같네요. 무료 응시 기회를 주셔서 감사합니다.",
+    },
   },
   {
     university: "서울대학교",
@@ -124,7 +144,7 @@ const REVIEWS = [
     content: "모의고사 퀄리티가 다른 곳과 비교가 안 됩니다. 강력 추천합니다.",
     hasDetail: false,
   },
-] as const;
+];
 
 const PRODUCT_SECTIONS = [
   {
@@ -187,7 +207,7 @@ const Summit = () => {
 
   // Auto-scroll reviews carousel every 6 seconds
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
-  const [selectedReview, setSelectedReview] = useState<typeof REVIEWS[0] | null>(null);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -779,27 +799,35 @@ const Summit = () => {
               </div>
               
               {/* Full Review Content */}
-              <div className="space-y-5 text-[#1d1d1f]">
-                <p className="leading-[1.8] tracking-tight">
-                  <span className="text-muted-foreground">① 응시 학교 / 수험 상태 : </span>
-                  {selectedReview.detail.school} / {selectedReview.detail.status}
-                </p>
-                <p className="leading-[1.8] tracking-tight">
-                  <span className="text-muted-foreground">② 체감 난이도 (쉬움/적당/어려움) : </span>
-                  {selectedReview.detail.difficulty}
-                </p>
-                <p className="leading-[1.8] tracking-tight">
-                  <span className="text-muted-foreground">③ 실제 1차 대비 유사도 (1~5) : </span>
-                  {selectedReview.detail.similarity}
-                </p>
-                <p className="leading-[1.8] tracking-tight">
-                  <span className="text-muted-foreground">④ 좋았던 점 1가지 : </span>
-                  {selectedReview.detail.pros}
-                </p>
-                <p className="leading-[1.8] tracking-tight">
-                  <span className="text-muted-foreground">⑤ 다음 회차 재응시 의향 (있음/없음) : </span>
-                  {selectedReview.detail.reapply}
-                </p>
+              <div className="text-[#1d1d1f]">
+                {selectedReview.detail?.fullText ? (
+                  <p className="leading-[1.8] tracking-tight">
+                    {selectedReview.detail.fullText}
+                  </p>
+                ) : (
+                  <div className="space-y-5">
+                    <p className="leading-[1.8] tracking-tight">
+                      <span className="text-muted-foreground">① 응시 학교 / 수험 상태 : </span>
+                      {selectedReview.detail?.school} / {selectedReview.detail?.status}
+                    </p>
+                    <p className="leading-[1.8] tracking-tight">
+                      <span className="text-muted-foreground">② 체감 난이도 (쉬움/적당/어려움) : </span>
+                      {selectedReview.detail?.difficulty}
+                    </p>
+                    <p className="leading-[1.8] tracking-tight">
+                      <span className="text-muted-foreground">③ 실제 1차 대비 유사도 (1~5) : </span>
+                      {selectedReview.detail?.similarity}
+                    </p>
+                    <p className="leading-[1.8] tracking-tight">
+                      <span className="text-muted-foreground">④ 좋았던 점 1가지 : </span>
+                      {selectedReview.detail?.pros}
+                    </p>
+                    <p className="leading-[1.8] tracking-tight">
+                      <span className="text-muted-foreground">⑤ 다음 회차 재응시 의향 (있음/없음) : </span>
+                      {selectedReview.detail?.reapply}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}

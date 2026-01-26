@@ -81,8 +81,8 @@ const GALLERY_ITEMS = [
 // Reviews data
 const REVIEWS = [
   {
-    university: "서울대학교",
-    content: "실제 시험과 동일한 난이도와 형식이라 실전 감각을 익히는 데 큰 도움이 됐습니다.",
+    university: "연세대학교 / 재시",
+    content: "보기에는 쉬운 듯하면서도 개념을 정확히 모르면 틀리는 문제들이 여럿 있어서 기본개념을 복습하기에 좋았습니다.",
   },
   {
     university: "연세대학교",

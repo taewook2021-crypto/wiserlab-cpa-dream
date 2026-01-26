@@ -78,6 +78,12 @@ const Payment = () => {
   const [isCheckingCode, setIsCheckingCode] = useState(false);
   const [isLoadingAutoDiscount, setIsLoadingAutoDiscount] = useState(true);
 
+  // 무료 코드 관련 상태 (exam_numbers 테이블의 WLP- 코드)
+  const [appliedFreeCode, setAppliedFreeCode] = useState<{
+    code: string;
+    codeId: string;
+  } | null>(null);
+
   // 레퍼럴 코드 관련 상태
   const [referralCode, setReferralCode] = useState("");
   const [appliedReferral, setAppliedReferral] = useState<{
@@ -97,7 +103,9 @@ const Payment = () => {
   const shippingFee = 0;
   const discountAmount = appliedDiscount?.amount || 0;
   const referralAmount = appliedReferral?.amount || 0;
-  const totalDiscount = discountAmount + referralAmount;
+  // 무료 코드가 적용된 경우 100% 할인
+  const freeCodeDiscount = appliedFreeCode ? BUNDLE_PRICE : 0;
+  const totalDiscount = discountAmount + referralAmount + freeCodeDiscount;
   const totalPrice = Math.max(0, BUNDLE_PRICE + shippingFee - totalDiscount);
 
   const formatPrice = (price: number) => {
@@ -224,7 +232,7 @@ const Payment = () => {
     }
   }, [user, loading]);
 
-  // 할인 코드 적용
+  // 할인 코드 적용 (discount_codes 또는 exam_numbers의 무료 코드)
   const handleApplyDiscountCode = async () => {
     if (!discountCode.trim()) {
       toast.error("할인 코드를 입력해주세요.");
@@ -235,11 +243,38 @@ const Payment = () => {
     setIsCheckingCode(true);
 
     try {
+      // 먼저 exam_numbers 테이블에서 무료 코드 확인 (WLP- 접두사)
+      if (code.startsWith("WLP-")) {
+        const { data: freeCodeData, error: freeCodeError } = await supabase
+          .from("exam_numbers")
+          .select("*")
+          .eq("exam_number", code)
+          .maybeSingle();
+
+        if (!freeCodeError && freeCodeData) {
+          if (freeCodeData.is_used) {
+            toast.error("이미 사용된 무료 코드입니다.");
+            setIsCheckingCode(false);
+            return;
+          }
+
+          setAppliedFreeCode({
+            code: freeCodeData.exam_number,
+            codeId: freeCodeData.id,
+          });
+          setDiscountCode("");
+          toast.success("무료 코드가 적용되었습니다! 결제 금액이 0원이 됩니다.");
+          setIsCheckingCode(false);
+          return;
+        }
+      }
+
+      // discount_codes 테이블에서 할인 코드 확인
       const { data, error } = await supabase
         .from("discount_codes")
         .select("*")
         .eq("code", code)
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         toast.error("유효하지 않은 할인 코드입니다.");
@@ -321,6 +356,13 @@ const Payment = () => {
     toast.success("할인 코드가 제거되었습니다.");
   };
 
+  // 무료 코드 제거
+  const handleRemoveFreeCode = () => {
+    setAppliedFreeCode(null);
+    setDiscountCode("");
+    toast.success("무료 코드가 제거되었습니다.");
+  };
+
   // 레퍼럴 코드 제거
   const handleRemoveReferralCode = () => {
     setAppliedReferral(null);
@@ -346,24 +388,78 @@ const Payment = () => {
       return;
     }
 
-    if (!window.TossPayments) {
-      toast.error("결제 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
-      const tossPayments = new window.TossPayments(TOSS_CLIENT_KEY);
       const orderId = `ORDER_${Date.now()}_${user?.id?.slice(0, 8)}`;
       
       // 상품명 생성
       const discountInfo: string[] = [];
+      if (appliedFreeCode) discountInfo.push(`무료: ${appliedFreeCode.code}`);
       if (appliedDiscount) discountInfo.push(`할인: ${appliedDiscount.code}`);
       if (appliedReferral) discountInfo.push(`레퍼럴: ${appliedReferral.code}`);
       const productName = discountInfo.length > 0
         ? `SUMMIT 전과목 PACK (${discountInfo.join(', ')})`
         : 'SUMMIT 전과목 PACK';
+
+      // 0원 결제인 경우 (무료 코드 적용)
+      if (totalPrice === 0) {
+        // 무료 코드 사용 처리
+        if (appliedFreeCode) {
+          const { error: freeCodeError } = await supabase
+            .from("exam_numbers")
+            .update({
+              is_used: true,
+              user_id: user!.id,
+              used_at: new Date().toISOString(),
+            })
+            .eq("id", appliedFreeCode.codeId)
+            .eq("is_used", false);
+
+          if (freeCodeError) {
+            console.error('Failed to mark free code as used:', freeCodeError);
+            toast.error('무료 코드 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+            setIsProcessing(false);
+            return;
+          }
+        }
+
+        // 주문 정보 직접 저장 (결제 없이)
+        const { error: orderError } = await supabase.from('orders').insert({
+          user_id: user!.id,
+          order_id: orderId,
+          buyer_name: buyerName,
+          buyer_email: user?.email || '',
+          buyer_phone: buyerPhone,
+          shipping_address: address,
+          shipping_detail_address: detailAddress,
+          shipping_postal_code: postcode,
+          product_name: productName,
+          amount: 0,
+          status: 'paid',
+          paid_at: new Date().toISOString(),
+        });
+
+        if (orderError) {
+          console.error('Failed to save order:', orderError);
+          toast.error('주문 정보 저장에 실패했습니다. 다시 시도해주세요.');
+          setIsProcessing(false);
+          return;
+        }
+
+        toast.success("무료 주문이 완료되었습니다!");
+        navigate('/payment/success?free=true');
+        return;
+      }
+
+      // 유료 결제 처리
+      if (!window.TossPayments) {
+        toast.error("결제 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+        setIsProcessing(false);
+        return;
+      }
+
+      const tossPayments = new window.TossPayments(TOSS_CLIENT_KEY);
 
       // pending_orders 테이블에 배송 정보 저장 (서버 사이드 처리를 위해)
       const { error: pendingError } = await supabase.from('pending_orders').insert({
@@ -524,23 +620,51 @@ const Payment = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
+                    {/* 무료 코드 표시 */}
+                    {appliedFreeCode && (
+                      <div className="p-3 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Check className="w-4 h-4 text-emerald-600" />
+                          <div>
+                            <p className="font-medium text-emerald-700 dark:text-emerald-300 text-sm">
+                              {appliedFreeCode.code}
+                              <span className="ml-2 text-xs bg-emerald-200 dark:bg-emerald-800 px-2 py-0.5 rounded">
+                                무료 코드
+                              </span>
+                            </p>
+                            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                              100% 할인 적용 (결제 금액 0원)
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRemoveFreeCode}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+
                     {/* 할인 코드 섹션 */}
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">할인 코드</Label>
                       {appliedDiscount ? (
-                        <div className="p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg flex items-center justify-between">
+                        <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <Check className="w-4 h-4 text-green-600" />
+                            <Check className="w-4 h-4 text-primary" />
                             <div>
-                              <p className="font-medium text-green-700 dark:text-green-300 text-sm">
+                              <p className="font-medium text-primary text-sm">
                                 {appliedDiscount.code}
                                 {appliedDiscount.isAutoApplied && (
-                                  <span className="ml-2 text-xs bg-green-200 dark:bg-green-800 px-2 py-0.5 rounded">
+                                  <span className="ml-2 text-xs bg-primary/20 px-2 py-0.5 rounded">
                                     자동 적용
                                   </span>
                                 )}
                               </p>
-                              <p className="text-xs text-green-600 dark:text-green-400">
+                              <p className="text-xs text-primary/80">
                                 {formatPrice(appliedDiscount.amount)}원 할인
                               </p>
                             </div>
@@ -554,10 +678,10 @@ const Payment = () => {
                             <X className="w-4 h-4" />
                           </Button>
                         </div>
-                      ) : (
+                      ) : !appliedFreeCode ? (
                         <div className="flex gap-2">
                           <Input
-                            placeholder="할인 코드를 입력하세요 (예: DISC-XXXXXX)"
+                            placeholder="할인/무료 코드 입력 (예: DISC-XXXX, WLP-XXXX)"
                             value={discountCode}
                             onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
                             className="flex-1"
@@ -570,6 +694,8 @@ const Payment = () => {
                             {isCheckingCode ? "확인 중..." : "적용"}
                           </Button>
                         </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">무료 코드가 적용되어 추가 할인 코드를 사용할 수 없습니다.</p>
                       )}
                     </div>
 
@@ -577,17 +703,17 @@ const Payment = () => {
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">레퍼럴 코드 (추천인)</Label>
                       {appliedReferral ? (
-                        <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center justify-between">
+                        <div className="p-3 bg-accent/50 border border-accent rounded-lg flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <Check className="w-4 h-4 text-blue-600" />
+                            <Check className="w-4 h-4 text-accent-foreground" />
                             <div>
-                              <p className="font-medium text-blue-700 dark:text-blue-300 text-sm">
+                              <p className="font-medium text-accent-foreground text-sm">
                                 {appliedReferral.code}
-                                <span className="ml-2 text-xs bg-blue-200 dark:bg-blue-800 px-2 py-0.5 rounded">
+                                <span className="ml-2 text-xs bg-accent px-2 py-0.5 rounded">
                                   레퍼럴
                                 </span>
                               </p>
-                              <p className="text-xs text-blue-600 dark:text-blue-400">
+                              <p className="text-xs text-accent-foreground/80">
                                 {formatPrice(appliedReferral.amount)}원 할인
                               </p>
                             </div>
@@ -601,7 +727,7 @@ const Payment = () => {
                             <X className="w-4 h-4" />
                           </Button>
                         </div>
-                      ) : (
+                      ) : !appliedFreeCode ? (
                         <div className="flex gap-2">
                           <Input
                             placeholder="레퍼럴 코드를 입력하세요 (예: REF-XXXXXX)"
@@ -617,11 +743,13 @@ const Payment = () => {
                             {isCheckingReferral ? "확인 중..." : "적용"}
                           </Button>
                         </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">무료 코드가 적용되어 레퍼럴 코드를 사용할 수 없습니다.</p>
                       )}
                     </div>
 
                     {/* 중복 할인 안내 */}
-                    {(appliedDiscount || appliedReferral) && (
+                    {(appliedDiscount || appliedReferral) && !appliedFreeCode && (
                       <div className="p-3 bg-muted/50 rounded-lg">
                         <p className="text-xs text-muted-foreground">
                           💡 할인 코드와 레퍼럴 코드는 중복 적용이 가능합니다.
@@ -736,14 +864,20 @@ const Payment = () => {
                     <span className="text-muted-foreground">배송비</span>
                     <span className="text-primary">무료</span>
                   </div>
+                  {appliedFreeCode && (
+                    <div className="flex justify-between text-primary">
+                      <span>무료 코드 ({appliedFreeCode.code})</span>
+                      <span>-{formatPrice(BUNDLE_PRICE)}원</span>
+                    </div>
+                  )}
                   {appliedDiscount && (
-                    <div className="flex justify-between text-green-600">
+                    <div className="flex justify-between text-primary">
                       <span>할인 ({appliedDiscount.code})</span>
                       <span>-{formatPrice(appliedDiscount.amount)}원</span>
                     </div>
                   )}
                   {appliedReferral && (
-                    <div className="flex justify-between text-blue-600">
+                    <div className="flex justify-between text-primary">
                       <span>레퍼럴 ({appliedReferral.code})</span>
                       <span>-{formatPrice(appliedReferral.amount)}원</span>
                     </div>
@@ -764,7 +898,7 @@ const Payment = () => {
                   onClick={handlePayment}
                   disabled={isProcessing}
                 >
-                  {isProcessing ? "결제 처리 중..." : `${formatPrice(totalPrice)}원 결제하기`}
+                  {isProcessing ? "처리 중..." : totalPrice === 0 ? "무료 주문하기" : `${formatPrice(totalPrice)}원 결제하기`}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">

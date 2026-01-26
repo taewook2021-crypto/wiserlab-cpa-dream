@@ -251,7 +251,16 @@ const Payment = () => {
           .eq("exam_number", code)
           .maybeSingle();
 
-        if (!freeCodeError && freeCodeData) {
+        console.log("Free code check:", { code, freeCodeData, freeCodeError });
+
+        if (freeCodeError) {
+          console.error("Free code error:", freeCodeError);
+          toast.error("무료 코드 확인 중 오류가 발생했습니다.");
+          setIsCheckingCode(false);
+          return;
+        }
+
+        if (freeCodeData) {
           if (freeCodeData.is_used) {
             toast.error("이미 사용된 무료 코드입니다.");
             setIsCheckingCode(false);
@@ -264,6 +273,11 @@ const Payment = () => {
           });
           setDiscountCode("");
           toast.success("무료 코드가 적용되었습니다! 결제 금액이 0원이 됩니다.");
+          setIsCheckingCode(false);
+          return;
+        } else {
+          // WLP- 접두사인데 코드가 없는 경우
+          toast.error("존재하지 않는 무료 코드입니다.");
           setIsCheckingCode(false);
           return;
         }

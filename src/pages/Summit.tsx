@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,6 @@ import summitGallery1 from "@/assets/summit-gallery-1.png";
 import summitGallery2 from "@/assets/summit-gallery-2.png";
 import summitGallery3 from "@/assets/summit-gallery-3.png";
 import summitGallery4 from "@/assets/summit-gallery-4.png";
-import { useState } from "react";
 import { useScrollAnimation, scrollAnimationClasses } from "@/hooks/useScrollAnimation";
 
 const BUNDLE_PRICE = 50000;
@@ -164,6 +163,52 @@ const Summit = () => {
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
     });
+  }, []);
+
+  // Auto-scroll reviews carousel every 6 seconds
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!reviewsScrollRef.current) return;
+      
+      const container = reviewsScrollRef.current;
+      const cards = container.children;
+      if (cards.length === 0) return;
+      
+      // Calculate next index (loop back to start)
+      const nextIndex = (currentReviewIndex + 1) % REVIEWS.length;
+      setCurrentReviewIndex(nextIndex);
+      
+      // Get the card width including gap
+      const card = cards[0] as HTMLElement;
+      const cardWidth = card.offsetWidth;
+      const gap = 16; // gap-4 = 16px, gap-6 = 24px on md
+      const scrollPosition = nextIndex * (cardWidth + gap);
+      
+      container.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth',
+      });
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [currentReviewIndex]);
+
+  // Reset auto-scroll when user manually scrolls
+  useEffect(() => {
+    const container = reviewsScrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const cardWidth = (container.children[0] as HTMLElement)?.offsetWidth || 0;
+      const gap = 16;
+      const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
+      setCurrentReviewIndex(Math.min(newIndex, REVIEWS.length - 1));
+    };
+
+    container.addEventListener('scrollend', handleScroll);
+    return () => container.removeEventListener('scrollend', handleScroll);
   }, []);
 
 

@@ -78,6 +78,14 @@ const Payment = () => {
   const [isCheckingCode, setIsCheckingCode] = useState(false);
   const [isLoadingAutoDiscount, setIsLoadingAutoDiscount] = useState(true);
 
+  // 레퍼럴 코드 관련 상태
+  const [appliedReferral, setAppliedReferral] = useState<{
+    code: string;
+    amount: number;
+    codeId: string;
+    rewardAmount: number;
+  } | null>(null);
+
   // URL params에서 상품 확인
   const isValidOrder = useMemo(() => {
     const items = searchParams.get("items");
@@ -86,7 +94,9 @@ const Payment = () => {
 
   const shippingFee = 0;
   const discountAmount = appliedDiscount?.amount || 0;
-  const totalPrice = Math.max(0, BUNDLE_PRICE + shippingFee - discountAmount);
+  const referralAmount = appliedReferral?.amount || 0;
+  const totalDiscount = discountAmount + referralAmount;
+  const totalPrice = Math.max(0, BUNDLE_PRICE + shippingFee - totalDiscount);
 
   const formatPrice = (price: number) => {
     return price.toLocaleString("ko-KR");
@@ -212,24 +222,48 @@ const Payment = () => {
     }
   }, [user, loading]);
 
-  // 할인 코드 적용
+  // 할인/레퍼럴 코드 적용 (자동 분류)
   const handleApplyDiscountCode = async () => {
     if (!discountCode.trim()) {
       toast.error("할인 코드를 입력해주세요.");
       return;
     }
 
+    const code = discountCode.trim().toUpperCase();
     setIsCheckingCode(true);
 
     try {
+      // 먼저 레퍼럴 코드인지 확인 (REF-로 시작하거나 referral_codes 테이블에 존재)
+      const { data: referralData, error: referralError } = await supabase
+        .from("referral_codes")
+        .select("*")
+        .eq("code", code)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (!referralError && referralData) {
+        // 레퍼럴 코드인 경우
+        setAppliedReferral({
+          code: referralData.code,
+          amount: referralData.discount_amount,
+          codeId: referralData.id,
+          rewardAmount: referralData.reward_amount,
+        });
+        setDiscountCode("");
+        toast.success(`레퍼럴 코드 적용! ${formatPrice(referralData.discount_amount)}원 할인`);
+        setIsCheckingCode(false);
+        return;
+      }
+
+      // 일반 할인 코드 확인
       const { data, error } = await supabase
         .from("discount_codes")
         .select("*")
-        .eq("code", discountCode.trim().toUpperCase())
+        .eq("code", code)
         .single();
 
       if (error || !data) {
-        toast.error("유효하지 않은 할인 코드입니다.");
+        toast.error("유효하지 않은 코드입니다.");
         setIsCheckingCode(false);
         return;
       }
@@ -251,10 +285,11 @@ const Payment = () => {
         amount: data.discount_amount,
         codeId: data.id,
       });
+      setDiscountCode("");
       toast.success(`${formatPrice(data.discount_amount)}원 할인이 적용되었습니다.`);
     } catch (error) {
-      console.error("Discount code check error:", error);
-      toast.error("할인 코드 확인 중 오류가 발생했습니다.");
+      console.error("Code check error:", error);
+      toast.error("코드 확인 중 오류가 발생했습니다.");
     } finally {
       setIsCheckingCode(false);
     }
@@ -265,6 +300,12 @@ const Payment = () => {
     setAppliedDiscount(null);
     setDiscountCode("");
     toast.success("할인 코드가 제거되었습니다.");
+  };
+
+  // 레퍼럴 코드 제거
+  const handleRemoveReferralCode = () => {
+    setAppliedReferral(null);
+    toast.success("레퍼럴 코드가 제거되었습니다.");
   };
 
   const handlePayment = async () => {
@@ -296,6 +337,14 @@ const Payment = () => {
       const tossPayments = new window.TossPayments(TOSS_CLIENT_KEY);
       const orderId = `ORDER_${Date.now()}_${user?.id?.slice(0, 8)}`;
       
+      // 상품명 생성
+      const discountInfo: string[] = [];
+      if (appliedDiscount) discountInfo.push(`할인: ${appliedDiscount.code}`);
+      if (appliedReferral) discountInfo.push(`레퍼럴: ${appliedReferral.code}`);
+      const productName = discountInfo.length > 0
+        ? `SUMMIT 전과목 PACK (${discountInfo.join(', ')})`
+        : 'SUMMIT 전과목 PACK';
+
       // pending_orders 테이블에 배송 정보 저장 (서버 사이드 처리를 위해)
       const { error: pendingError } = await supabase.from('pending_orders').insert({
         user_id: user!.id,
@@ -306,9 +355,7 @@ const Payment = () => {
         shipping_address: address,
         shipping_detail_address: detailAddress,
         shipping_postal_code: postcode,
-        product_name: appliedDiscount 
-          ? `SUMMIT 전과목 PACK (할인: ${appliedDiscount.code})`
-          : 'SUMMIT 전과목 PACK',
+        product_name: productName,
         amount: totalPrice,
       });
 
@@ -339,12 +386,43 @@ const Payment = () => {
         }
       }
 
+      // 레퍼럴 코드가 적용된 경우 사용 내역 기록 및 usage_count 증가
+      if (appliedReferral) {
+        // 레퍼럴 사용 내역 기록
+        const { error: usageError } = await supabase
+          .from("referral_usages")
+          .insert({
+            referral_code_id: appliedReferral.codeId,
+            order_id: orderId,
+            user_id: user!.id,
+            discount_applied: appliedReferral.amount,
+            reward_amount: appliedReferral.rewardAmount,
+          });
+
+        if (usageError) {
+          console.error('Failed to record referral usage:', usageError);
+          // 레퍼럴 기록 실패해도 결제는 진행 (크리티컬하지 않음)
+        }
+
+        // usage_count 증가 (현재 값 조회 후 업데이트)
+        const { data: currentCode } = await supabase
+          .from("referral_codes")
+          .select("usage_count")
+          .eq("id", appliedReferral.codeId)
+          .single();
+        
+        if (currentCode) {
+          await supabase
+            .from("referral_codes")
+            .update({ usage_count: (currentCode.usage_count || 0) + 1 })
+            .eq("id", appliedReferral.codeId);
+        }
+      }
+
       await tossPayments.requestPayment("카드", {
         amount: totalPrice,
         orderId,
-        orderName: appliedDiscount 
-          ? `SUMMIT 전과목 PACK (할인 적용)`
-          : "SUMMIT 전과목 PACK",
+        orderName: totalDiscount > 0 ? `SUMMIT 전과목 PACK (할인 적용)` : "SUMMIT 전과목 PACK",
         customerName: buyerName,
         successUrl: `${window.location.origin}/payment/success`,
         failUrl: `${window.location.origin}/payment/fail`,
@@ -467,6 +545,34 @@ const Payment = () => {
                     </Button>
                   </div>
                 )}
+
+                {/* 레퍼럴 코드 표시 */}
+                {appliedReferral && (
+                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <p className="font-medium text-blue-700 dark:text-blue-300">
+                          {appliedReferral.code}
+                          <span className="ml-2 text-xs bg-blue-200 dark:bg-blue-800 px-2 py-0.5 rounded">
+                            레퍼럴
+                          </span>
+                        </p>
+                        <p className="text-sm text-blue-600 dark:text-blue-400">
+                          {formatPrice(appliedReferral.amount)}원 할인 적용됨
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemoveReferralCode}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </section>
 
               <Separator />
@@ -577,6 +683,12 @@ const Payment = () => {
                     <div className="flex justify-between text-green-600">
                       <span>할인 ({appliedDiscount.code})</span>
                       <span>-{formatPrice(appliedDiscount.amount)}원</span>
+                    </div>
+                  )}
+                  {appliedReferral && (
+                    <div className="flex justify-between text-blue-600">
+                      <span>레퍼럴 ({appliedReferral.code})</span>
+                      <span>-{formatPrice(appliedReferral.amount)}원</span>
                     </div>
                   )}
                 </div>

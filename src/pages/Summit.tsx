@@ -789,7 +789,11 @@ const Summit = () => {
 
       {/* Review Detail Dialog */}
       <Dialog open={!!selectedReview} onOpenChange={() => setSelectedReview(null)}>
-        <DialogContent className="max-w-md p-0 gap-0 overflow-hidden border border-border/50 !rounded-2xl md:!rounded-3xl shadow-sm bg-white">
+        <DialogContent 
+          className="max-w-md p-0 gap-0 overflow-hidden border border-border/50 shadow-sm bg-white rounded-2xl md:rounded-3xl [&]:rounded-2xl md:[&]:rounded-3xl"
+          aria-describedby={undefined}
+        >
+          <DialogTitle className="sr-only">실제 응시자 후기</DialogTitle>
           {selectedReview?.hasDetail && selectedReview.detail && (
             <div className="p-8 sm:p-10 space-y-6">
               {/* Header */}

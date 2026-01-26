@@ -767,55 +767,39 @@ const Summit = () => {
 
       </main>
 
-      {/* Review Detail Dialog - Apple-inspired design */}
+      {/* Review Detail Dialog */}
       <Dialog open={!!selectedReview} onOpenChange={() => setSelectedReview(null)}>
-        <DialogContent className="max-w-md p-0 gap-0 overflow-hidden border-0 shadow-2xl">
-          {/* Header */}
-          <div className="bg-foreground text-background px-8 py-6">
-            <div className="flex items-center gap-3 mb-1">
-              <GraduationCap className="w-5 h-5 opacity-80" />
-              <span className="text-sm font-medium opacity-80">실제 응시자 후기</span>
-            </div>
-            <h3 className="text-2xl font-semibold tracking-tight">
-              {selectedReview?.hasDetail && selectedReview.detail?.school} / {selectedReview?.hasDetail && selectedReview.detail?.status}
-            </h3>
-          </div>
-          
-          {/* Content */}
+        <DialogContent className="max-w-md p-0 gap-0 overflow-hidden border-0 rounded-3xl shadow-2xl bg-white">
           {selectedReview?.hasDetail && selectedReview.detail && (
-            <div className="px-8 py-8 space-y-6 bg-background">
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">체감 난이도</p>
-                  <p className="text-lg font-medium">{selectedReview.detail.difficulty}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">실제 1차 대비 유사도</p>
-                  <p className="text-lg font-medium">{selectedReview.detail.similarity} / 5</p>
-                </div>
+            <div className="p-8 sm:p-10 space-y-6">
+              {/* Header */}
+              <div className="flex items-center gap-3">
+                <GraduationCap className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">실제 응시자 후기</span>
               </div>
               
-              {/* Divider */}
-              <div className="h-px bg-border" />
-              
-              {/* Pros Section */}
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">좋았던 점</p>
-                <p className="text-base leading-relaxed text-foreground">
+              {/* Full Review Content */}
+              <div className="space-y-5 text-[#1d1d1f]">
+                <p className="leading-[1.8] tracking-tight">
+                  <span className="text-muted-foreground">① 응시 학교 / 수험 상태 : </span>
+                  {selectedReview.detail.school} / {selectedReview.detail.status}
+                </p>
+                <p className="leading-[1.8] tracking-tight">
+                  <span className="text-muted-foreground">② 체감 난이도 (쉬움/적당/어려움) : </span>
+                  {selectedReview.detail.difficulty}
+                </p>
+                <p className="leading-[1.8] tracking-tight">
+                  <span className="text-muted-foreground">③ 실제 1차 대비 유사도 (1~5) : </span>
+                  {selectedReview.detail.similarity}
+                </p>
+                <p className="leading-[1.8] tracking-tight">
+                  <span className="text-muted-foreground">④ 좋았던 점 1가지 : </span>
                   {selectedReview.detail.pros}
                 </p>
-              </div>
-              
-              {/* Divider */}
-              <div className="h-px bg-border" />
-              
-              {/* Reapply */}
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">다음 회차 재응시 의향</p>
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-foreground text-background text-sm font-medium">
+                <p className="leading-[1.8] tracking-tight">
+                  <span className="text-muted-foreground">⑤ 다음 회차 재응시 의향 (있음/없음) : </span>
                   {selectedReview.detail.reapply}
-                </span>
+                </p>
               </div>
             </div>
           )}

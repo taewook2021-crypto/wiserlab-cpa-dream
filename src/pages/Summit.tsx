@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, ChevronLeft, ChevronRight, GraduationCap } from "lucide-react";
 import summitFeature from "@/assets/summit-front.png";
 import summitCover from "@/assets/summit-cover-mockup.png";
 import summitFinancial from "@/assets/summit-financial.png";
@@ -79,6 +79,34 @@ const GALLERY_ITEMS = [
   },
 ] as const;
 
+// Reviews data
+const REVIEWS = [
+  {
+    university: "서울대학교",
+    content: "실제 시험과 동일한 난이도와 형식이라 실전 감각을 익히는 데 큰 도움이 됐습니다.",
+  },
+  {
+    university: "연세대학교",
+    content: "서울대, 연세대 데이터 기반 분석 덕분에 내 위치를 정확히 파악할 수 있었어요.",
+  },
+  {
+    university: "서울대학교",
+    content: "해설이 정말 상세해서 틀린 문제도 완벽하게 이해할 수 있었습니다.",
+  },
+  {
+    university: "연세대학교",
+    content: "안정권/경합권 분석이 남은 기간 공부 방향 잡는 데 결정적이었어요.",
+  },
+  {
+    university: "서울대학교",
+    content: "기출의 결을 그대로 가져왔다는 말이 정말 맞았어요. 실전 그 자체입니다.",
+  },
+  {
+    university: "연세대학교",
+    content: "모의고사 퀄리티가 다른 곳과 비교가 안 됩니다. 강력 추천합니다.",
+  },
+] as const;
+
 const PRODUCT_SECTIONS = [
   {
     subject: "SUMMIT 재무회계",
@@ -108,10 +136,12 @@ const Summit = () => {
   const navigate = useNavigate();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const galleryRef = useRef<HTMLDivElement>(null);
+  const reviewsScrollRef = useRef<HTMLDivElement>(null);
 
   // Scroll animations for each section
   const heroAnim = useScrollAnimation({ threshold: 0.1 });
   const featuresAnim = useScrollAnimation({ threshold: 0.1 });
+  const reviewsAnim = useScrollAnimation({ threshold: 0.1 });
   const financialAnim = useScrollAnimation({ threshold: 0.1 });
   const galleryAnim = useScrollAnimation({ threshold: 0.1 });
   const taxAnim = useScrollAnimation({ threshold: 0.1 });
@@ -122,6 +152,15 @@ const Summit = () => {
     if (!galleryRef.current) return;
     const scrollAmount = galleryRef.current.clientWidth * 0.8;
     galleryRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  }, []);
+
+  const scrollReviews = useCallback((direction: 'left' | 'right') => {
+    if (!reviewsScrollRef.current) return;
+    const scrollAmount = reviewsScrollRef.current.clientWidth * 0.8;
+    reviewsScrollRef.current.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
     });
@@ -309,6 +348,72 @@ const Summit = () => {
                     </p>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Reviews Section */}
+        <section className="py-20 sm:py-28 md:py-36 bg-muted/20 overflow-hidden">
+          <div 
+            ref={reviewsAnim.ref}
+            className={`${scrollAnimationClasses.transition} ${reviewsAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
+          >
+            {/* Section Header */}
+            <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-center">
+                <span className="font-bold">실제 응시자</span>들의 후기
+              </h2>
+            </div>
+
+            {/* Reviews Carousel */}
+            <div className="relative">
+              <div
+                ref={reviewsScrollRef}
+                className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6 md:px-12 lg:px-20 pb-4"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                }}
+              >
+                {REVIEWS.map((review, index) => (
+                  <div
+                    key={index}
+                    className="flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[35vw] xl:w-[30vw] snap-center"
+                  >
+                    <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm border border-border/50 h-full flex flex-col">
+                      {/* University Badge */}
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full mb-4 w-fit">
+                        <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {review.university}
+                        </span>
+                      </div>
+                      {/* Review Content */}
+                      <p className="text-base md:text-lg text-foreground leading-relaxed flex-1">
+                        "{review.content}"
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="hidden md:flex justify-end gap-3 mt-6 px-6 md:px-12 lg:px-20">
+                <button
+                  onClick={() => scrollReviews('left')}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
+                  aria-label="이전 후기"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scrollReviews('right')}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
+                  aria-label="다음 후기"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
             </div>
           </div>

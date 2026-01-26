@@ -414,7 +414,7 @@ const Summit = () => {
           >
             {/* Section Header */}
             <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-12 md:mb-20">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-center flex flex-col gap-1 md:gap-2">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-center flex flex-col gap-0.5 md:gap-1">
                 <span><span className="font-bold">진짜</span>는 모두가 알아보는 법.</span>
                 <span><span className="font-bold">실제 구매자</span>들의 후기를 만나 보세요.</span>
               </h2>

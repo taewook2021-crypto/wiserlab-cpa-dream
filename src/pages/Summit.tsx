@@ -176,7 +176,7 @@ const Summit = () => {
       const cards = container.children;
       if (cards.length === 0) return;
       
-      // Calculate next index (loop back to start)
+      // Calculate next index (loop back to start when reaching the end)
       const nextIndex = (currentReviewIndex + 1) % REVIEWS.length;
       setCurrentReviewIndex(nextIndex);
       
@@ -184,12 +184,20 @@ const Summit = () => {
       const card = cards[0] as HTMLElement;
       const cardWidth = card.offsetWidth;
       const gap = 16; // gap-4 = 16px, gap-6 = 24px on md
-      const scrollPosition = nextIndex * (cardWidth + gap);
       
-      container.scrollTo({
-        left: scrollPosition,
-        behavior: 'smooth',
-      });
+      // If looping back to start, scroll to beginning
+      if (nextIndex === 0) {
+        container.scrollTo({
+          left: 0,
+          behavior: 'smooth',
+        });
+      } else {
+        const scrollPosition = nextIndex * (cardWidth + gap);
+        container.scrollTo({
+          left: scrollPosition,
+          behavior: 'smooth',
+        });
+      }
     }, 6000);
 
     return () => clearInterval(interval);
@@ -407,7 +415,8 @@ const Summit = () => {
             {/* Section Header */}
             <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-center">
-                <span className="font-bold">실제 응시자</span>들의 후기
+                <span className="font-bold">진짜</span>는 모두가 알아보는 법.<br className="sm:hidden" />{" "}
+                <span className="font-bold">실제 구매자</span>들의 후기를 만나 보세요.
               </h2>
             </div>
 

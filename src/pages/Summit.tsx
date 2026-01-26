@@ -789,7 +789,7 @@ const Summit = () => {
 
       {/* Review Detail Dialog */}
       <Dialog open={!!selectedReview} onOpenChange={() => setSelectedReview(null)}>
-        <DialogContent className="max-w-md p-0 gap-0 overflow-hidden border-0 rounded-3xl shadow-2xl bg-white">
+        <DialogContent className="max-w-md p-0 gap-0 overflow-hidden border border-border/50 !rounded-2xl md:!rounded-3xl shadow-sm bg-white">
           {selectedReview?.hasDetail && selectedReview.detail && (
             <div className="p-8 sm:p-10 space-y-6">
               {/* Header */}

@@ -407,14 +407,14 @@ const Summit = () => {
         </section>
 
         {/* Reviews Section */}
-        <section className="py-20 sm:py-28 md:py-36 bg-muted/20 overflow-hidden">
+        <section className="py-28 sm:py-36 md:py-44 bg-muted/20 overflow-hidden">
           <div 
             ref={reviewsAnim.ref}
             className={`${scrollAnimationClasses.transition} ${reviewsAnim.isVisible ? scrollAnimationClasses.visible : scrollAnimationClasses.hidden}`}
           >
             {/* Section Header */}
-            <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-10 md:mb-16">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-center">
+            <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-12 md:mb-20">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-center leading-relaxed md:leading-relaxed">
                 <span className="font-bold">진짜</span>는 모두가 알아보는 법.<br />
                 <span className="font-bold">실제 구매자</span>들의 후기를 만나 보세요.
               </h2>

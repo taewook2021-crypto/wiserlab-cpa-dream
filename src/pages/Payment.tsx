@@ -79,12 +79,14 @@ const Payment = () => {
   const [isLoadingAutoDiscount, setIsLoadingAutoDiscount] = useState(true);
 
   // 레퍼럴 코드 관련 상태
+  const [referralCode, setReferralCode] = useState("");
   const [appliedReferral, setAppliedReferral] = useState<{
     code: string;
     amount: number;
     codeId: string;
     rewardAmount: number;
   } | null>(null);
+  const [isCheckingReferral, setIsCheckingReferral] = useState(false);
 
   // URL params에서 상품 확인
   const isValidOrder = useMemo(() => {
@@ -222,7 +224,7 @@ const Payment = () => {
     }
   }, [user, loading]);
 
-  // 할인/레퍼럴 코드 적용 (자동 분류)
+  // 할인 코드 적용
   const handleApplyDiscountCode = async () => {
     if (!discountCode.trim()) {
       toast.error("할인 코드를 입력해주세요.");
@@ -233,29 +235,6 @@ const Payment = () => {
     setIsCheckingCode(true);
 
     try {
-      // 먼저 레퍼럴 코드인지 확인 (REF-로 시작하거나 referral_codes 테이블에 존재)
-      const { data: referralData, error: referralError } = await supabase
-        .from("referral_codes")
-        .select("*")
-        .eq("code", code)
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (!referralError && referralData) {
-        // 레퍼럴 코드인 경우
-        setAppliedReferral({
-          code: referralData.code,
-          amount: referralData.discount_amount,
-          codeId: referralData.id,
-          rewardAmount: referralData.reward_amount,
-        });
-        setDiscountCode("");
-        toast.success(`레퍼럴 코드 적용! ${formatPrice(referralData.discount_amount)}원 할인`);
-        setIsCheckingCode(false);
-        return;
-      }
-
-      // 일반 할인 코드 확인
       const { data, error } = await supabase
         .from("discount_codes")
         .select("*")
@@ -263,7 +242,7 @@ const Payment = () => {
         .single();
 
       if (error || !data) {
-        toast.error("유효하지 않은 코드입니다.");
+        toast.error("유효하지 않은 할인 코드입니다.");
         setIsCheckingCode(false);
         return;
       }
@@ -288,10 +267,50 @@ const Payment = () => {
       setDiscountCode("");
       toast.success(`${formatPrice(data.discount_amount)}원 할인이 적용되었습니다.`);
     } catch (error) {
-      console.error("Code check error:", error);
-      toast.error("코드 확인 중 오류가 발생했습니다.");
+      console.error("Discount code check error:", error);
+      toast.error("할인 코드 확인 중 오류가 발생했습니다.");
     } finally {
       setIsCheckingCode(false);
+    }
+  };
+
+  // 레퍼럴 코드 적용
+  const handleApplyReferralCode = async () => {
+    if (!referralCode.trim()) {
+      toast.error("레퍼럴 코드를 입력해주세요.");
+      return;
+    }
+
+    const code = referralCode.trim().toUpperCase();
+    setIsCheckingReferral(true);
+
+    try {
+      const { data: referralData, error: referralError } = await supabase
+        .from("referral_codes")
+        .select("*")
+        .eq("code", code)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (referralError || !referralData) {
+        toast.error("유효하지 않은 레퍼럴 코드입니다.");
+        setIsCheckingReferral(false);
+        return;
+      }
+
+      setAppliedReferral({
+        code: referralData.code,
+        amount: referralData.discount_amount,
+        codeId: referralData.id,
+        rewardAmount: referralData.reward_amount,
+      });
+      setReferralCode("");
+      toast.success(`레퍼럴 코드 적용! ${formatPrice(referralData.discount_amount)}원 할인`);
+    } catch (error) {
+      console.error("Referral code check error:", error);
+      toast.error("레퍼럴 코드 확인 중 오류가 발생했습니다.");
+    } finally {
+      setIsCheckingReferral(false);
     }
   };
 
@@ -305,6 +324,7 @@ const Payment = () => {
   // 레퍼럴 코드 제거
   const handleRemoveReferralCode = () => {
     setAppliedReferral(null);
+    setReferralCode("");
     toast.success("레퍼럴 코드가 제거되었습니다.");
   };
 
@@ -495,82 +515,119 @@ const Payment = () => {
               <section className="space-y-4">
                 <h2 className="text-lg font-medium flex items-center gap-2">
                   <Tag className="w-5 h-5" />
-                  할인 코드
+                  할인 / 레퍼럴 코드
                 </h2>
+                
                 {isLoadingAutoDiscount ? (
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <p className="text-sm text-muted-foreground animate-pulse">할인 코드 확인 중...</p>
                   </div>
-                ) : appliedDiscount ? (
-                  <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-green-600" />
-                      <div>
-                        <p className="font-medium text-green-700 dark:text-green-300">
-                          {appliedDiscount.code}
-                          {appliedDiscount.isAutoApplied && (
-                            <span className="ml-2 text-xs bg-green-200 dark:bg-green-800 px-2 py-0.5 rounded">
-                              자동 적용
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-sm text-green-600 dark:text-green-400">
-                          {formatPrice(appliedDiscount.amount)}원 할인 적용됨
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleRemoveDiscountCode}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
                 ) : (
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="할인 코드를 입력하세요"
-                      value={discountCode}
-                      onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
-                      className="flex-1"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={handleApplyDiscountCode}
-                      disabled={isCheckingCode}
-                    >
-                      {isCheckingCode ? "확인 중..." : "적용"}
-                    </Button>
-                  </div>
-                )}
+                  <div className="space-y-4">
+                    {/* 할인 코드 섹션 */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">할인 코드</Label>
+                      {appliedDiscount ? (
+                        <div className="p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Check className="w-4 h-4 text-green-600" />
+                            <div>
+                              <p className="font-medium text-green-700 dark:text-green-300 text-sm">
+                                {appliedDiscount.code}
+                                {appliedDiscount.isAutoApplied && (
+                                  <span className="ml-2 text-xs bg-green-200 dark:bg-green-800 px-2 py-0.5 rounded">
+                                    자동 적용
+                                  </span>
+                                )}
+                              </p>
+                              <p className="text-xs text-green-600 dark:text-green-400">
+                                {formatPrice(appliedDiscount.amount)}원 할인
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleRemoveDiscountCode}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="할인 코드를 입력하세요 (예: DISC-XXXXXX)"
+                            value={discountCode}
+                            onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                            className="flex-1"
+                          />
+                          <Button
+                            variant="outline"
+                            onClick={handleApplyDiscountCode}
+                            disabled={isCheckingCode}
+                          >
+                            {isCheckingCode ? "확인 중..." : "적용"}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
 
-                {/* 레퍼럴 코드 표시 */}
-                {appliedReferral && (
-                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <p className="font-medium text-blue-700 dark:text-blue-300">
-                          {appliedReferral.code}
-                          <span className="ml-2 text-xs bg-blue-200 dark:bg-blue-800 px-2 py-0.5 rounded">
-                            레퍼럴
-                          </span>
-                        </p>
-                        <p className="text-sm text-blue-600 dark:text-blue-400">
-                          {formatPrice(appliedReferral.amount)}원 할인 적용됨
+                    {/* 레퍼럴 코드 섹션 */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">레퍼럴 코드 (추천인)</Label>
+                      {appliedReferral ? (
+                        <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Check className="w-4 h-4 text-blue-600" />
+                            <div>
+                              <p className="font-medium text-blue-700 dark:text-blue-300 text-sm">
+                                {appliedReferral.code}
+                                <span className="ml-2 text-xs bg-blue-200 dark:bg-blue-800 px-2 py-0.5 rounded">
+                                  레퍼럴
+                                </span>
+                              </p>
+                              <p className="text-xs text-blue-600 dark:text-blue-400">
+                                {formatPrice(appliedReferral.amount)}원 할인
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleRemoveReferralCode}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="레퍼럴 코드를 입력하세요 (예: REF-XXXXXX)"
+                            value={referralCode}
+                            onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                            className="flex-1"
+                          />
+                          <Button
+                            variant="outline"
+                            onClick={handleApplyReferralCode}
+                            disabled={isCheckingReferral}
+                          >
+                            {isCheckingReferral ? "확인 중..." : "적용"}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 중복 할인 안내 */}
+                    {(appliedDiscount || appliedReferral) && (
+                      <div className="p-3 bg-muted/50 rounded-lg">
+                        <p className="text-xs text-muted-foreground">
+                          💡 할인 코드와 레퍼럴 코드는 중복 적용이 가능합니다.
                         </p>
                       </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleRemoveReferralCode}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+                    )}
                   </div>
                 )}
               </section>

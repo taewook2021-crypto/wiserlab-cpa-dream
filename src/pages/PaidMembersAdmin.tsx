@@ -14,9 +14,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Download, RefreshCw, Search, Truck } from "lucide-react";
+import * as XLSX from "xlsx";
 
 interface PaidMember {
   id: string;
@@ -43,6 +45,7 @@ const PaidMembersAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<PaidMember[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // Check admin role
   useEffect(() => {
@@ -153,42 +156,61 @@ const PaidMembersAdmin = () => {
     link.click();
   };
 
-  // 물류택배 양식 다운로드
-  const handleDownloadShippingCSV = () => {
-    if (filteredMembers.length === 0) {
-      alert("다운로드할 구매자가 없습니다.");
+  // 선택 핸들러
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(filteredMembers.map((m) => m.id));
+      setSelectedIds(allIds);
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    const newSet = new Set(selectedIds);
+    if (checked) {
+      newSet.add(id);
+    } else {
+      newSet.delete(id);
+    }
+    setSelectedIds(newSet);
+  };
+
+  // 물류택배 양식 Excel 다운로드 (선택된 항목만)
+  const handleDownloadShippingExcel = () => {
+    const selectedMembers = filteredMembers.filter((m) => selectedIds.has(m.id));
+    
+    if (selectedMembers.length === 0) {
+      alert("선택된 구매자가 없습니다.");
       return;
     }
 
-
-    const headers = ["상호", "핸드폰번호", "핸드폰번호", "주소", "내품수량", "배송메세지1", "박스타입", "박스수량"];
-    const rows = filteredMembers.map((m) => {
-      const fullAddress = m.shipping_detail_address 
-        ? `${m.shipping_address} ${m.shipping_detail_address}` 
+    const data = selectedMembers.map((m) => {
+      const fullAddress = m.shipping_detail_address
+        ? `${m.shipping_address} ${m.shipping_detail_address}`
         : m.shipping_address;
-      
-      return [
-        m.buyer_name,
-        m.buyer_phone,
-        m.buyer_phone,
-        fullAddress,
-        "1",
-        "",
-        "극소",
-        "1",
-      ];
+
+      return {
+        상호: m.buyer_name,
+        핸드폰번호: m.buyer_phone,
+        핸드폰번호2: m.buyer_phone,
+        주소: fullAddress,
+        내품수량: "1",
+        배송메세지1: "",
+        박스타입: "극소",
+        박스수량: "1",
+      };
     });
 
-    const csvContent = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
-      .join("\n");
-
-    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `shipping_list_${new Date().toISOString().split("T")[0]}.csv`;
-    link.click();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "배송명단");
+    XLSX.writeFile(workbook, `shipping_list_${new Date().toISOString().split("T")[0]}.xlsx`);
   };
+
+  const isAllSelected = filteredMembers.length > 0 && filteredMembers.every((m) => selectedIds.has(m.id));
+  const isSomeSelected = filteredMembers.some((m) => selectedIds.has(m.id));
+  const selectedCount = filteredMembers.filter((m) => selectedIds.has(m.id)).length;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ko-KR", {
@@ -280,9 +302,12 @@ const PaidMembersAdmin = () => {
                     <Download className="h-4 w-4 mr-2" />
                     전체 CSV
                   </Button>
-                  <Button onClick={handleDownloadShippingCSV}>
+                  <Button 
+                    onClick={handleDownloadShippingExcel}
+                    disabled={selectedCount === 0}
+                  >
                     <Truck className="h-4 w-4 mr-2" />
-                    물류택배 양식 ({realPurchasers}명)
+                    물류택배 양식 ({selectedCount}명 선택)
                   </Button>
                 </div>
               </div>
@@ -292,6 +317,14 @@ const PaidMembersAdmin = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-[50px]">
+                        <Checkbox
+                          checked={isAllSelected}
+                          onCheckedChange={(checked) => handleSelectAll(checked === true)}
+                          aria-label="전체 선택"
+                          className={isSomeSelected && !isAllSelected ? "data-[state=checked]:bg-primary/50" : ""}
+                        />
+                      </TableHead>
                       <TableHead>수험번호</TableHead>
                       <TableHead>구매자</TableHead>
                       <TableHead>이메일</TableHead>
@@ -304,13 +337,20 @@ const PaidMembersAdmin = () => {
                   <TableBody>
                     {filteredMembers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                           유료 회원이 없습니다
                         </TableCell>
                       </TableRow>
                     ) : (
                       filteredMembers.map((member) => (
-                        <TableRow key={member.id}>
+                        <TableRow key={member.id} data-state={selectedIds.has(member.id) ? "selected" : undefined}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedIds.has(member.id)}
+                              onCheckedChange={(checked) => handleSelectOne(member.id, checked === true)}
+                              aria-label={`${member.buyer_name} 선택`}
+                            />
+                          </TableCell>
                           <TableCell className="font-mono text-sm">
                             {member.exam_number || "-"}
                           </TableCell>

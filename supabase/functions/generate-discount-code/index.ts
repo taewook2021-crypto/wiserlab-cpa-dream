@@ -83,7 +83,7 @@ const handler = async (req: Request): Promise<Response> => {
       .from("discount_codes")
       .insert({
         code: discountCode,
-        discount_amount: 10000,
+        discount_amount: 25000,
         batch_name: batch_name,
         assigned_email: kakao_email,
       });
@@ -134,7 +134,7 @@ SUMMIT 모의고사 구매에 사용할 수 있는 할인 코드가 발급되었
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 할인 코드: ${discountCode}
-할인 금액: 10,000원
+할인 금액: 25,000원
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -191,7 +191,7 @@ SUMMIT 구매하기: https://wiserlab.co.kr/summit
                 ${discountCode}
               </div>
               <div style="font-size: 16px; color: #000000; font-weight: 300;">
-                10,000원 할인
+                25,000원 할인
               </div>
             </td>
           </tr>

@@ -53,7 +53,7 @@ const DiscountCodesAdmin = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [batchName, setBatchName] = useState("");
   const [codeCount, setCodeCount] = useState(10);
-  const [discountAmount, setDiscountAmount] = useState(10000);
+  const [discountAmount, setDiscountAmount] = useState(25000);
   const [isCreating, setIsCreating] = useState(false);
 
   // 이메일 기반 생성 다이얼로그
@@ -223,7 +223,7 @@ const DiscountCodesAdmin = () => {
     try {
       const newCodes = emails.map((email) => ({
         code: generateCode(),
-        discount_amount: 10000,
+        discount_amount: 25000,
         batch_name: emailBatchName.trim(),
         assigned_email: email,
       }));
@@ -485,7 +485,7 @@ const DiscountCodesAdmin = () => {
                 min={1000}
                 step={1000}
                 value={discountAmount}
-                onChange={(e) => setDiscountAmount(parseInt(e.target.value) || 10000)}
+                onChange={(e) => setDiscountAmount(parseInt(e.target.value) || 25000)}
               />
             </div>
           </div>
